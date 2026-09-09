@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class HotelImage extends Model
+{
+    protected $fillable = [
+        'hotel_id',
+        'image_path',
+        'alt_text',
+        'is_banner',
+        'sort_order',
+    ];
+
+    protected $casts = [
+        'is_banner' => 'boolean',
+        'sort_order' => 'integer',
+    ];
+
+    public function hotel()
+    {
+        return $this->belongsTo(\App\Models\Hotel::class);
+    }
+
+    public function getImageUrlAttribute()
+    {
+        if (str_starts_with((string) $this->image_path, 'http')) {
+            return $this->image_path;
+        }
+
+        return asset('storage/' . $this->image_path);
+    }
+
+    public function scopeBanner($query)
+    {
+        return $query->where('is_banner', true);
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('id');
+    }
+}
