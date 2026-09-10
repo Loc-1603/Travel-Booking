@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Webhooks: handled by yared/laravel-smart-stripe at api/webhooks/stripe
+| VNPay IPN: server-to-server callback (no auth, checksum verified).
+| Frontend return page is separate (VNPAY_RETURN_URL, no trust for confirmation).
 |--------------------------------------------------------------------------
 */
+Route::get('/v1/payments/vnpay-ipn', [\App\Http\Controllers\Api\V1\VnpayIpnController::class, '__invoke'])->name('api.v1.payments.vnpay-ipn');
 
 /*
 |--------------------------------------------------------------------------
