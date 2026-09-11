@@ -1,0 +1,214 @@
+@extends('admin.layouts.app')
+
+@section('content')
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">{{ __('admin.vendor.website_settings.title') }}</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">{{ __('admin.vendor.website_settings.general') }}</h4>
+            </div>
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0 ps-3">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form action="{{ route('admin.website-settings.update') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_name" class="form-label">{{ __('admin.vendor.website_settings.site_name') }} <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="site_name" name="site_name" value="{{ old('site_name', $settings['site_name']) }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_email" class="form-label">{{ __('admin.vendor.website_settings.contact_email') }}</label>
+                                <input type="email" class="form-control" id="site_email" name="site_email" value="{{ old('site_email', $settings['site_email']) }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="site_description" class="form-label">{{ __('admin.vendor.website_settings.site_description') }}</label>
+                        <textarea class="form-control" id="site_description" name="site_description" rows="3">{{ old('site_description', $settings['site_description']) }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_phone" class="form-label">{{ __('admin.vendor.website_settings.contact_phone') }}</label>
+                                <input type="text" class="form-control" id="site_phone" name="site_phone" value="{{ old('site_phone', $settings['site_phone']) }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_address" class="form-label">{{ __('admin.vendor.website_settings.address') }}</label>
+                                <input type="text" class="form-control" id="site_address" name="site_address" value="{{ old('site_address', $settings['site_address']) }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">{{ __('admin.vendor.website_settings.brand_assets') }}</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_logo" class="form-label">{{ __('admin.vendor.website_settings.site_logo') }}</label>
+                                <input type="file" class="form-control" id="site_logo" name="site_logo" accept="image/*">
+                                @if($settings['site_logo'])
+                                    <div class="mt-2">
+                                        <img src="{{ asset('storage/' . $settings['site_logo']) }}" alt="Logo" style="max-height: 60px;" class="img-thumbnail">
+                                        {{-- Nested <form> is invalid HTML and closes the outer form early, breaking Save. Use a sibling form + button. --}}
+                                        <button type="button" class="btn btn-sm btn-danger ms-2"
+                                            onclick="if (confirm('{{ __('admin.vendor.website_settings.confirm_remove_logo') }}')) document.getElementById('website-settings-remove-logo-form').submit();">
+                                            {{ __('admin.vendor.website_settings.remove') }}
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="site_favicon" class="form-label">{{ __('admin.vendor.website_settings.site_favicon') }}</label>
+                                <input type="file" class="form-control" id="site_favicon" name="site_favicon" accept="image/*">
+                                @if($settings['site_favicon'])
+                                    <div class="mt-2">
+                                        <img src="{{ asset('storage/' . $settings['site_favicon']) }}" alt="Favicon" style="max-height: 32px;" class="img-thumbnail">
+                                        <button type="button" class="btn btn-sm btn-danger ms-2"
+                                            onclick="if (confirm('{{ __('admin.vendor.website_settings.confirm_remove_favicon') }}')) document.getElementById('website-settings-remove-favicon-form').submit();">
+                                            {{ __('admin.vendor.website_settings.remove') }}
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">{{ __('admin.vendor.website_settings.social_media') }}</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="social_facebook" class="form-label">{{ __('admin.vendor.website_settings.facebook_url') }}</label>
+                                <input type="url" class="form-control" id="social_facebook" name="social_facebook" value="{{ old('social_facebook', $settings['social_facebook']) }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="social_twitter" class="form-label">{{ __('admin.vendor.website_settings.twitter_url') }}</label>
+                                <input type="url" class="form-control" id="social_twitter" name="social_twitter" value="{{ old('social_twitter', $settings['social_twitter']) }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="social_instagram" class="form-label">{{ __('admin.vendor.website_settings.instagram_url') }}</label>
+                                <input type="url" class="form-control" id="social_instagram" name="social_instagram" value="{{ old('social_instagram', $settings['social_instagram']) }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="social_linkedin" class="form-label">{{ __('admin.vendor.website_settings.linkedin_url') }}</label>
+                                <input type="url" class="form-control" id="social_linkedin" name="social_linkedin" value="{{ old('social_linkedin', $settings['social_linkedin']) }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">{{ __('admin.vendor.website_settings.seo') }}</h3>
+                    
+                    <div class="mb-3">
+                        <label for="meta_title" class="form-label">{{ __('admin.vendor.website_settings.meta_title') }}</label>
+                        <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ old('meta_title', $settings['meta_title']) }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="meta_description" class="form-label">{{ __('admin.vendor.website_settings.meta_description') }}</label>
+                        <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ old('meta_description', $settings['meta_description']) }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="meta_keywords" class="form-label">{{ __('admin.vendor.website_settings.meta_keywords') }}</label>
+                        <input type="text" class="form-control" id="meta_keywords" name="meta_keywords" value="{{ old('meta_keywords', $settings['meta_keywords']) }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="google_analytics" class="form-label">{{ __('admin.vendor.website_settings.google_analytics') }}</label>
+                        <textarea class="form-control" id="google_analytics" name="google_analytics" rows="3" placeholder="{{ __('admin.vendor.website_settings.google_analytics_placeholder') }}">{{ old('google_analytics', $settings['google_analytics']) }}</textarea>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">{{ __('admin.vendor.website_settings.maintenance_mode') }}</h3>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            {{-- Unchecked checkboxes are not submitted; hidden ensures maintenance_mode is always present for validation. --}}
+                            <input type="hidden" name="maintenance_mode" value="0">
+                            <input class="form-check-input" type="checkbox" id="maintenance_mode" name="maintenance_mode" value="1" {{ old('maintenance_mode', $settings['maintenance_mode'] == '1' ? '1' : '0') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="maintenance_mode">
+                                {{ __('admin.vendor.website_settings.enable_maintenance') }}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="maintenance_message" class="form-label">{{ __('admin.vendor.website_settings.maintenance_message') }}</label>
+                        <textarea class="form-control" id="maintenance_message" name="maintenance_message" rows="2">{{ old('maintenance_message', $settings['maintenance_message']) }}</textarea>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="mdi mdi-content-save me-1"></i> {{ __('admin.vendor.website_settings.save_settings') }}
+                        </button>
+                    </div>
+                </form>
+
+                @if($settings['site_logo'])
+                    <form id="website-settings-remove-logo-form" action="{{ route('admin.website-settings.remove-logo') }}" method="POST" class="d-none" aria-hidden="true">
+                        @csrf
+                        @method('DELETE')
+                    </form>
+                @endif
+                @if($settings['site_favicon'])
+                    <form id="website-settings-remove-favicon-form" action="{{ route('admin.website-settings.remove-favicon') }}" method="POST" class="d-none" aria-hidden="true">
+                        @csrf
+                        @method('DELETE')
+                    </form>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
