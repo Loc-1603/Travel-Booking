@@ -1,0 +1,960 @@
+{
+  "common": {
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "clearFilters": "Clear filters",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saveChanges": "Save changes",
+    "edit": "Edit",
+    "delete": "Delete",
+    "remove": "Remove",
+    "update": "Update",
+    "create": "Create",
+    "add": "Add",
+    "view": "View",
+    "details": "Details",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "close": "Close",
+    "open": "Open",
+    "submit": "Submit",
+    "reset": "Reset",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "select": "Select",
+    "choose": "Choose",
+    "optional": "Optional",
+    "required": "Required",
+    "all": "All",
+    "none": "None",
+    "guest": "Guest",
+    "guests": "Guests",
+    "night": "Night",
+    "nights": "Nights",
+    "price": "Price",
+    "rating": "Rating",
+    "reviews": "Reviews",
+    "amenities": "Amenities",
+    "location": "Location",
+    "map": "Map",
+    "list": "List",
+    "grid": "Grid",
+    "sortBy": "Sort by",
+    "sortOptions": {
+      "recommended": "Recommended",
+      "priceLow": "Price: Low to High",
+      "priceHigh": "Price: High to Low",
+      "rating": "Rating",
+      "name": "Name"
+    },
+    "currency": {
+      "usd": "USD",
+      "vnd": "VND"
+    },
+    "date": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "checkInDate": "Check-in date",
+      "checkOutDate": "Check-out date"
+    },
+    "encryptedCheckout": "Encrypted checkout",
+    "encryptedCheckoutDesc": "Card details are handled over secure connections with payment partners you already trust.",
+    "flexibleCancellation": "Flexible cancellation",
+    "flexibleCancellationDesc": "Change of plans? On qualifying rates you can cancel at no charge up to 48 hours before arrival.",
+    "humanSupport": "Support, not scripts",
+    "humanSupportDesc": "Reach a real team any time — whether it's a booking tweak or a question before you travel.",
+    "verifiedReviews": "Reviews from real stays",
+    "verifiedReviewsDesc": "Ratings come from guests who completed a booking — so you see feedback that actually reflects the stay."
+  },
+  "header": {
+    "home": "Home",
+    "hotels": "Hotels",
+    "mapSearch": "Map Search",
+    "wishlist": "Wishlist",
+    "login": "Login",
+    "register": "Register",
+    "profile": "Profile",
+    "logout": "Logout",
+    "admin": "Admin",
+    "vendorDashboard": "Vendor Dashboard",
+    "language": "Language",
+    "english": "English",
+    "vietnamese": "Vietnamese",
+    "welcome": "Welcome",
+    "myBookings": "My Bookings",
+    "settings": "Settings",
+    "support": "Support",
+    "tours": "Tours",
+    "myTourBookings": "My tour bookings",
+    "savedTours": "Saved tours"
+  },
+  "home": {
+    "heroTitleLine1": "Find your perfect",
+    "heroTitleLine2": "hotel getaway",
+    "heroSubtitle": "Your next stay starts here",
+    "heroDescription": "Discover handpicked hotels across Vietnam. Search by city or pick a spot on the map — book with confidence.",
+    "searchPlaceholder": "Where are you going?",
+    "searchButton": "Search",
+    "mapSearch": {
+      "title": "Search hotels on the map",
+      "description": "Pick a location, set your radius, and discover hotels in that area. Perfect for finding stays near landmarks or neighborhoods.",
+      "cta": "Open map search"
+    },
+    "mapSearchTitle": "Search hotels on the map",
+    "mapSearchDescription": "Pick a location, set your radius, and discover hotels in that area. Perfect for finding stays near landmarks or neighborhoods.",
+    "mapSearchCta": "Open map search",
+    "popularDestinations": "Popular Destinations",
+    "topRatedHotels": "Top Rated Hotels",
+    "whyChooseUs": "Why Choose Us",
+    "bestPrice": "Best Price Guarantee",
+    "bestPriceDesc": "We guarantee the best rates for your stay",
+    "secureBooking": "Secure Booking",
+    "secureBookingDesc": "Your payment and personal info are protected",
+    "support247": "24/7 Support",
+    "support247Desc": "Our team is here to help anytime",
+    "propertyTypes": {
+      "title": "Browse by type",
+      "description": "Whether you want a city break, beach escape, or countryside retreat.",
+      "cityHotels": "City hotels",
+      "beachfront": "Beachfront",
+      "countryside": "Countryside",
+      "luxuryStays": "Luxury stays"
+    },
+    "destinations": {
+      "label": "Destinations",
+      "title": "Popular destinations",
+      "description": "From Hanoi and Da Nang to Ho Chi Minh City and Phu Quoc — curated cities where travelers love to stay.",
+      "browseAll": "Browse all cities"
+    },
+    "trust": {
+      "label": "Expectations",
+      "title": "The standard behind your stay",
+      "description": "No clutter — just what matters after you've picked a place on the map: safe payments, fair cancellation rules, human support, and reviews tied to completed visits."
+    },
+    "aiPicks": {
+      "label": "AI picks",
+      "title": "Recommended for you",
+      "description": "Hotels matched to your taste — from wishlist, past stays, and top-rated places.",
+      "reasonPrefix": "Why: "
+    },
+    "featuredHotels": {
+      "title": "Featured hotels",
+      "description": "Handpicked stays for a memorable trip.",
+      "viewAll": "View all hotels",
+      "browseAll": "Browse all hotels",
+      "empty": "No featured hotels yet."
+    },
+    "testimonials": {
+      "label": "Guest correspondence",
+      "title": "Stays worth remembering",
+      "description": "Notes from travelers who found their hotel through us — unedited, uncompensated, in their own words.",
+      "quote1": "I chose our Hanoi stay by dropping a pin on the map — no guesswork about which quarter we'd wake up in. The hotel matched what we saw online.",
+      "quote2": "Booking took minutes. When our dates shifted, cancelling was straightforward. I've already used it again for Da Nang.",
+      "quote3": "Seeing every hotel on the map before paying made comparing neighborhoods effortless. Exactly what planning a city trip should feel like."
+    },
+    "newsletter": {
+      "title": "Get travel inspiration",
+      "description": "Sign up for deals, new destinations, and tips for your next trip.",
+      "placeholder": "Your email",
+      "subscribe": "Subscribe"
+    },
+    "stats": {
+      "hotels": "Hotels",
+      "cities": "Cities",
+      "support": "Support",
+      "quality": "Quality"
+    }
+  },
+  "hotels": {
+    "title": "Hotels",
+    "found": "{{count}} hotels found",
+    "noResults": "No hotels found",
+    "noResultsDesc": "Try adjusting your filters or search criteria to find more options.",
+    "searchFromHome": "Search from home",
+    "filters": {
+      "title": "Filters",
+      "guests": "Guests",
+      "roomsFitAtLeast": "Rooms that fit at least",
+      "minimumRating": "Minimum Rating",
+      "basedOnGuestReviews": "Based on guest reviews",
+      "priceRange": "Price Range (per night)",
+      "minPrice": "Min",
+      "maxPrice": "Max",
+      "amenities": "Amenities",
+      "sortBy": "Sort by",
+      "clearAll": "Clear filters"
+    },
+    "search": {
+      "placeholder": "City or country"
+    },
+    "reviewScore": {
+      "excellent": "Excellent: 5",
+      "veryGood": "Very Good: 4+",
+      "good": "Good: 3+",
+      "pleasant": "Pleasant: 2+"
+    },
+    "sort": {
+      "recommended": "Recommended",
+      "priceLow": "Price: Low to High",
+      "priceHigh": "Price: High to Low",
+      "rating": "Highest rated",
+      "name": "Name A–Z",
+      "distance": "Distance",
+      "comingSoon": "(coming soon)"
+    },
+    "results": {
+      "found": "found",
+      "withinRadius": "within {{radius}} km",
+      "mapAreaFilters": "Results follow your map area and filters.",
+      "totalsUpdate": "Totals update when you change filters or dates.",
+      "updating": "Updating…"
+    },
+    "roomType": "Room Type",
+    "availability": "Availability",
+    "bookNow": "Book Now",
+    "viewDetails": "View Details",
+    "addToWishlist": "Add to Wishlist",
+    "removeFromWishlist": "Remove from Wishlist",
+    "perNight": "/night",
+    "totalPrice": "Total Price",
+    "averageRating": "Average Rating",
+    "reviewCount": "{{count}} reviews",
+    "cancellationPolicy": "Cancellation Policy",
+    "cancellationPolicySummary": "Cancellation Policy Summary",
+    "hotelDescription": "Description",
+    "hotelAddress": "Address",
+    "checkInTime": "Check-in",
+    "checkOutTime": "Check-out",
+    "lateCheckoutPrice": "Late Checkout Price",
+    "taxInfo": "Tax Information",
+    "inclusive": "Inclusive",
+    "exclusive": "Exclusive",
+    "wishlist": {
+      "add": "Add to wishlist",
+      "remove": "Remove from wishlist",
+      "loginToSave": "Log in to save to wishlist"
+    },
+    "disclaimer": "Commission paid on bookings, and other factors can affect property rankings."
+  },
+  "booking": {
+    "title": "Booking",
+    "preview": "Booking Preview",
+    "guestDetails": "Guest Details",
+    "contactInfo": "Contact Information",
+    "specialRequests": "Special Requests",
+    "payment": "Payment",
+    "paymentMethod": "Payment Method",
+    "cardDetails": "Card Details",
+    "cardNumber": "Card Number",
+    "expiryDate": "Expiry Date",
+    "cvv": "CVV",
+    "cardholderName": "Cardholder Name",
+    "stripe": "VNPay",
+    "paypal": "PayPal",
+    "cash": "Cash at Hotel",
+    "summary": "Booking Summary",
+    "subtotal": "Subtotal",
+    "taxes": "Taxes",
+    "fees": "Fees",
+    "discount": "Discount",
+    "total": "Total",
+    "confirmBooking": "Confirm Booking",
+    "bookingConfirmed": "Booking Confirmed!",
+    "bookingReference": "Booking Reference",
+    "checkEmail": "Check your email for confirmation details",
+    "guestBooking": "Guest Booking",
+    "loginToBook": "Login to Book",
+    "continueAsGuest": "Continue as Guest",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "country": "Country",
+    "address": "Address",
+    "city": "City",
+    "postalCode": "Postal Code",
+    "rooms": "Rooms",
+    "adults": "Adults",
+    "children": "Children",
+    "age": "Age",
+    "selectRoom": "Select Room",
+    "roomDetails": "Room Details",
+    "capacity": "Capacity",
+    "bedType": "Bed Type",
+    "roomAmenities": "Room Amenities",
+    "included": "Included",
+    "notIncluded": "Not Included",
+    "errors": {
+      "missingParams": "Missing search params. Start from a hotel and select dates and room.",
+      "hotelNotFound": "Hotel or room not found.",
+      "roomNotFound": "Room not found."
+    },
+    "steps": {
+      "room": "Room",
+      "guestDetails": "Guest Details",
+      "review": "Review & pay",
+      "ariaLabel": "Booking steps"
+    },
+    "step1": {
+      "title": "Room selection",
+      "quantity": "Quantity",
+      "fromTotal": "From {{price}} total"
+    },
+    "step2": {
+      "title": "Guest details",
+      "guestNote": "Book as guest — no account needed. We'll email your confirmation and a link to view the booking.",
+      "name": "Your name",
+      "namePlaceholder": "e.g. Jane Smith",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "bookingAs": "Booking as"
+    },
+    "step3": {
+      "title": "Review & pay",
+      "roomTotal": "Room total",
+      "discount": "Discount",
+      "tax": "Tax ({{name}})",
+      "addOns": "Add-ons",
+      "total": "Total",
+      "estimatedTotal": "Estimated total",
+      "finalPriceAtCheckout": "Final price calculated at checkout",
+      "addLateCheckout": "Add late checkout",
+      "lateCheckoutPrice": "+{{price}}",
+      "couponCode": "Coupon code (optional)",
+      "couponPlaceholder": "e.g. SAVE10",
+      "specialRequests": "Special requests (optional)",
+      "specialRequestsPlaceholder": "e.g. Late arrival, high floor, extra towels",
+      "creating": "Creating…",
+      "proceedToPayment": "Proceed to Payment",
+      "alreadyHaveAccount": "Already have an account?",
+      "logIn": "Log in",
+      "toBookAndSeeHistory": "to book and see your history"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "subtitle": "Welcome back. Sign in to manage your bookings.",
+      "submit": "Log in",
+      "signingIn": "Signing in…",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "register": {
+      "title": "Sign up",
+      "subtitle": "Create an account to book hotels and manage your stays.",
+      "submit": "Sign up",
+      "creatingAccount": "Creating account…",
+      "hasAccount": "Already have an account?",
+      "logIn": "Log in"
+    },
+    "logout": "Logout",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "rememberMe": "Remember Me",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "registerAsVendor": "Register as Vendor",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "loginWithGoogle": "Login with Google",
+    "loginWithFacebook": "Login with Facebook",
+    "or": "Or",
+    "loginSuccess": "Login successful!",
+    "registerSuccess": "Registration successful!",
+    "logoutSuccess": "Logged out successfully",
+    "invalidCredentials": "Invalid email or password",
+    "emailExists": "Email already exists",
+    "passwordMismatch": "Passwords do not match",
+    "weakPassword": "Password is too weak",
+    "resetEmailSent": "Password reset email sent",
+    "resetSuccess": "Password reset successful",
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "Jane Smith",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "••••••••"
+    },
+    "errors": {
+      "loginFailed": "Login failed",
+      "registerFailed": "Registration failed",
+      "passwordMismatch": "Passwords do not match"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account and view booking history",
+    "editProfile": "Edit profile",
+    "myBookings": {
+      "title": "My Bookings",
+      "subtitle": "View and manage your reservations"
+    },
+    "guests": {
+      "signInToView": "Sign in to view your profile",
+      "signInToManage": "Log in to see your bookings and manage your account."
+    },
+    "avatar": {
+      "title": "Profile photo",
+      "removeCurrent": "Remove current photo",
+      "noPhoto": "No photo"
+    },
+    "form": {
+      "newPassword": "New password (leave blank to keep)",
+      "saveChanges": "Save changes",
+      "saving": "Saving…"
+    }
+  },
+  "wishlist": {
+    "title": "My Wishlist",
+    "subtitle": "{{count}} {{count === 1 ? 'hotel' : 'hotels'}} saved",
+    "empty": {
+      "title": "Your wishlist is empty",
+      "description": "Browse hotels and tap the heart icon to save your favorites. They'll appear here for easy access.",
+      "searchHotels": "Search hotels"
+    },
+    "guests": {
+      "signInToView": "Sign in to view your wishlist",
+      "signInToSave": "Save your favorite hotels and access them anytime."
+    },
+    "actions": {
+      "discoverMore": "Discover more",
+      "remove": "Remove from wishlist",
+      "viewDetails": "View details →"
+    },
+    "errors": {
+      "couldNotLoad": "Could not load wishlist"
+    }
+  },
+  "reviews": {
+    "title": "Reviews",
+    "writeReview": "Write a Review",
+    "yourRating": "Your Rating",
+    "yourComment": "Your Comment",
+    "submitReview": "Submit Review",
+    "reviewSubmitted": "Review submitted for moderation",
+    "noReviews": "No reviews yet",
+    "beFirst": "Be the first to review this hotel",
+    "rating": "Rating",
+    "comment": "Comment",
+    "date": "Date",
+    "verified": "Verified Stay",
+    "pending": "Pending Approval",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "support": {
+    "title": "Support",
+    "subtitle": "Create a ticket for billing, booking, or technical help. We'll reply here and email you.",
+    "actions": {
+      "newTicket": "New ticket"
+    },
+    "categories": {
+      "billing": "Billing",
+      "booking": "Booking",
+      "technical": "Technical",
+      "other": "Other"
+    },
+    "empty": {
+      "title": "No support tickets yet",
+      "description": "Have a question or need help? Create a ticket and we'll get back to you as soon as possible.",
+      "createFirst": "Create your first ticket"
+    },
+    "replies": {
+      "one": "reply",
+      "other": "replies"
+    },
+    "guests": {
+      "signInToView": "Sign in to access support",
+      "signInToManage": "Log in to view and create support tickets."
+    },
+    "pagination": {
+      "showing": "Page {{current}} of {{total}} · {{count}} ticket{{count !== 1 ? 's' : ''}}"
+    },
+    "errors": {
+      "couldNotLoad": "Could not load tickets"
+    }
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "statistics": "Statistics",
+    "totalUsers": "Total Users",
+    "totalHotels": "Total Hotels",
+    "totalBookings": "Total Bookings",
+    "totalRevenue": "Total Revenue",
+    "pendingApprovals": "Pending Approvals",
+    "recentBookings": "Recent Bookings",
+    "topHotels": "Top Performing Hotels",
+    "revenueChart": "Revenue Chart",
+    "bookingChart": "Booking Chart",
+    "users": "Users",
+    "roles": "Roles",
+    "permissions": "Permissions",
+    "vendors": "Vendors",
+    "approve": "Approve",
+    "reject": "Reject",
+    "status": "Status",
+    "commission": "Commission",
+    "payouts": "Payouts",
+    "websiteSettings": "Website Settings",
+    "siteName": "Site Name",
+    "siteDescription": "Site Description",
+    "siteLogo": "Site Logo",
+    "siteFavicon": "Site Favicon",
+    "siteEmail": "Site Email",
+    "sitePhone": "Site Phone",
+    "siteAddress": "Site Address",
+    "socialLinks": "Social Links",
+    "metaTitle": "Meta Title",
+    "metaDescription": "Meta Description",
+    "metaKeywords": "Meta Keywords",
+    "googleAnalytics": "Google Analytics ID",
+    "maintenanceMode": "Maintenance Mode",
+    "maintenanceMessage": "Maintenance Message",
+    "locale": "Default Language",
+    "fallbackLocale": "Fallback Language",
+    "saveSettings": "Save Settings",
+    "settingsSaved": "Settings saved successfully",
+    "logoRemoved": "Logo removed",
+    "faviconRemoved": "Favicon removed",
+    "countries": "Countries",
+    "cities": "Cities",
+    "amenities": "Amenities",
+    "disputes": "Disputes",
+    "reviews": "Review Moderation",
+    "supportTickets": "Support Tickets",
+    "reports": "Reports",
+    "export": "Export",
+    "filter": "Filter",
+    "search": "Search",
+    "actions": "Actions",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this?",
+    "yesDelete": "Yes, Delete",
+    "noCancel": "No, Cancel"
+  },
+  "vendor": {
+    "dashboard": "Vendor Dashboard",
+    "overview": "Overview",
+    "myHotels": "My Hotels",
+    "addHotel": "Add Hotel",
+    "myRooms": "My Rooms",
+    "addRoom": "Add Room",
+    "bookings": "Bookings",
+    "reports": "Reports",
+    "payouts": "Payouts",
+    "profile": "Profile",
+    "settings": "Settings",
+    "supportTickets": "Support Tickets",
+    "revenue": "Revenue",
+    "occupancy": "Occupancy Rate",
+    "pendingBookings": "Pending Bookings",
+    "confirmedBookings": "Confirmed Bookings",
+    "cancelledBookings": "Cancelled Bookings",
+    "totalEarnings": "Total Earnings",
+    "pendingPayouts": "Pending Payouts",
+    "paidPayouts": "Paid Payouts",
+    "hotelName": "Hotel Name",
+    "hotelDescription": "Hotel Description",
+    "hotelAddress": "Hotel Address",
+    "hotelCity": "City",
+    "hotelCountry": "Country",
+    "hotelImages": "Hotel Images",
+    "roomName": "Room Name",
+    "roomDescription": "Room Description",
+    "basePrice": "Base Price",
+    "capacity": "Capacity",
+    "roomImages": "Room Images",
+    "roomAmenities": "Room Amenities",
+    "availability": "Availability",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "lateCheckout": "Late Checkout",
+    "cancellationPolicy": "Cancellation Policy",
+    "taxRate": "Tax Rate",
+    "taxName": "Tax Name",
+    "taxInclusive": "Tax Inclusive"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "serverError": "Server error",
+    "networkError": "Network error",
+    "validationError": "Validation error",
+    "unknownError": "An unknown error occurred",
+    "tryAgain": "Please try again",
+    "contactSupport": "Contact support if the problem persists"
+  },
+  "footer": {
+    "about": "About Us",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "careers": "Careers",
+    "press": "Press",
+    "partners": "Partners",
+    "copyright": "© {{year}} Hotel Booking Platform. All rights reserved.",
+    "followUs": "Follow Us"
+  },
+  "notifications": {
+    "bookingConfirmed": "Your booking has been confirmed",
+    "bookingCancelled": "Your booking has been cancelled",
+    "paymentSuccess": "Payment successful",
+    "paymentFailed": "Payment failed",
+    "reviewApproved": "Your review has been approved",
+    "reviewRejected": "Your review was not approved",
+    "payoutProcessed": "Payout processed",
+    "newMessage": "New message received",
+    "priceDrop": "Price dropped for a hotel in your wishlist",
+    "availabilityAlert": "Rooms now available for your dates"
+  },
+  "hotelDetail": {
+    "tabs": {
+      "overview": "Overview",
+      "rooms": "Rooms",
+      "reviews": "Reviews",
+      "location": "Location",
+      "ariaLabel": "Hotel detail sections"
+    },
+    "gallery": {
+      "prev": "Previous image",
+      "next": "Next image",
+      "close": "Close gallery",
+      "imageAriaLabel": "Image {{index}}"
+    },
+    "overview": {
+      "amenities": "Amenities",
+      "checkInOut": "Check-in / Check-out",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "cancellationPolicy": "Cancellation policy",
+      "seeTermsAtBooking": "See cancellation terms at booking."
+    },
+    "rooms": {
+      "noRooms": "No rooms available.",
+      "capacity": "Up to {{count}} guests",
+      "fromPerNight": "From {{price}} / night",
+      "select": "Select",
+      "selectDatesToBook": "Select dates to book",
+      "selectRoom": "Select a room"
+    },
+    "reviews": {
+      "sentimentTitle": "Review sentiment summary",
+      "aiAssisted": "AI-assisted",
+      "basedOn": "Based on {{count}} verified review{{count !== 1 ? 's' : ''}}",
+      "starLabel": "{{count}} star{{count > 1 ? 's' : ''}}",
+      "starDistribution": "Star distribution",
+      "verifiedStay": "Verified stay",
+      "noReviews": "No reviews yet.",
+      "paginationAriaLabel": "Reviews pagination"
+    },
+    "location": {
+      "title": "Location",
+      "mapTitle": "Hotel location map",
+      "openInMaps": "Open in Maps →",
+      "coordinatesNotAvailable": "Coordinates not available",
+      "addLocationNote": "Add a location when creating or editing the hotel to show the map."
+    },
+    "booking": {
+      "title": "Booking",
+      "checkAvailability": "Check availability",
+      "room": "Room",
+      "quantity": "Quantity",
+      "rooms": "room{{count > 1 ? 's' : ''}}",
+      "selectRoom": "Select a room",
+      "subtotal": "Subtotal",
+      "tax": "Tax ({{rate}}%)",
+      "total": "Total",
+      "bookNow": "Book Now",
+      "loginRequired": "You need to sign in to book a room. Sign in or create an account to continue."
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "summary": {
+      "title": "Booking summary",
+      "guest": "Guest",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "lateCheckout": "Late checkout",
+      "tax": "Tax",
+      "total": "Total",
+      "reportProblem": "Report a problem with this booking"
+    },
+    "payment": {
+      "secure": "Secure payment",
+      "redirectNotice": "You will be redirected to VNPay to complete your payment securely.",
+      "payNow": "Pay Now",
+      "processing": "Processing…",
+      "backTo": "← Back to {{target}}",
+      "profile": "profile",
+      "home": "home"
+    },
+    "success": {
+      "title": "Booking confirmed",
+      "confirmationSent": "Thank you for your booking. A confirmation has been sent to your email.",
+      "bookingReference": "Your booking reference",
+      "viewBookings": "View my bookings",
+      "backToHome": "Back to home"
+    },
+    "dispute": {
+      "title": "Report a problem",
+      "description": "Describe your issue. Our team will review it and contact you by email.",
+      "name": "Your name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "whatHappened": "What happened?",
+      "placeholder": "At least 20 characters…",
+      "submitting": "Submitting…",
+      "submit": "Submit"
+    },
+    "errors": {
+      "missingReference": "Missing booking reference.",
+      "sessionExpired": "This checkout session has expired or the page was refreshed.",
+      "useEmailLink": "We'll send a link to your email after you complete the booking — use that link to view and pay.",
+      "useEmailLink2": "Please use the link from your confirmation email to complete payment.",
+      "bookingNotFound": "Booking not found",
+      "couldNotStartPayment": "Could not start payment",
+      "disputeMinChars": "Please describe the issue in at least 20 characters.",
+      "couldNotSubmitDispute": "Could not submit dispute"
+    }
+  },
+  "myBookings": {
+    "title": "My Bookings",
+    "subtitle": "View and manage your reservations",
+    "total": "total",
+    "status": {
+      "pending": "Pending",
+      "pendingPayment": "Awaiting Payment",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "actions": {
+      "view": "View",
+      "invoice": "Invoice",
+      "reportIssue": "Report issue",
+      "cancel": "Cancel"
+    },
+    "dispute": {
+      "title": "Report an issue",
+      "description": "Describe what went wrong. Our support team will review your case and reply by email.",
+      "name": "Name (optional)",
+      "email": "Email (optional)",
+      "phone": "Phone (optional)",
+      "details": "Details",
+      "placeholder": "At least 20 characters…",
+      "submit": "Submit dispute",
+      "submitting": "Submitting…",
+      "minChars": "Please describe the issue in at least 20 characters.",
+      "couldNotSubmit": "Could not submit dispute"
+    },
+    "errors": {
+      "couldNotLoadInvoice": "Could not load invoice",
+      "couldNotCancel": "Could not cancel booking"
+    },
+    "empty": {
+      "title": "No bookings yet",
+      "description": "Start exploring and book your next stay. Your reservations will appear here.",
+      "searchHotels": "Search hotels"
+    },
+    "guests": {
+      "signInToView": "Sign in to view your bookings",
+      "signInToManage": "Log in to see your reservations and manage your stays."
+    },
+    "confirmCancel": "Are you sure you want to cancel this booking?",
+    "pagination": {
+      "ariaLabel": "Bookings pagination",
+      "showing": "Showing page {{current}} of {{total}}"
+    }
+  },
+  "tours": {
+    "list": {
+      "title": "Private 1vs1 Tours",
+      "subtitle": "One guest, one local guide — pick your province and time.",
+      "empty": "No tours found. Try different filters.",
+      "results": "tours found",
+      "viewDetails": "View details"
+    },
+    "provinces": {
+      "title": "Browse by province",
+      "tours": "tours"
+    },
+    "filters": {
+      "province": "Province",
+      "allProvinces": "All provinces",
+      "date": "Date",
+      "sort": "Sort",
+      "recommended": "Recommended",
+      "priceLow": "Price: low to high",
+      "priceHigh": "Price: high to low",
+      "rating": "Top rated",
+      "name": "Name"
+    },
+    "save": {
+      "save": "Save",
+      "saved": "Saved",
+      "add": "Save tour",
+      "remove": "Remove from saved",
+      "loginToSave": "Log in to save tours"
+    },
+    "slots": {
+      "title": "Available time slots",
+      "prevWeek": "Previous week",
+      "nextWeek": "Next week",
+      "none": "No available slots",
+      "couldNotLoad": "Could not load availability."
+    },
+    "detail": {
+      "guide": "Your guide",
+      "languages": "Languages",
+      "attractions": "Famous places in this province",
+      "famous": "Famous",
+      "fromPrice": "From",
+      "fixedFee": "Base fee",
+      "hourly": "Per hour",
+      "daily": "Per day",
+      "transport": "Transport",
+      "meetingPoint": "Meeting point",
+      "selected": "Selected",
+      "bookNow": "Book now",
+      "loginToBook": "Log in to book",
+      "loginHint": "You will be redirected to log in, then back here.",
+      "pickSlotHint": "Pick an available time slot to continue."
+    },
+    "wizard": {
+      "title": "Book your private tour",
+      "loginRequired": "Log in required",
+      "loginRequiredHint": "Tour booking requires an account (no guest checkout).",
+      "duration": "Duration",
+      "hour": "By hour",
+      "day": "By day",
+      "details": "Trip details",
+      "coupon": "Coupon code (optional)",
+      "couponPlaceholder": "Enter coupon code",
+      "meetingPoint": "Meeting point (optional)",
+      "meetingPointPlaceholder": "Where should the guide meet you?",
+      "notes": "Notes for your guide (optional)",
+      "price": "Price preview",
+      "subtotal": "Subtotal",
+      "transport": "Transport fee",
+      "discount": "Discount",
+      "total": "Total",
+      "previewHint": "Could not preview price. The slot may have just been taken.",
+      "confirm": "Confirm booking"
+    },
+    "checkout": {
+      "title": "Tour checkout",
+      "summary": "Booking summary",
+      "secure": "Secure payment via VNPay",
+      "payNow": "Pay now",
+      "successTitle": "Payment successful!",
+      "successHint": "Your private tour is confirmed. Check your bookings for details.",
+      "viewBookings": "View my tour bookings"
+    },
+    "bookings": {
+      "title": "My tour bookings",
+      "subtitle": "Your private 1vs1 tours.",
+      "empty": "You have no tour bookings yet.",
+      "browse": "Browse tours",
+      "view": "View",
+      "invoice": "Invoice",
+      "report": "Report issue",
+      "cancel": "Cancel",
+      "confirmCancel": "Cancel this tour booking?",
+      "invoiceError": "Could not load invoice.",
+      "loginRequired": "Log in to view your tour bookings",
+      "disputeTitle": "Report a problem",
+      "disputeMin": "Please describe the issue (min 20 characters)."
+    },
+    "saved": {
+      "title": "Saved tours",
+      "subtitle": "{count} saved tours",
+      "empty": "No saved tours yet.",
+      "loginRequired": "Log in to view saved tours"
+    },
+    "chat": {
+      "title": "Chat with your guide",
+      "live": "Live",
+      "polling": "Auto-refresh",
+      "empty": "No messages yet. Say hello to your guide!",
+      "placeholder": "Type a message...",
+      "send": "Send",
+      "couldNotLoad": "Could not load messages."
+    },
+    "reviews": {
+      "title": "Guest reviews",
+      "empty": "No reviews yet.",
+      "writeTitle": "Write a review",
+      "commentPlaceholder": "Share your experience with this tour...",
+      "submit": "Submit review"
+    },
+    "provinceDetail": {
+      "back": "All provinces",
+      "attractions": "Must-see places",
+      "guides": "1vs1 local guides",
+      "guidesHint": "Ranked by score = stars × reviews.",
+      "from": "From",
+      "to": "To",
+      "filter": "Filter by free days",
+      "clear": "Clear",
+      "sort": "Sort",
+      "sortScore": "Highest score",
+      "sortRating": "Highest rated",
+      "sortPriceLow": "Lowest price",
+      "emptyGuides": "No guides are free on these days.",
+      "results": "guides"
+    },
+    "guides": {
+      "viewProfile": "View profile & book",
+      "score": "pts",
+      "reviewsCount": "reviews",
+      "priceFrom": "From",
+      "about": "About the guide",
+      "offers": "Can take you to",
+      "availability": "Availability",
+      "pickTourHint": "Pick a tour and a free time slot to continue.",
+      "bookThis": "Book this tour",
+      "loginToBook": "Log in to book",
+      "backToProvince": "Back to province",
+      "noTours": "This guide has no tours in this province yet.",
+      "myBooking": "Your booking with this guide",
+      "viewAllBookings": "View all my tour bookings"
+    },
+    "status": {
+      "pending_payment": "Pending payment",
+      "confirmed": "Confirmed",
+      "ongoing": "Ongoing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "disputed": "Disputed",
+      "refunded": "Refunded"
+    }
+  }
+}

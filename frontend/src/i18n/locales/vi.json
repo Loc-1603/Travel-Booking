@@ -1,0 +1,960 @@
+{
+  "common": {
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "clear": "Xóa",
+    "clearFilters": "Xóa bộ lọc",
+    "apply": "Áp dụng",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "saveChanges": "Lưu thay đổi",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "remove": "Gỡ",
+    "update": "Cập nhật",
+    "create": "Tạo mới",
+    "add": "Thêm",
+    "view": "Xem",
+    "details": "Chi tiết",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "warning": "Cảnh báo",
+    "info": "Thông tin",
+    "confirm": "Xác nhận",
+    "yes": "Có",
+    "no": "Không",
+    "ok": "OK",
+    "close": "Đóng",
+    "open": "Mở",
+    "submit": "Gửi",
+    "reset": "Đặt lại",
+    "refresh": "Làm mới",
+    "retry": "Thử lại",
+    "select": "Chọn",
+    "choose": "Chọn",
+    "optional": "Tùy chọn",
+    "required": "Bắt buộc",
+    "all": "Tất cả",
+    "none": "Không có",
+    "guest": "Khách",
+    "guests": "Khách",
+    "night": "Đêm",
+    "nights": "Đêm",
+    "price": "Giá",
+    "rating": "Đánh giá",
+    "reviews": "Đánh giá",
+    "amenities": "Tiện ích",
+    "location": "Vị trí",
+    "map": "Bản đồ",
+    "list": "Danh sách",
+    "grid": "Lưới",
+    "sortBy": "Sắp xếp theo",
+    "sortOptions": {
+      "recommended": "Đề xuất",
+      "priceLow": "Giá: Thấp đến Cao",
+      "priceHigh": "Giá: Cao đến Thấp",
+      "rating": "Đánh giá",
+      "name": "Tên"
+    },
+    "currency": {
+      "usd": "USD",
+      "vnd": "VND"
+    },
+    "date": {
+      "today": "Hôm nay",
+      "tomorrow": "Ngày mai",
+      "checkIn": "Nhận phòng",
+      "checkOut": "Trả phòng",
+      "checkInDate": "Ngày nhận phòng",
+      "checkOutDate": "Ngày trả phòng"
+    },
+    "encryptedCheckout": "Thanh toán mã hóa",
+    "encryptedCheckoutDesc": "Thông tin thẻ được xử lý qua kết nối an toàn với các đối tác thanh toán bạn đã tin dùng.",
+    "flexibleCancellation": "Hủy linh hoạt",
+    "flexibleCancellationDesc": "Thay đổi kế hoạch? Với các mức giá đủ điều kiện, bạn có thể hủy miễn phí trước 48 giờ so với ngày đến.",
+    "humanSupport": "Hỗ trợ trực tiếp, không phải kịch bản",
+    "humanSupportDesc": "Liên lạc với đội ngũ thực sự bất cứ lúc nào — dù là điều chỉnh đặt phòng hay câu hỏi trước chuyến đi.",
+    "verifiedReviews": "Đánh giá từ người đã lưu trú thực tế",
+    "verifiedReviewsDesc": "Đánh giá đến từ khách đã hoàn tất đặt phòng — nên bạn thấy phản hồi thực sự phản ánh trải nghiệm lưu trú."
+  },
+  "header": {
+    "home": "Trang chủ",
+    "hotels": "Khách sạn",
+    "mapSearch": "Tìm trên bản đồ",
+    "wishlist": "Yêu thích",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "profile": "Hồ sơ",
+    "logout": "Đăng xuất",
+    "admin": "Quản trị",
+    "vendorDashboard": "Bảng điều khiển chủ nhà",
+    "language": "Ngôn ngữ",
+    "english": "Tiếng Anh",
+    "vietnamese": "Tiếng Việt",
+    "welcome": "Chào",
+    "myBookings": "Đặt phòng của tôi",
+    "settings": "Cài đặt",
+    "support": "Hỗ trợ",
+    "tours": "Tour",
+    "myTourBookings": "Tour đã đặt",
+    "savedTours": "Tour đã lưu"
+  },
+  "home": {
+    "heroTitleLine1": "Tìm chỗ nghỉ",
+    "heroTitleLine2": "hoàn hảo cho bạn",
+    "heroSubtitle": "Chuyến đi tiếp theo của bạn bắt đầu từ đây",
+    "heroDescription": "Khám phá những khách sạn được tuyển chọn kỹ lưỡng tại Việt Nam. Tìm kiếm theo thành phố hoặc chọn vị trí trên bản đồ — đặt phòng với sự tự tin.",
+    "searchPlaceholder": "Bạn muốn đi đâu?",
+    "searchButton": "Tìm kiếm",
+    "mapSearch": {
+      "title": "Tìm khách sạn trên bản đồ",
+      "description": "Chọn vị trí, đặt bán kính, và khám phá khách sạn trong khu vực đó. Hoàn hảo để tìm chỗ ở gần các địa danh hay khu dân cư.",
+      "cta": "Mở tìm kiếm bản đồ"
+    },
+    "mapSearchTitle": "Tìm khách sạn trên bản đồ",
+    "mapSearchDescription": "Chọn vị trí, đặt bán kính, và khám phá khách sạn trong khu vực đó. Hoàn hảo để tìm chỗ ở gần các địa danh hay khu dân cư.",
+    "mapSearchCta": "Mở tìm kiếm bản đồ",
+    "popularDestinations": "Địa điểm phổ biến",
+    "topRatedHotels": "Khách sạn đánh giá cao",
+    "whyChooseUs": "Tại sao chọn chúng tôi",
+    "bestPrice": "Cam kết giá tốt nhất",
+    "bestPriceDesc": "Chúng tôi cam kết mang lại mức giá tốt nhất cho kỳ nghỉ của bạn",
+    "secureBooking": "Đặt phòng an toàn",
+    "secureBookingDesc": "Thông tin thanh toán và cá nhân của bạn được bảo vệ",
+    "support247": "Hỗ trợ 24/7",
+    "support247Desc": "Đội ngũ của chúng tôi luôn sẵn sàng hỗ trợ bạn mọi lúc",
+    "propertyTypes": {
+      "title": "Duyệt theo loại hình",
+      "description": "Dù bạn muốn nghỉ dưỡng tại thành phố, biển hay vùng quê.",
+      "cityHotels": "Khách sạn thành phố",
+      "beachfront": "Bờ biển",
+      "countryside": "Vùng quê",
+      "luxuryStays": "Nghỉ dưỡng cao cấp"
+    },
+    "destinations": {
+      "label": "Địa điểm",
+      "title": "Địa điểm phổ biến",
+      "description": "Từ Hà Nội, Đà Nẵng đến TP.HCM và Phú Quốc — những thành phố được tuyển chọn nơi du khách yêu thích lưu trú.",
+      "browseAll": "Xem tất cả thành phố"
+    },
+    "trust": {
+      "label": "Mong đợi",
+      "title": "Tiêu chuẩn phía sau chuyến lưu trú của bạn",
+      "description": "Không rối rắm — chỉ những gì quan trọng sau khi bạn chọn nơi trên bản đồ: thanh toán an toàn, quy định hủy công bằng, hỗ trợ nhân văn, và đánh giá gắn với chuyến đi đã hoàn tất."
+    },
+    "aiPicks": {
+      "label": "Gợi ý AI",
+      "title": "Đề xuất cho bạn",
+      "description": "Khách sạn phù hợp với gu của bạn — từ danh sách yêu thích, các chuyến đi trước, và nơi được đánh giá cao nhất.",
+      "reasonPrefix": "Lý do: "
+    },
+    "featuredHotels": {
+      "title": "Khách sạn nổi bật",
+      "description": "Những chỗ nghỉ được tuyển chọn cho chuyến đi đáng nhớ.",
+      "viewAll": "Xem tất cả khách sạn",
+      "browseAll": "Duyệt tất cả khách sạn",
+      "empty": "Chưa có khách sạn nổi bật."
+    },
+    "testimonials": {
+      "label": "Thư từ khách",
+      "title": "Chuyến lưu trú đáng nhớ",
+      "description": "Chia sẻ từ du khách tìm thấy khách sạn của họ qua chúng tôi — không chỉnh sửa, không tài trợ, bằng lời nói của chính họ.",
+      "quote1": "Tôi chọn nơi ở tại Hà Nội bằng cách ghim trên bản đồ — không phải đoán mò khu vực nào. Khách sạn đúng như những gì thấy trực tuyến.",
+      "quote2": "Đặt phòng chỉ mất vài phút. Khi ngày thay đổi, hủy phòng rất dễ dàng. Tôi đã dùng lại cho chuyến Đà Nẵng.",
+      "quote3": "Nhìn thấy mọi khách sạn trên bản đồ trước khi thanh toán khiến việc so sánh khu vực trở nên dễ dàng. Chính xác cảm giác lên kế hoạch cho chuyến đi thành phố."
+    },
+    "newsletter": {
+      "title": "Nhận cảm hứng du lịch",
+      "description": "Đăng ký để nhận ưu đãi, địa điểm mới, và mẹo cho chuyến đi tiếp theo.",
+      "placeholder": "Email của bạn",
+      "subscribe": "Đăng ký"
+    },
+    "stats": {
+      "hotels": "Khách sạn",
+      "cities": "Thành phố",
+      "support": "Hỗ trợ",
+      "quality": "Chất lượng"
+    }
+  },
+  "hotels": {
+    "title": "Khách sạn",
+    "found": "Tìm thấy {{count}} khách sạn",
+    "noResults": "Không tìm thấy khách sạn",
+    "noResultsDesc": "Hãy thử điều chỉnh bộ lọc hoặc tiêu chí tìm kiếm để tìm thêm lựa chọn.",
+    "searchFromHome": "Tìm kiếm từ trang chủ",
+    "filters": {
+      "title": "Bộ lọc",
+      "guests": "Khách",
+      "roomsFitAtLeast": "Phòng phù hợp từ",
+      "minimumRating": "Đánh giá tối thiểu",
+      "basedOnGuestReviews": "Dựa trên đánh giá khách",
+      "priceRange": "Khoảng giá (mỗi đêm)",
+      "minPrice": "Tối thiểu",
+      "maxPrice": "Tối đa",
+      "amenities": "Tiện ích",
+      "sortBy": "Sắp xếp theo",
+      "clearAll": "Xóa bộ lọc"
+    },
+    "search": {
+      "placeholder": "Thành phố hoặc quốc gia"
+    },
+    "reviewScore": {
+      "excellent": "Xuất sắc: 5",
+      "veryGood": "Rất tốt: 4+",
+      "good": "Tốt: 3+",
+      "pleasant": "Thoải mái: 2+"
+    },
+    "sort": {
+      "recommended": "Đề xuất",
+      "priceLow": "Giá: Thấp đến Cao",
+      "priceHigh": "Giá: Cao đến Thấp",
+      "rating": "Đánh giá cao nhất",
+      "name": "Tên A–Z",
+      "distance": "Khoảng cách",
+      "comingSoon": "(sắp ra mắt)"
+    },
+    "results": {
+      "found": "tìm thấy",
+      "withinRadius": "trong bán kính {{radius}} km",
+      "mapAreaFilters": "Kết quả theo khu vực bản đồ và bộ lọc.",
+      "totalsUpdate": "Tổng số cập nhật khi thay đổi bộ lọc hoặc ngày.",
+      "updating": "Đang cập nhật…"
+    },
+    "roomType": "Loại phòng",
+    "availability": "Trạng thái",
+    "bookNow": "Đặt ngay",
+    "viewDetails": "Xem chi tiết",
+    "addToWishlist": "Thêm vào yêu thích",
+    "removeFromWishlist": "Gỡ khỏi yêu thích",
+    "perNight": "/đêm",
+    "totalPrice": "Tổng giá",
+    "averageRating": "Đánh giá trung bình",
+    "reviewCount": "{{count}} đánh giá",
+    "cancellationPolicy": "Chính sách hủy",
+    "cancellationPolicySummary": "Tóm tắt chính sách hủy",
+    "hotelDescription": "Mô tả",
+    "hotelAddress": "Địa chỉ",
+    "checkInTime": "Nhận phòng",
+    "checkOutTime": "Trả phòng",
+    "lateCheckoutPrice": "Giá trả phòng muộn",
+    "taxInfo": "Thông tin thuế",
+    "inclusive": "Đã bao gồm",
+    "exclusive": "Chưa bao gồm",
+    "wishlist": {
+      "add": "Thêm vào yêu thích",
+      "remove": "Gỡ khỏi yêu thích",
+      "loginToSave": "Đăng nhập để lưu yêu thích"
+    },
+    "disclaimer": "Hoa hồng được trả khi đặt phòng, và các yếu tố khác có thể ảnh hưởng đến thứ hạng khách sạn."
+  },
+  "booking": {
+    "title": "Đặt phòng",
+    "preview": "Xem trước đặt phòng",
+    "guestDetails": "Thông tin khách",
+    "contactInfo": "Thông tin liên hệ",
+    "specialRequests": "Yêu cầu đặc biệt",
+    "payment": "Thanh toán",
+    "paymentMethod": "Phương thức thanh toán",
+    "cardDetails": "Thông tin thẻ",
+    "cardNumber": "Số thẻ",
+    "expiryDate": "Ngày hết hạn",
+    "cvv": "CVV",
+    "cardholderName": "Tên chủ thẻ",
+    "stripe": "VNPay",
+    "paypal": "PayPal",
+    "cash": "Tiền mặt tại khách sạn",
+    "summary": "Tóm tắt đặt phòng",
+    "subtotal": "Tạm tính",
+    "taxes": "Thuế",
+    "fees": "Phí",
+    "discount": "Giảm giá",
+    "total": "Tổng cộng",
+    "confirmBooking": "Xác nhận đặt phòng",
+    "bookingConfirmed": "Đặt phòng thành công!",
+    "bookingReference": "Mã đặt phòng",
+    "checkEmail": "Kiểm tra email để xem chi tiết xác nhận",
+    "guestBooking": "Đặt phòng khách vãng lai",
+    "loginToBook": "Đăng nhập để đặt phòng",
+    "continueAsGuest": "Tiếp tục làm khách",
+    "firstName": "Tên",
+    "lastName": "Họ",
+    "email": "Email",
+    "phone": "Điện thoại",
+    "country": "Quốc gia",
+    "address": "Địa chỉ",
+    "city": "Thành phố",
+    "postalCode": "Mã bưu chính",
+    "rooms": "Phòng",
+    "adults": "Người lớn",
+    "children": "Trẻ em",
+    "age": "Tuổi",
+    "selectRoom": "Chọn phòng",
+    "roomDetails": "Chi tiết phòng",
+    "capacity": "Sức chứa",
+    "bedType": "Loại giường",
+    "roomAmenities": "Tiện ích phòng",
+    "included": "Đã bao gồm",
+    "notIncluded": "Chưa bao gồm",
+    "errors": {
+      "missingParams": "Thiếu tham số tìm kiếm. Hãy bắt đầu từ khách sạn và chọn ngày, phòng.",
+      "hotelNotFound": "Không tìm thấy khách sạn hoặc phòng.",
+      "roomNotFound": "Không tìm thấy phòng."
+    },
+    "steps": {
+      "room": "Phòng",
+      "guestDetails": "Thông tin khách",
+      "review": "Xem lại & thanh toán",
+      "ariaLabel": "Các bước đặt phòng"
+    },
+    "step1": {
+      "title": "Chọn phòng",
+      "quantity": "Số lượng",
+      "fromTotal": "Từ {{price}} tổng cộng"
+    },
+    "step2": {
+      "title": "Thông tin khách",
+      "guestNote": "Đặt phòng làm khách — không cần tài khoản. Chúng tôi sẽ gửi xác nhận và liên kết xem đặt phòng qua email.",
+      "name": "Tên của bạn",
+      "namePlaceholder": "Ví dụ: Nguyễn Văn An",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "bookingAs": "Đặt phòng với tư cách"
+    },
+    "step3": {
+      "title": "Xem lại & thanh toán",
+      "roomTotal": "Tổng phòng",
+      "discount": "Giảm giá",
+      "tax": "Thuế ({{name}})",
+      "addOns": "Dịch vụ thêm",
+      "total": "Tổng cộng",
+      "estimatedTotal": "Ước tính tổng",
+      "finalPriceAtCheckout": "Giá cuối cùng được tính khi thanh toán",
+      "addLateCheckout": "Thêm trả phòng muộn",
+      "lateCheckoutPrice": "(+{{price}})",
+      "couponCode": "Mã giảm giá (tùy chọn)",
+      "couponPlaceholder": "Ví dụ: SAVE10",
+      "specialRequests": "Yêu cầu đặc biệt (tùy chọn)",
+      "specialRequestsPlaceholder": "Ví dụ: Đến muộn, tầng cao, khăn thêm",
+      "creating": "Đang tạo…",
+      "proceedToPayment": "Tiếp tục thanh toán",
+      "alreadyHaveAccount": "Đã có tài khoản?",
+      "logIn": "Đăng nhập",
+      "toBookAndSeeHistory": "để đặt phòng và xem lịch sử."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "subtitle": "Chào mừng quay lại. Đăng nhập để quản lý đặt phòng của bạn.",
+      "submit": "Đăng nhập",
+      "signingIn": "Đang đăng nhập…",
+      "noAccount": "Chưa có tài khoản?",
+      "signUp": "Đăng ký"
+    },
+    "register": {
+      "title": "Đăng ký",
+      "subtitle": "Tạo tài khoản để đặt khách sạn và quản lý kỳ nghỉ của bạn.",
+      "submit": "Đăng ký",
+      "creatingAccount": "Đang tạo tài khoản…",
+      "hasAccount": "Đã có tài khoản?",
+      "logIn": "Đăng nhập"
+    },
+    "logout": "Đăng xuất",
+    "forgotPassword": "Quên mật khẩu?",
+    "resetPassword": "Đặt lại mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "firstName": "Tên",
+    "lastName": "Họ",
+    "phone": "Điện thoại",
+    "registerAsVendor": "Đăng ký làm chủ nhà",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "dontHaveAccount": "Chưa có tài khoản?",
+    "loginWithGoogle": "Đăng nhập với Google",
+    "loginWithFacebook": "Đăng nhập với Facebook",
+    "or": "Hoặc",
+    "loginSuccess": "Đăng nhập thành công!",
+    "registerSuccess": "Đăng ký thành công!",
+    "logoutSuccess": "Đăng xuất thành công",
+    "invalidCredentials": "Email hoặc mật khẩu không đúng",
+    "emailExists": "Email đã tồn tại",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "weakPassword": "Mật khẩu quá yếu",
+    "resetEmailSent": "Đã gửi email đặt lại mật khẩu",
+    "resetSuccess": "Đặt lại mật khẩu thành công",
+    "fields": {
+      "name": "Tên",
+      "namePlaceholder": "Nguyễn Văn An",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "••••••••",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "••••••••"
+    },
+    "errors": {
+      "loginFailed": "Đăng nhập thất bại",
+      "registerFailed": "Đăng ký thất bại",
+      "passwordMismatch": "Mật khẩu không khớp"
+    }
+  },
+  "profile": {
+    "title": "Hồ sơ",
+    "subtitle": "Quản lý tài khoản và xem lịch sử đặt phòng",
+    "editProfile": "Sửa hồ sơ",
+    "myBookings": {
+      "title": "Đặt phòng của tôi",
+      "subtitle": "Xem và quản lý đặt phòng"
+    },
+    "guests": {
+      "signInToView": "Đăng nhập để xem hồ sơ",
+      "signInToManage": "Đăng nhập để xem đặt phòng và quản lý tài khoản."
+    },
+    "avatar": {
+      "title": "Ảnh đại diện",
+      "removeCurrent": "Gỡ ảnh hiện tại",
+      "noPhoto": "Không có ảnh"
+    },
+    "form": {
+      "newPassword": "Mật khẩu mới (để trống để giữ nguyên)",
+      "saveChanges": "Lưu thay đổi",
+      "saving": "Đang lưu…"
+    }
+  },
+  "wishlist": {
+    "title": "Yêu thích của tôi",
+    "subtitle": "{{count}} {{count === 1 ? 'khách sạn' : 'khách sạn'}} đã lưu",
+    "empty": {
+      "title": "Danh sách yêu thích trống",
+      "description": "Duyệt khách sạn và nhấn biểu tượng tim để lưu yêu thích. Chúng sẽ xuất hiện ở đây để dễ dàng truy cập.",
+      "searchHotels": "Tìm khách sạn"
+    },
+    "guests": {
+      "signInToView": "Đăng nhập để xem yêu thích",
+      "signInToSave": "Lưu khách sạn yêu thích và truy cập bất cứ lúc nào."
+    },
+    "actions": {
+      "discoverMore": "Khám phá thêm",
+      "remove": "Gỡ khỏi yêu thích",
+      "viewDetails": "Xem chi tiết →"
+    },
+    "errors": {
+      "couldNotLoad": "Không thể tải danh sách yêu thích"
+    }
+  },
+  "reviews": {
+    "title": "Đánh giá",
+    "writeReview": "Viết đánh giá",
+    "yourRating": "Đánh giá của bạn",
+    "yourComment": "Nhận xét của bạn",
+    "submitReview": "Gửi đánh giá",
+    "reviewSubmitted": "Đánh giá đã được gửi để duyệt",
+    "noReviews": "Chưa có đánh giá nào",
+    "beFirst": "Hãy trở thành người đầu tiên đánh giá khách sạn này",
+    "rating": "Đánh giá",
+    "comment": "Nhận xét",
+    "date": "Ngày",
+    "verified": "Đã lưu trú thực tế",
+    "pending": "Chờ duyệt",
+    "approved": "Đã duyệt",
+    "rejected": "Từ chối"
+  },
+  "support": {
+    "title": "Hỗ trợ",
+    "subtitle": "Tạo yêu cầu cho thanh toán, đặt phòng, hoặc hỗ trợ kỹ thuật. Chúng tôi sẽ phản hồi tại đây và qua email.",
+    "actions": {
+      "newTicket": "Tạo yêu cầu mới"
+    },
+    "categories": {
+      "billing": "Thanh toán",
+      "booking": "Đặt phòng",
+      "technical": "Kỹ thuật",
+      "other": "Khác"
+    },
+    "empty": {
+      "title": "Chưa có yêu cầu hỗ trợ nào",
+      "description": "Có câu hỏi hoặc cần giúp đỡ? Tạo yêu cầu và chúng tôi sẽ phản hồi sớm nhất có thể.",
+      "createFirst": "Tạo yêu cầu đầu tiên"
+    },
+    "replies": {
+      "one": "phản hồi",
+      "other": "phản hồi"
+    },
+    "guests": {
+      "signInToView": "Đăng nhập để truy cập hỗ trợ",
+      "signInToManage": "Đăng nhập để xem và tạo yêu cầu hỗ trợ."
+    },
+    "pagination": {
+      "showing": "Trang {{current}} của {{total}} · {{count}} yêu cầu"
+    },
+    "errors": {
+      "couldNotLoad": "Không thể tải danh sách yêu cầu"
+    }
+  },
+  "admin": {
+    "dashboard": "Bảng điều khiển",
+    "overview": "Tổng quan",
+    "statistics": "Thống kê",
+    "totalUsers": "Tổng người dùng",
+    "totalHotels": "Tổng khách sạn",
+    "totalBookings": "Tổng đặt phòng",
+    "totalRevenue": "Tổng doanh thu",
+    "pendingApprovals": "Chờ phê duyệt",
+    "recentBookings": "Đặt phòng gần đây",
+    "topHotels": "Khách sạn hiệu quả nhất",
+    "revenueChart": "Biểu đồ doanh thu",
+    "bookingChart": "Biểu đồ đặt phòng",
+    "users": "Người dùng",
+    "roles": "Vai trò",
+    "permissions": "Quyền hạn",
+    "vendors": "Chủ nhà",
+    "approve": "Phê duyệt",
+    "reject": "Từ chối",
+    "status": "Trạng thái",
+    "commission": "Hoa hồng",
+    "payouts": "Thanh toán",
+    "websiteSettings": "Cài đặt website",
+    "siteName": "Tên website",
+    "siteDescription": "Mô tả website",
+    "siteLogo": "Logo website",
+    "siteFavicon": "Favicon",
+    "siteEmail": "Email website",
+    "sitePhone": "Điện thoại website",
+    "siteAddress": "Địa chỉ website",
+    "socialLinks": "Mạng xã hội",
+    "metaTitle": "Meta Title",
+    "metaDescription": "Meta Description",
+    "metaKeywords": "Meta Keywords",
+    "googleAnalytics": "Google Analytics ID",
+    "maintenanceMode": "Chế độ bảo trì",
+    "maintenanceMessage": "Thông báo bảo trì",
+    "locale": "Ngôn ngữ mặc định",
+    "fallbackLocale": "Ngôn ngữ dự phòng",
+    "saveSettings": "Lưu cài đặt",
+    "settingsSaved": "Đã lưu cài đặt",
+    "logoRemoved": "Đã gỡ logo",
+    "faviconRemoved": "Đã gỡ favicon",
+    "countries": "Quốc gia",
+    "cities": "Thành phố",
+    "amenities": "Tiện ích",
+    "disputes": "Tranh chấp",
+    "reviews": "Duyệt đánh giá",
+    "supportTickets": "Yêu cầu hỗ trợ",
+    "reports": "Báo cáo",
+    "export": "Xuất file",
+    "filter": "Lọc",
+    "search": "Tìm kiếm",
+    "actions": "Hành động",
+    "view": "Xem",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "confirmDelete": "Bạn có chắc muốn xóa?",
+    "yesDelete": "Có, xóa",
+    "noCancel": "Không, hủy"
+  },
+  "vendor": {
+    "dashboard": "Bảng điều khiển chủ nhà",
+    "overview": "Tổng quan",
+    "myHotels": "Khách sạn của tôi",
+    "addHotel": "Thêm khách sạn",
+    "myRooms": "Phòng của tôi",
+    "addRoom": "Thêm phòng",
+    "bookings": "Đặt phòng",
+    "reports": "Báo cáo",
+    "payouts": "Thanh toán",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "supportTickets": "Yêu cầu hỗ trợ",
+    "revenue": "Doanh thu",
+    "occupancy": "Tỷ lệ lấp đầy",
+    "pendingBookings": "Đặt phòng chờ",
+    "confirmedBookings": "Đặt phòng đã xác nhận",
+    "cancelledBookings": "Đặt phòng đã hủy",
+    "totalEarnings": "Tổng thu nhập",
+    "pendingPayouts": "Thanh toán chờ",
+    "paidPayouts": "Đã thanh toán",
+    "hotelName": "Tên khách sạn",
+    "hotelDescription": "Mô tả khách sạn",
+    "hotelAddress": "Địa chỉ khách sạn",
+    "hotelCity": "Thành phố",
+    "hotelCountry": "Quốc gia",
+    "hotelImages": "Ảnh khách sạn",
+    "roomName": "Tên phòng",
+    "roomDescription": "Mô tả phòng",
+    "basePrice": "Giá cơ bản",
+    "capacity": "Sức chứa",
+    "roomImages": "Ảnh phòng",
+    "roomAmenities": "Tiện ích phòng",
+    "availability": "Sẵn có",
+    "checkIn": "Nhận phòng",
+    "checkOut": "Trả phòng",
+    "lateCheckout": "Trả phòng muộn",
+    "cancellationPolicy": "Chính sách hủy",
+    "taxRate": "Thuế suất",
+    "taxName": "Tên thuế",
+    "taxInclusive": "Đã bao gồm thuế"
+  },
+  "errors": {
+    "notFound": "Không tìm thấy trang",
+    "unauthorized": "Truy cập không được phép",
+    "forbidden": "Bị cấm truy cập",
+    "serverError": "Lỗi máy chủ",
+    "networkError": "Lỗi mạng",
+    "validationError": "Lỗi kiểm tra",
+    "unknownError": "Đã xảy ra lỗi không xác định",
+    "tryAgain": "Vui lòng thử lại",
+    "contactSupport": "Liên hệ hỗ trợ nếu vấn đề tiếp diễn"
+  },
+  "footer": {
+    "about": "Về chúng tôi",
+    "contact": "Liên hệ",
+    "privacy": "Chính sách bảo mật",
+    "terms": "Điều khoản dịch vụ",
+    "careers": "Tuyển dụng",
+    "press": "Báo chí",
+    "partners": "Đối tác",
+    "copyright": "© {{year}} Nền tảng đặt khách sạn. Mọi quyền được bảo lưu.",
+    "followUs": "Theo dõi chúng tôi"
+  },
+  "notifications": {
+    "bookingConfirmed": "Đặt phòng của bạn đã được xác nhận",
+    "bookingCancelled": "Đặt phòng của bạn đã bị hủy",
+    "paymentSuccess": "Thanh toán thành công",
+    "paymentFailed": "Thanh toán thất bại",
+    "reviewApproved": "Đánh giá của bạn đã được duyệt",
+    "reviewRejected": "Đánh giá của bạn không được duyệt",
+    "payoutProcessed": "Đã xử lý thanh toán",
+    "newMessage": "Có tin nhắn mới",
+    "priceDrop": "Giá giảm cho khách sạn trong yêu thích của bạn",
+    "availabilityAlert": "Có phòng trống cho ngày của bạn"
+  },
+  "hotelDetail": {
+    "tabs": {
+      "overview": "Tổng quan",
+      "rooms": "Phòng",
+      "reviews": "Đánh giá",
+      "location": "Vị trí",
+      "ariaLabel": "Các phần chi tiết khách sạn"
+    },
+    "gallery": {
+      "prev": "Ảnh trước",
+      "next": "Ảnh sau",
+      "close": "Đóng thư viện ảnh",
+      "imageAriaLabel": "Ảnh {{index}}"
+    },
+    "overview": {
+      "amenities": "Tiện ích",
+      "checkInOut": "Nhận phòng / Trả phòng",
+      "checkIn": "Nhận phòng",
+      "checkOut": "Trả phòng",
+      "cancellationPolicy": "Chính sách hủy",
+      "seeTermsAtBooking": "Xem điều khoản hủy khi đặt phòng."
+    },
+    "rooms": {
+      "noRooms": "Không có phòng trống.",
+      "capacity": "Tối đa {{count}} khách",
+      "fromPerNight": "Từ {{price}} / đêm",
+      "select": "Chọn",
+      "selectDatesToBook": "Chọn ngày để đặt phòng",
+      "selectRoom": "Chọn phòng"
+    },
+    "reviews": {
+      "sentimentTitle": "Tóm tắt cảm xúc đánh giá",
+      "aiAssisted": "Hỗ trợ bởi AI",
+      "basedOn": "Dựa trên {{count}} đánh giá đã xác minh",
+      "starLabel": "{{count}} sao",
+      "starDistribution": "Phân bố sao",
+      "verifiedStay": "Đã lưu trú thực tế",
+      "noReviews": "Chưa có đánh giá nào.",
+      "paginationAriaLabel": "Phân trang đánh giá"
+    },
+    "location": {
+      "title": "Vị trí",
+      "mapTitle": "Bản đồ vị trí khách sạn",
+      "openInMaps": "Mở trên Maps →",
+      "coordinatesNotAvailable": "Chưa có tọa độ",
+      "addLocationNote": "Thêm vị trí khi tạo hoặc sửa khách sạn để hiển thị bản đồ."
+    },
+    "booking": {
+      "title": "Đặt phòng",
+      "checkAvailability": "Kiểm tra phòng trống",
+      "room": "Phòng",
+      "quantity": "Số lượng",
+      "rooms": "phòng",
+      "selectRoom": "Chọn phòng",
+      "subtotal": "Tạm tính",
+      "tax": "Thuế ({{rate}}%)",
+      "total": "Tổng cộng",
+      "bookNow": "Đặt ngay",
+      "loginRequired": "Bạn cần đăng nhập để đặt phòng. Đăng nhập hoặc tạo tài khoản để tiếp tục."
+    }
+  },
+  "checkout": {
+    "title": "Thanh toán",
+    "summary": {
+      "title": "Tóm tắt đặt phòng",
+      "guest": "Khách",
+      "subtotal": "Tạm tính",
+      "discount": "Giảm giá",
+      "lateCheckout": "Trả phòng muộn",
+      "tax": "Thuế",
+      "total": "Tổng cộng",
+      "reportProblem": "Báo cáo vấn đề với đặt phòng này"
+    },
+    "payment": {
+      "secure": "Thanh toán an toàn",
+      "redirectNotice": "Bạn sẽ được chuyển hướng đến VNPay để hoàn tất thanh toán an toàn.",
+      "payNow": "Thanh toán ngay",
+      "processing": "Đang xử lý…",
+      "backTo": "← Quay lại {{target}}",
+      "profile": "hồ sơ",
+      "home": "trang chủ"
+    },
+    "success": {
+      "title": "Đặt phòng thành công",
+      "confirmationSent": "Cảm ơn bạn đã đặt phòng. Xác nhận đã được gửi đến email của bạn.",
+      "bookingReference": "Mã đặt phòng của bạn",
+      "viewBookings": "Xem đặt phòng của tôi",
+      "backToHome": "Quay lại trang chủ"
+    },
+    "dispute": {
+      "title": "Báo cáo vấn đề",
+      "description": "Mô tả sự cố của bạn. Đội ngũ sẽ xem xét và liên hệ lại qua email.",
+      "name": "Tên của bạn",
+      "email": "Email",
+      "phone": "Điện thoại (tùy chọn)",
+      "whatHappened": "Điều gì đã xảy ra?",
+      "placeholder": "Ít nhất 20 ký tự…",
+      "submitting": "Đang gửi…",
+      "submit": "Gửi"
+    },
+    "errors": {
+      "missingReference": "Thiếu mã đặt phòng.",
+      "sessionExpired": "Phiên thanh toán đã hết hạn hoặc trang được làm mới.",
+      "useEmailLink": "Chúng tôi sẽ gửi liên kết đến email sau khi bạn hoàn tất đặt phòng — hãy dùng liên kết đó để xem và thanh toán.",
+      "useEmailLink2": "Vui lòng dùng liên kết từ email xác nhận để thanh toán.",
+      "bookingNotFound": "Không tìm thấy đặt phòng",
+      "couldNotStartPayment": "Không thể bắt đầu thanh toán",
+      "disputeMinChars": "Vui lòng mô tả vấn đề ít nhất 20 ký tự.",
+      "couldNotSubmitDispute": "Không thể gửi báo cáo"
+    }
+  },
+  "myBookings": {
+    "title": "Đặt phòng của tôi",
+    "subtitle": "Xem và quản lý đặt phòng",
+    "total": "tổng",
+    "status": {
+      "pending": "Chờ xử lý",
+      "pendingPayment": "Chờ thanh toán",
+      "confirmed": "Đã xác nhận",
+      "cancelled": "Đã hủy",
+      "completed": "Đã hoàn tất"
+    },
+    "actions": {
+      "view": "Xem",
+      "invoice": "Hóa đơn",
+      "reportIssue": "Báo cáo vấn đề",
+      "cancel": "Hủy"
+    },
+    "dispute": {
+      "title": "Báo cáo vấn đề",
+      "description": "Mô tả sự cố. Đội ngũ hỗ trợ sẽ xem xét và phản hồi qua email.",
+      "name": "Tên (tùy chọn)",
+      "email": "Email (tùy chọn)",
+      "phone": "Điện thoại (tùy chọn)",
+      "details": "Chi tiết",
+      "placeholder": "Ít nhất 20 ký tự…",
+      "submit": "Gửi báo cáo",
+      "submitting": "Đang gửi…",
+      "minChars": "Vui lòng mô tả vấn đề ít nhất 20 ký tự.",
+      "couldNotSubmit": "Không thể gửi báo cáo"
+    },
+    "errors": {
+      "couldNotLoadInvoice": "Không thể tải hóa đơn",
+      "couldNotCancel": "Không thể hủy đặt phòng"
+    },
+    "empty": {
+      "title": "Chưa có đặt phòng nào",
+      "description": "Khám phá và đặt kỳ nghỉ tiếp theo. Các đặt phòng sẽ hiển thị ở đây.",
+      "searchHotels": "Tìm khách sạn"
+    },
+    "guests": {
+      "signInToView": "Đăng nhập để xem đặt phòng",
+      "signInToManage": "Đăng nhập để xem đặt phòng và quản lý kỳ nghỉ."
+    },
+    "confirmCancel": "Bạn có chắc muốn hủy đặt phòng này?",
+    "pagination": {
+      "ariaLabel": "Phân trang đặt phòng",
+      "showing": "Đang xem trang {{current}} của {{total}}"
+    }
+  },
+  "tours": {
+    "list": {
+      "title": "Tour riêng 1 kèm 1",
+      "subtitle": "Một khách, một hướng dẫn viên — chọn tỉnh thành và thời gian.",
+      "empty": "Không tìm thấy tour. Hãy thử bộ lọc khác.",
+      "results": "tour được tìm thấy",
+      "viewDetails": "Xem chi tiết"
+    },
+    "provinces": {
+      "title": "Khám phá theo tỉnh thành",
+      "tours": "tour"
+    },
+    "filters": {
+      "province": "Tỉnh thành",
+      "allProvinces": "Tất cả tỉnh thành",
+      "date": "Ngày",
+      "sort": "Sắp xếp",
+      "recommended": "Gợi ý",
+      "priceLow": "Giá: thấp đến cao",
+      "priceHigh": "Giá: cao đến thấp",
+      "rating": "Đánh giá cao",
+      "name": "Tên"
+    },
+    "save": {
+      "save": "Lưu",
+      "saved": "Đã lưu",
+      "add": "Lưu tour",
+      "remove": "Bỏ lưu",
+      "loginToSave": "Đăng nhập để lưu tour"
+    },
+    "slots": {
+      "title": "Khung giờ còn trống",
+      "prevWeek": "Tuần trước",
+      "nextWeek": "Tuần sau",
+      "none": "Hết chỗ",
+      "couldNotLoad": "Không tải được lịch trống."
+    },
+    "detail": {
+      "guide": "Hướng dẫn viên",
+      "languages": "Ngôn ngữ",
+      "attractions": "Điểm nổi tiếng của tỉnh",
+      "famous": "Nổi tiếng",
+      "fromPrice": "Từ",
+      "fixedFee": "Phí cơ bản",
+      "hourly": "Mỗi giờ",
+      "daily": "Mỗi ngày",
+      "transport": "Phí di chuyển",
+      "meetingPoint": "Điểm hẹn",
+      "selected": "Đã chọn",
+      "bookNow": "Đặt ngay",
+      "loginToBook": "Đăng nhập để đặt",
+      "loginHint": "Bạn sẽ được chuyển tới đăng nhập rồi quay lại đây.",
+      "pickSlotHint": "Chọn khung giờ còn trống để tiếp tục."
+    },
+    "wizard": {
+      "title": "Đặt tour riêng",
+      "loginRequired": "Cần đăng nhập",
+      "loginRequiredHint": "Đặt tour yêu cầu tài khoản (không hỗ trợ khách vãng lai).",
+      "duration": "Thời lượng",
+      "hour": "Theo giờ",
+      "day": "Theo ngày",
+      "details": "Thông tin chuyến đi",
+      "coupon": "Mã giảm giá (không bắt buộc)",
+      "couponPlaceholder": "Nhập mã giảm giá",
+      "meetingPoint": "Điểm hẹn (không bắt buộc)",
+      "meetingPointPlaceholder": "Hướng dẫn viên đón bạn ở đâu?",
+      "notes": "Ghi chú cho hướng dẫn viên (không bắt buộc)",
+      "price": "Xem trước giá",
+      "subtotal": "Tạm tính",
+      "transport": "Phí di chuyển",
+      "discount": "Giảm giá",
+      "total": "Tổng cộng",
+      "previewHint": "Không xem được giá. Khung giờ có thể vừa bị đặt.",
+      "confirm": "Xác nhận đặt tour"
+    },
+    "checkout": {
+      "title": "Thanh toán tour",
+      "summary": "Tóm tắt đặt tour",
+      "secure": "Thanh toán an toàn qua VNPay",
+      "payNow": "Thanh toán ngay",
+      "successTitle": "Thanh toán thành công!",
+      "successHint": "Tour riêng của bạn đã được xác nhận.",
+      "viewBookings": "Xem tour đã đặt"
+    },
+    "bookings": {
+      "title": "Tour đã đặt",
+      "subtitle": "Các tour riêng 1 kèm 1 của bạn.",
+      "empty": "Bạn chưa đặt tour nào.",
+      "browse": "Khám phá tour",
+      "view": "Xem",
+      "invoice": "Hóa đơn",
+      "report": "Báo sự cố",
+      "cancel": "Hủy",
+      "confirmCancel": "Hủy đặt tour này?",
+      "invoiceError": "Không tải được hóa đơn.",
+      "loginRequired": "Đăng nhập để xem tour đã đặt",
+      "disputeTitle": "Báo cáo sự cố",
+      "disputeMin": "Hãy mô tả sự cố (tối thiểu 20 ký tự)."
+    },
+    "saved": {
+      "title": "Tour đã lưu",
+      "subtitle": "{count} tour đã lưu",
+      "empty": "Chưa có tour nào được lưu.",
+      "loginRequired": "Đăng nhập để xem tour đã lưu"
+    },
+    "chat": {
+      "title": "Nhắn tin với hướng dẫn viên",
+      "live": "Trực tiếp",
+      "polling": "Tự làm mới",
+      "empty": "Chưa có tin nhắn. Hãy chào hướng dẫn viên!",
+      "placeholder": "Nhập tin nhắn...",
+      "send": "Gửi",
+      "couldNotLoad": "Không tải được tin nhắn."
+    },
+    "reviews": {
+      "title": "Đánh giá của khách",
+      "empty": "Chưa có đánh giá nào.",
+      "writeTitle": "Viết đánh giá",
+      "commentPlaceholder": "Chia sẻ trải nghiệm tour của bạn...",
+      "submit": "Gửi đánh giá"
+    },
+    "provinceDetail": {
+      "back": "Tất cả tỉnh thành",
+      "attractions": "Điểm đến nổi bật",
+      "guides": "Hướng dẫn viên 1 kèm 1",
+      "guidesHint": "Xếp hạng theo điểm = số sao × lượt đánh giá.",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "filter": "Lọc lịch trống",
+      "clear": "Xóa lọc",
+      "sort": "Sắp xếp",
+      "sortScore": "Điểm cao nhất",
+      "sortRating": "Sao cao nhất",
+      "sortPriceLow": "Giá thấp nhất",
+      "emptyGuides": "Chưa có hướng dẫn viên trống lịch trong những ngày này.",
+      "results": "hướng dẫn viên"
+    },
+    "guides": {
+      "viewProfile": "Xem profile & đặt",
+      "score": "điểm",
+      "reviewsCount": "đánh giá",
+      "priceFrom": "Từ",
+      "about": "Về hướng dẫn viên",
+      "offers": "Nhận chở tới",
+      "availability": "Lịch trống",
+      "pickTourHint": "Chọn tour và khung giờ trống để tiếp tục.",
+      "bookThis": "Đặt tour này",
+      "loginToBook": "Đăng nhập để đặt",
+      "backToProvince": "Về trang tỉnh",
+      "noTours": "Hướng dẫn viên chưa có tour nào ở tỉnh này.",
+      "myBooking": "Đặt tour của bạn với hướng dẫn viên này",
+      "viewAllBookings": "Xem tất cả tour đã đặt"
+    },
+    "status": {
+      "pending_payment": "Chờ thanh toán",
+      "confirmed": "Đã xác nhận",
+      "ongoing": "Đang diễn ra",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "disputed": "Khiếu nại",
+      "refunded": "Đã hoàn tiền"
+    }
+  }
+}
