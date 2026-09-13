@@ -7,7 +7,15 @@ use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\HotelSearchController;
 use App\Http\Controllers\Api\V1\LocationController;
 use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\SavedTourController;
+use App\Http\Controllers\Api\V1\TourMessageController;
+use App\Http\Controllers\Api\V1\TourProviderController;
+use App\Http\Controllers\Api\V1\TourReviewController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
+use App\Http\Controllers\Api\V1\TourAvailabilityController;
+use App\Http\Controllers\Api\V1\TourBookingController;
+use App\Http\Controllers\Api\V1\TourProvinceController;
+use App\Http\Controllers\Api\V1\TourSearchController;
 use App\Http\Controllers\Api\V1\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/v1/payments/vnpay-ipn', [\App\Http\Controllers\Api\V1\VnpayIpnController::class, '__invoke'])->name('api.v1.payments.vnpay-ipn');
+Route::get('/v1/payments/tour-vnpay-ipn', [\App\Http\Controllers\Api\V1\TourVnpayIpnController::class, '__invoke'])->name('api.v1.payments.tour-vnpay-ipn');
 
 /*
 |--------------------------------------------------------------------------
@@ -68,16 +77,18 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
 
     // Reviews list (no auth) – approved only
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/tour-reviews', [TourReviewController::class, 'index'])->name('tour-reviews.index');
 
-    // Guest checkout (no auth)
-    Route::post('/bookings/guest/preview', [BookingController::class, 'previewGuest'])->name('bookings.guest.preview');
-    Route::post('/bookings/guest', [BookingController::class, 'storeGuest'])->name('bookings.guest.store');
-    Route::get('/bookings/guest-view', [BookingController::class, 'guestView'])->name('bookings.guest-view');
-    Route::get('/bookings/guest-invoice', [BookingController::class, 'guestInvoice'])->name('bookings.guest-invoice');
-    Route::post('/bookings/guest-checkout-session', [BookingController::class, 'guestCheckoutSession'])->name('bookings.guest-checkout-session')->middleware('signed');
-    Route::post('/bookings/guest-dispute', [BookingController::class, 'guestStoreDispute'])->name('bookings.guest-dispute')->middleware('signed');
+    // Tour 1vs1 discovery (public, login only required at booking time)
+    Route::get('/tour-provinces', [TourProvinceController::class, 'index'])->name('tour-provinces.index');
+    Route::get('/tour-provinces/{slug}', [TourProvinceController::class, 'show'])->name('tour-provinces.show');
+    Route::get('/tour-providers', [TourProviderController::class, 'index'])->name('tour-providers.index');
+    Route::get('/tour-providers/{uuid}', [TourProviderController::class, 'show'])->name('tour-providers.show');
+    Route::get('/tours', [TourSearchController::class, 'index'])->name('tours.index');
+    Route::get('/tours/{uuid}', [TourSearchController::class, 'show'])->name('tours.show');
+    Route::get('/tours/{uuid}/availability', [TourAvailabilityController::class, 'index'])->name('tours.availability');
 
-    // Authenticated customer routes
+    // Authenticated customer routes (booking requires login — no guest flow by design)
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/me', [AuthController::class, 'me'])->name('me');
@@ -90,7 +101,21 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('/bookings/{uuid}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
         Route::post('/bookings/{uuid}/dispute', [BookingController::class, 'storeDispute'])->name('bookings.dispute.store');
         Route::post('/bookings/{uuid}/claim', [BookingController::class, 'claim'])->name('bookings.claim');
+        // Tour 1vs1 bookings (auth required — no guest flow by design)
+        Route::post('/tour-bookings/preview', [TourBookingController::class, 'preview'])->name('tour-bookings.preview');
+        Route::apiResource('tour-bookings', TourBookingController::class)->only(['index', 'store']);
+        Route::get('/tour-bookings/{uuid}', [TourBookingController::class, 'show'])->name('tour-bookings.show');
+        Route::post('/tour-bookings/{uuid}/checkout-session', [TourBookingController::class, 'createCheckoutSession'])->name('tour-bookings.checkout-session');
+        Route::post('/tour-bookings/{uuid}/cancel', [TourBookingController::class, 'cancel'])->name('tour-bookings.cancel');
+        Route::get('/tour-bookings/{uuid}/invoice', [TourBookingController::class, 'invoice'])->name('tour-bookings.invoice');
+        Route::post('/tour-bookings/{uuid}/dispute', [TourBookingController::class, 'storeDispute'])->name('tour-bookings.dispute.store');
+        Route::get('/tour-bookings/{uuid}/messages', [TourMessageController::class, 'index'])->name('tour-bookings.messages.index');
+        Route::post('/tour-bookings/{uuid}/messages', [TourMessageController::class, 'store'])->name('tour-bookings.messages.store');
+        Route::get('/saved-tours', [SavedTourController::class, 'index'])->name('saved-tours.index');
+        Route::post('/saved-tours', [SavedTourController::class, 'store'])->name('saved-tours.store');
+        Route::delete('/saved-tours/{tourId}', [SavedTourController::class, 'destroy'])->name('saved-tours.destroy');
         Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+        Route::post('/tour-reviews', [TourReviewController::class, 'store'])->name('tour-reviews.store');
         Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
         Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
         Route::delete('/wishlist/{hotelId}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
