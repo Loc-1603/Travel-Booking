@@ -1,7 +1,7 @@
 # AGENTS.md — Travel-Booking
 
 ## Project Overview
-Monorepo: Laravel 11 backend (`backend/`) + React 19 frontend (`frontend/`). Multi-hotel booking platform with Stripe/PayPal payments, vendor payouts, and dynamic website settings.
+Monorepo: Laravel 11 backend (`backend/`) + React 19 frontend (`frontend/`). Multi-hotel booking platform with VNPay payments, vendor payouts, and dynamic website settings.
 
 ## Key Commands
 
@@ -50,7 +50,7 @@ npm run lint       # ESLint (flat config)
 - No `.env.example` in backend — copy `.env` manually and configure:
   - `DB_CONNECTION` (mysql/pgsql), `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
   - `REDIS_HOST`, `QUEUE_CONNECTION=redis` (required for async jobs)
-  - `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_KEY` (see `backend/PAYMENTS.md`)
+  - `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET`, `VNPAY_URL`, `VNPAY_RETURN_URL` (see `backend/PAYMENTS.md`)
 - Frontend: create `.env.local` with `VITE_API_URL=http://localhost:8000/api/v1` if not using Vite proxy
 - Redis required for queues; `QUEUE_CONNECTION=sync` only for local testing
 
@@ -73,5 +73,5 @@ npm run lint       # ESLint (flat config)
 - `README.md` — full project docs
 - `backend/app/README.md` — folder conventions
 - `backend/docs/INFRASTRUCTURE.md` — queue/scheduler setup
-- `backend/PAYMENTS.md` — Stripe flow, webhooks, refunds
+- `backend/PAYMENTS.md` — VNPay flow, IPN, refunds
 - `composer.json` scripts: `setup`, `dev`, `test`
