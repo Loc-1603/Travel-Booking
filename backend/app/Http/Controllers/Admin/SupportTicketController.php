@@ -52,7 +52,7 @@ class SupportTicketController extends Controller
             $supportTicket->closed_at = now();
         }
         $supportTicket->save();
-        return redirect()->route('admin.support-tickets.show', $supportTicket)->with('success', 'Ticket updated.');
+        return redirect()->route('admin.support-tickets.show', $supportTicket)->with('success', __('admin.vendor.support_tickets.flash.updated'));
     }
 
     public function storeReply(Request $request, SupportTicket $supportTicket): RedirectResponse
@@ -65,6 +65,6 @@ class SupportTicketController extends Controller
             'body' => $validated['body'],
         ]);
         event(new SupportTicketReplyCreated($reply));
-        return redirect()->route('admin.support-tickets.show', $supportTicket)->with('success', 'Reply added.');
+        return redirect()->route('admin.support-tickets.show', $supportTicket)->with('success', __('admin.vendor.support_tickets.flash.reply_added'));
     }
 }

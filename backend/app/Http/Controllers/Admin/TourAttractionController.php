@@ -49,7 +49,7 @@ class TourAttractionController extends Controller
         }
         TourAttraction::create($validated);
 
-        return redirect()->route('admin.tour-attractions.index')->with('success', 'Attraction created.');
+        return redirect()->route('admin.tour-attractions.index')->with('success', __('admin.vendor.tour_attractions.flash.created'));
     }
 
     public function edit(TourAttraction $tourAttraction): View
@@ -80,7 +80,7 @@ class TourAttractionController extends Controller
         }
         $tourAttraction->update($validated);
 
-        return redirect()->route('admin.tour-attractions.index')->with('success', 'Attraction updated.');
+        return redirect()->route('admin.tour-attractions.index')->with('success', __('admin.vendor.tour_attractions.flash.updated'));
     }
 
     public function destroy(TourAttraction $tourAttraction): RedirectResponse
@@ -91,6 +91,6 @@ class TourAttractionController extends Controller
         }
         $tourAttraction->delete();
 
-        return redirect()->route('admin.tour-attractions.index')->with('success', 'Attraction deleted.');
+        return redirect()->route('admin.tour-attractions.index')->with('success', __('admin.vendor.tour_attractions.flash.deleted'));
     }
 }

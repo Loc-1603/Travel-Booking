@@ -55,6 +55,6 @@ class ReviewModerationController extends Controller
                 break;
         }
         $review->update($data);
-        return redirect()->route('admin.reviews.show', $review)->with('success', 'Review updated.');
+        return redirect()->route('admin.reviews.show', $review)->with('success', __('admin.vendor.reviews.flash.updated'));
     }
 }

@@ -56,9 +56,9 @@ class TourDisputeController extends Controller
                 }
             }
 
-            return redirect()->route('admin.tour-disputes.show', $tourDispute)->with('success', 'Tour dispute updated and payments refunded.');
+            return redirect()->route('admin.tour-disputes.show', $tourDispute)->with('success', __('admin.vendor.tour_disputes.flash.updated_refunded'));
         }
 
-        return redirect()->route('admin.tour-disputes.show', $tourDispute)->with('success', 'Tour dispute updated.');
+        return redirect()->route('admin.tour-disputes.show', $tourDispute)->with('success', __('admin.vendor.tour_disputes.flash.updated'));
     }
 }

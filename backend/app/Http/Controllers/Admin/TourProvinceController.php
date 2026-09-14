@@ -48,7 +48,7 @@ class TourProvinceController extends Controller
         }
         TourProvince::create($validated);
 
-        return redirect()->route('admin.tour-provinces.index')->with('success', 'Tour province created.');
+        return redirect()->route('admin.tour-provinces.index')->with('success', __('admin.vendor.tour_provinces.flash.created'));
     }
 
     public function edit(TourProvince $tourProvince): View
@@ -85,7 +85,7 @@ class TourProvinceController extends Controller
         }
         $tourProvince->update($validated);
 
-        return redirect()->route('admin.tour-provinces.index')->with('success', 'Tour province updated.');
+        return redirect()->route('admin.tour-provinces.index')->with('success', __('admin.vendor.tour_provinces.flash.updated'));
     }
 
     public function destroy(TourProvince $tourProvince): RedirectResponse
@@ -96,6 +96,6 @@ class TourProvinceController extends Controller
         }
         $tourProvince->delete();
 
-        return redirect()->route('admin.tour-provinces.index')->with('success', 'Tour province deleted.');
+        return redirect()->route('admin.tour-provinces.index')->with('success', __('admin.vendor.tour_provinces.flash.deleted'));
     }
 }

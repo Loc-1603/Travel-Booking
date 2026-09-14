@@ -312,6 +312,12 @@ return [
             ],
             'empty' => 'Không có đặt phòng nào khớp với bộ lọc.',
             'old_empty' => 'Không có đặt phòng cũ nào khớp với bộ lọc.',
+            'flash' => [
+                'marked_old' => 'Đã chuyển đặt phòng sang danh sách cũ.',
+                'restored' => 'Đã khôi phục đặt phòng về danh sách chính.',
+                'forbidden_booking' => 'Bạn không có quyền truy cập đặt phòng này.',
+                'forbidden_invoice' => 'Bạn không có quyền truy cập hóa đơn này.',
+            ],
         ],
 
         // Hotels
@@ -371,6 +377,11 @@ return [
                 'update' => 'Cập nhật',
                 'cancel' => 'Hủy',
             ],
+            'flash' => [
+                'created' => 'Đã tạo khách sạn.',
+                'updated' => 'Đã cập nhật khách sạn.',
+                'deactivated' => 'Đã vô hiệu hóa khách sạn.',
+            ],
         ],
 
         // Rooms
@@ -424,6 +435,12 @@ return [
                 ],
                 'empty' => 'Chưa có ngày sẵn có. Dùng biểu mẫu trên để thêm.',
                 'back_to_rooms' => 'Quay lại Phòng',
+            ],
+            'flash' => [
+                'created' => 'Đã tạo phòng.',
+                'updated' => 'Đã cập nhật phòng.',
+                'deleted' => 'Đã xóa phòng.',
+                'availability_updated' => 'Đã cập nhật sẵn có.',
             ],
         ],
 
@@ -490,8 +507,8 @@ return [
             'revenue_chart' => 'Doanh thu (6 tháng gần đây)',
         ],
 
-        // Support Tickets
-        'support_tickets' => [
+        // Support Tickets (vendor)
+        'vendor_support_tickets' => [
             'title' => 'Yêu cầu hỗ trợ',
             'new' => 'Yêu cầu hỗ trợ mới',
             'create' => 'Tạo mới',
@@ -501,6 +518,11 @@ return [
                 'status' => 'Trạng thái',
                 'all' => 'Tất cả',
                 'apply' => 'Lọc',
+                'status_open' => 'Mở',
+                'status_assigned' => 'Đã giao',
+                'status_in_progress' => 'Đang xử lý',
+                'status_resolved' => 'Đã giải quyết',
+                'status_closed' => 'Đã đóng',
             ],
             'table' => [
                 'id' => 'Mã',
@@ -531,6 +553,9 @@ return [
                 'created' => 'Ngày tạo',
                 'replies' => 'Phản hồi',
                 'no_replies' => 'Chưa có phản hồi nào. Hỗ trợ sẽ trả lời tại đây.',
+            ],
+            'flash' => [
+                'created' => 'Đã tạo yêu cầu hỗ trợ.',
             ],
         ],
 
@@ -591,6 +616,16 @@ return [
                     'add' => 'Thêm tài khoản',
                 ],
             ],
+            'flash' => [
+                'details_updated' => 'Đã cập nhật thông tin kinh doanh.',
+                'bank_added' => 'Đã thêm tài khoản ngân hàng.',
+                'bank_updated' => 'Đã cập nhật tài khoản ngân hàng.',
+                'bank_removed' => 'Đã gỡ tài khoản ngân hàng.',
+                'doc_not_found' => 'Không tìm thấy tài liệu.',
+                'doc_removed' => 'Đã gỡ tài liệu.',
+                'doc_uploaded' => 'Đã tải lên :count tệp.',
+                'doc_max_files' => 'Bạn chỉ được tải lên tối đa :max tệp.',
+            ],
         ],
 
         // Common
@@ -645,6 +680,12 @@ return [
                 'update' => 'Cập nhật người dùng',
             ],
             'confirm_delete' => 'Xóa người dùng này?',
+            'flash' => [
+                'created' => 'Đã tạo người dùng thành công.',
+                'updated' => 'Đã cập nhật người dùng thành công.',
+                'deleted' => 'Đã xóa người dùng thành công.',
+                'cannot_delete_super_admin' => 'Không thể xóa Super Admin.',
+            ],
         ],
 
         // Roles
@@ -664,6 +705,11 @@ return [
                 'update' => 'Cập nhật vai trò',
             ],
             'confirm_delete' => 'Xóa vai trò này?',
+            'flash' => [
+                'created' => 'Đã tạo vai trò thành công.',
+                'updated' => 'Đã cập nhật vai trò thành công.',
+                'deleted' => 'Đã xóa vai trò thành công.',
+            ],
         ],
 
         // Permissions
@@ -681,6 +727,11 @@ return [
                 'update' => 'Cập nhật quyền hạn',
             ],
             'confirm_delete' => 'Xóa quyền hạn này?',
+            'flash' => [
+                'created' => 'Đã tạo quyền hạn thành công.',
+                'updated' => 'Đã cập nhật quyền hạn thành công.',
+                'deleted' => 'Đã xóa quyền hạn thành công.',
+            ],
         ],
 
         // Countries
@@ -710,6 +761,11 @@ return [
                 'cancel' => 'Hủy',
             ],
             'confirm_delete' => 'Xóa quốc gia này?',
+            'flash' => [
+                'created' => 'Đã tạo quốc gia.',
+                'updated' => 'Đã cập nhật quốc gia.',
+                'deleted' => 'Đã xóa quốc gia.',
+            ],
         ],
 
         // Cities
@@ -734,6 +790,11 @@ return [
                 'cancel' => 'Hủy',
             ],
             'confirm_delete' => 'Xóa thành phố này?',
+            'flash' => [
+                'created' => 'Đã tạo thành phố.',
+                'updated' => 'Đã cập nhật thành phố.',
+                'deleted' => 'Đã xóa thành phố.',
+            ],
         ],
 
         // Amenities
@@ -764,6 +825,11 @@ return [
                 'cancel' => 'Hủy',
             ],
             'confirm_delete' => 'Xóa tiện ích này?',
+            'flash' => [
+                'created' => 'Đã tạo tiện ích.',
+                'updated' => 'Đã cập nhật tiện ích.',
+                'deleted' => 'Đã xóa tiện ích.',
+            ],
         ],
 
         // Support Tickets
@@ -819,6 +885,10 @@ return [
                 'priority_normal' => 'Bình thường',
                 'priority_high' => 'Cao',
             ],
+            'flash' => [
+                'updated' => 'Đã cập nhật yêu cầu.',
+                'reply_added' => 'Đã thêm phản hồi.',
+            ],
         ],
 
         // Reviews
@@ -863,6 +933,9 @@ return [
                 ],
                 'moderated' => 'Đã duyệt: :date bởi :name',
             ],
+            'flash' => [
+                'updated' => 'Đã cập nhật đánh giá.',
+            ],
         ],
 
         // Disputes
@@ -905,6 +978,9 @@ return [
                 'save' => 'Lưu',
                 'resolved' => 'Đã giải quyết',
                 'by' => 'Bởi',
+            ],
+            'flash' => [
+                'updated' => 'Đã cập nhật tranh chấp.',
             ],
         ],
 
@@ -972,6 +1048,12 @@ return [
                 'generate' => 'Tạo thanh toán',
                 'cancel' => 'Hủy',
             ],
+            'flash' => [
+                'generated' => 'Đã tạo :count thanh toán cho kỳ này.',
+                'empty_period' => 'Không có đặt phòng chưa thanh toán nào trong kỳ này.',
+                'updated' => 'Đã cập nhật thanh toán.',
+                'marked_paid' => 'Đã đánh dấu thanh toán đã thanh toán.',
+            ],
         ],
 
         // Commission
@@ -1007,6 +1089,9 @@ return [
                 'save' => 'Lưu',
                 'cancel' => 'Hủy',
             ],
+            'flash' => [
+                'rate_updated' => 'Đã cập nhật tỷ lệ hoa hồng.',
+            ],
         ],
 
         // Website Settings
@@ -1039,6 +1124,36 @@ return [
             'save_settings' => 'Lưu cài đặt',
             'confirm_remove_logo' => 'Bạn có chắc muốn gỡ logo?',
             'confirm_remove_favicon' => 'Bạn có chắc muốn gỡ favicon?',
+            'flash' => [
+                'updated' => 'Đã cập nhật cài đặt website thành công!',
+                'logo_removed' => 'Đã gỡ logo thành công!',
+                'favicon_removed' => 'Đã gỡ favicon thành công!',
+            ],
+            'validation' => [
+                'site_name_required' => 'Trường tên website là bắt buộc.',
+                'site_name_max' => 'Tên website không được vượt quá 255 ký tự.',
+                'site_description_max' => 'Mô tả website không được vượt quá 1000 ký tự.',
+                'site_email_email' => 'Vui lòng nhập địa chỉ email hợp lệ.',
+                'site_email_max' => 'Email không được vượt quá 255 ký tự.',
+                'site_phone_max' => 'Số điện thoại không được vượt quá 50 ký tự.',
+                'site_address_max' => 'Địa chỉ không được vượt quá 500 ký tự.',
+                'social_facebook_url' => 'Vui lòng nhập URL hợp lệ cho Facebook.',
+                'social_twitter_url' => 'Vui lòng nhập URL hợp lệ cho Twitter.',
+                'social_instagram_url' => 'Vui lòng nhập URL hợp lệ cho Instagram.',
+                'social_linkedin_url' => 'Vui lòng nhập URL hợp lệ cho LinkedIn.',
+                'meta_title_max' => 'Meta title không được vượt quá 255 ký tự.',
+                'meta_description_max' => 'Meta description không được vượt quá 500 ký tự.',
+                'meta_keywords_max' => 'Meta keywords không được vượt quá 500 ký tự.',
+                'google_analytics_max' => 'Mã Google Analytics không được vượt quá 500 ký tự.',
+                'maintenance_mode_boolean' => 'Chế độ bảo trì phải là bật hoặc tắt.',
+                'maintenance_message_max' => 'Thông báo bảo trì không được vượt quá 1000 ký tự.',
+                'site_logo_image' => 'Logo phải là tệp ảnh.',
+                'site_logo_mimes' => 'Logo phải là tệp thuộc loại: jpeg, png, jpg, gif, svg.',
+                'site_logo_max' => 'Logo không được vượt quá 2MB.',
+                'site_favicon_image' => 'Favicon phải là tệp ảnh.',
+                'site_favicon_mimes' => 'Favicon phải là tệp thuộc loại: ico, png, jpg, jpeg.',
+                'site_favicon_max' => 'Favicon không được vượt quá 1MB.',
+            ],
         ],
 
         // Vendors (Admin)
@@ -1108,6 +1223,359 @@ return [
                 'download' => 'Tải xuống',
                 'back_to_list' => 'Quay lại danh sách',
                 'actions' => 'Hành động',
+            ],
+            'flash' => [
+                'approved' => 'Đã phê duyệt chủ nhà.',
+                'rejected' => 'Đã từ chối chủ nhà.',
+                'activated' => 'Đã kích hoạt chủ nhà.',
+                'suspended' => 'Đã tạm ngừng chủ nhà.',
+            ],
+        ],
+
+        // Tour provinces
+        'tour_provinces' => [
+            'title' => 'Tỉnh tour',
+            'add' => 'Thêm tỉnh',
+            'edit' => 'Sửa tỉnh tour',
+            'table' => [
+                'image' => 'Ảnh',
+                'name' => 'Tên',
+                'slug' => 'Slug',
+                'country' => 'Quốc gia',
+                'attractions' => 'Điểm tham quan',
+                'tours' => 'Tour',
+                'featured' => 'Nổi bật',
+                'actions' => 'Hành động',
+            ],
+            'empty' => 'Chưa có tỉnh tour nào.',
+            'form' => [
+                'name' => 'Tên',
+                'slug' => 'Slug',
+                'country' => 'Quốc gia',
+                'city' => 'Thành phố',
+                'description' => 'Mô tả',
+                'image' => 'Ảnh',
+                'sort_order' => 'Thứ tự sắp xếp',
+                'featured' => 'Nổi bật',
+                'create' => 'Tạo',
+                'update' => 'Cập nhật',
+            ],
+            'attractions' => 'Điểm tham quan',
+            'confirm_delete' => 'Xóa tỉnh này?',
+            'flash' => [
+                'created' => 'Đã tạo tỉnh tour.',
+                'updated' => 'Đã cập nhật tỉnh tour.',
+                'deleted' => 'Đã xóa tỉnh tour.',
+            ],
+        ],
+
+        // Tour attractions
+        'tour_attractions' => [
+            'title' => 'Điểm tham quan',
+            'add' => 'Thêm điểm tham quan',
+            'edit' => 'Sửa điểm tham quan',
+            'filter' => [
+                'province' => 'Tỉnh',
+                'all' => 'Tất cả',
+                'apply' => 'Lọc',
+            ],
+            'table' => [
+                'image' => 'Ảnh',
+                'name' => 'Tên',
+                'province' => 'Tỉnh',
+                'famous' => 'Nổi tiếng',
+                'actions' => 'Hành động',
+            ],
+            'empty' => 'Chưa có điểm tham quan nào.',
+            'form' => [
+                'province' => 'Tỉnh',
+                'name' => 'Tên',
+                'description' => 'Mô tả',
+                'image' => 'Ảnh',
+                'latitude' => 'Vĩ độ',
+                'longitude' => 'Kinh độ',
+                'famous' => 'Nổi tiếng',
+                'create' => 'Tạo',
+                'update' => 'Cập nhật',
+            ],
+            'confirm_delete' => 'Xóa điểm tham quan này?',
+            'flash' => [
+                'created' => 'Đã tạo điểm tham quan.',
+                'updated' => 'Đã cập nhật điểm tham quan.',
+                'deleted' => 'Đã xóa điểm tham quan.',
+            ],
+        ],
+
+        // Tour providers (admin)
+        'tour_providers' => [
+            'title' => 'Nhà cung cấp tour',
+            'edit_title' => 'Sửa nhà cung cấp tour #:id',
+            'detail_title' => 'Nhà cung cấp tour #:id',
+            'filter' => [
+                'status' => 'Trạng thái',
+                'all' => 'Tất cả',
+                'apply' => 'Lọc',
+            ],
+            'table' => [
+                'id' => 'Mã',
+                'business' => 'Doanh nghiệp',
+                'vendor' => 'Chủ nhà',
+                'tours' => 'Tour',
+                'status' => 'Trạng thái',
+                'actions' => 'Hành động',
+            ],
+            'empty' => 'Chưa có nhà cung cấp tour nào.',
+            'detail' => [
+                'provider' => 'Nhà cung cấp',
+                'business' => 'Doanh nghiệp',
+                'vendor' => 'Chủ nhà',
+                'edit_profile' => 'Sửa hồ sơ + ảnh',
+                'status' => 'Trạng thái',
+                'bio' => 'Giới thiệu',
+                'moderation' => 'Kiểm duyệt',
+                'approve' => 'Phê duyệt',
+                'reject' => 'Từ chối',
+                'tours' => 'Tour (:count)',
+                'no_tours' => 'Chưa có tour nào.',
+            ],
+            'form' => [
+                'business_name' => 'Tên doanh nghiệp',
+                'bio' => 'Giới thiệu',
+                'avatar' => 'Ảnh đại diện',
+                'remove_avatar' => 'Gỡ ảnh (dùng ảnh đại diện tài khoản chủ nhà)',
+                'no_avatar' => 'Chưa có ảnh — trang bán hàng sẽ dùng ảnh đại diện tài khoản chủ nhà, sau đó là chữ cái đầu.',
+                'languages' => 'Ngôn ngữ (cách nhau bằng dấu phẩy)',
+            ],
+            'flash' => [
+                'updated' => 'Đã cập nhật nhà cung cấp tour.',
+                'approved' => 'Đã phê duyệt nhà cung cấp tour.',
+                'rejected' => 'Đã từ chối nhà cung cấp tour.',
+            ],
+        ],
+
+        // Tour disputes (admin)
+        'tour_disputes' => [
+            'title' => 'Tranh chấp tour',
+            'detail_title' => 'Tranh chấp #:id',
+            'filter' => [
+                'status' => 'Trạng thái',
+                'all' => 'Tất cả',
+                'apply' => 'Lọc',
+            ],
+            'table' => [
+                'id' => 'Mã',
+                'booking' => 'Đặt tour',
+                'tour' => 'Tour',
+                'status' => 'Trạng thái',
+                'created' => 'Ngày tạo',
+                'actions' => 'Hành động',
+            ],
+            'empty' => 'Chưa có tranh chấp tour nào.',
+            'detail' => [
+                'booking' => 'Đặt tour',
+                'uuid' => 'Mã UUID',
+                'tour' => 'Tour',
+                'customer' => 'Khách hàng',
+                'total' => 'Tổng cộng',
+                'contact' => 'Liên hệ',
+                'name' => 'Tên',
+                'email' => 'Email',
+                'phone' => 'Điện thoại',
+                'customer_notes' => 'Ghi chú khách hàng',
+                'update' => 'Cập nhật tranh chấp',
+                'status' => 'Trạng thái',
+                'internal_notes' => 'Ghi chú nội bộ',
+                'refund_hint' => 'Hoàn toàn bộ thanh toán tour đã hoàn tất khi lưu (đối soát trên cổng VNPay; chỉ hạch toán nội bộ)',
+                'save' => 'Lưu',
+                'resolved' => 'Đã giải quyết',
+                'by' => 'Bởi',
+            ],
+            'flash' => [
+                'updated' => 'Đã cập nhật tranh chấp tour.',
+                'updated_refunded' => 'Đã cập nhật tranh chấp tour và hoàn tiền.',
+            ],
+        ],
+
+        // Tour reviews (admin)
+        'tour_reviews' => [
+            'title' => 'Đánh giá tour',
+            'detail_title' => 'Đánh giá tour #:id',
+            'filter' => [
+                'label' => 'Lọc',
+                'all' => 'Tất cả',
+                'apply' => 'Lọc',
+            ],
+            'table' => [
+                'id' => 'Mã',
+                'tour' => 'Tour',
+                'rating' => 'Điểm',
+                'comment' => 'Nhận xét',
+                'approved' => 'Đã duyệt',
+                'hidden' => 'Đã ẩn',
+            ],
+            'empty' => 'Chưa có đánh giá tour nào.',
+            'detail' => [
+                'tour' => 'Tour',
+                'customer' => 'Khách hàng',
+                'rating' => 'Điểm',
+                'comment' => 'Nhận xét',
+                'state' => 'Trạng thái',
+                'approve' => 'Duyệt',
+                'reject' => 'Từ chối',
+                'hide' => 'Ẩn',
+                'unhide' => 'Bỏ ẩn',
+            ],
+            'flash' => [
+                'updated' => 'Đã cập nhật đánh giá tour.',
+            ],
+        ],
+
+        // Tours (vendor)
+        'tours' => [
+            'title' => 'Tour của tôi',
+            'add' => 'Thêm tour',
+            'edit' => 'Sửa tour',
+            'table' => [
+                'title' => 'Tiêu đề',
+                'provider' => 'Nhà cung cấp',
+                'province' => 'Tỉnh',
+                'fixed' => 'Giá cố định',
+                'hourly' => 'Theo giờ',
+                'daily' => 'Theo ngày',
+                'status' => 'Trạng thái',
+                'actions' => 'Hành động',
+            ],
+            'empty' => 'Chưa có tour nào. Hãy tạo tour 1vs1 đầu tiên của bạn.',
+            'actions' => [
+                'slots' => 'Khung giờ',
+                'edit' => 'Sửa',
+                'suspend' => 'Tạm ngừng',
+                'suspend_confirm' => 'Tạm ngừng tour này?',
+            ],
+            'form' => [
+                'provider' => 'Nhà cung cấp',
+                'province' => 'Tỉnh',
+                'title' => 'Tiêu đề',
+                'description' => 'Mô tả',
+                'base_fixed' => 'Giá cố định (VND)',
+                'per_hour' => 'Theo giờ (VND)',
+                'per_day' => 'Theo ngày (VND)',
+                'transport_fee' => 'Phí di chuyển (VND)',
+                'transport_desc' => 'Mô tả di chuyển',
+                'meeting_point' => 'Điểm hẹn',
+                'status' => 'Trạng thái',
+                'create_draft' => 'Tạo (nháp)',
+                'save' => 'Lưu',
+            ],
+            'flash' => [
+                'created' => 'Đã tạo tour.',
+                'updated' => 'Đã cập nhật tour.',
+                'suspended' => 'Đã tạm ngừng tour.',
+            ],
+            'slots' => [
+                'title' => 'Khung giờ: :title',
+                'heading' => 'Thêm / cập nhật khung giờ (sức chứa luôn là 1)',
+                'date' => 'Ngày',
+                'start' => 'Bắt đầu',
+                'end' => 'Kết thúc',
+                'status' => 'Trạng thái',
+                'price_override' => 'Giá ghi đè (VND)',
+                'save' => 'Lưu khung giờ',
+                'table' => [
+                    'date' => 'Ngày',
+                    'start' => 'Bắt đầu',
+                    'end' => 'Kết thúc',
+                    'status' => 'Trạng thái',
+                    'booking' => 'Đặt tour',
+                    'price_override' => 'Giá ghi đè',
+                ],
+                'empty' => 'Chưa có khung giờ nào.',
+                'remove' => 'Xóa',
+                'remove_confirm' => 'Xóa khung giờ này?',
+                'flash' => [
+                    'saved' => 'Đã lưu khung giờ.',
+                    'remove_booked' => 'Không thể xóa khung giờ đã được đặt.',
+                    'removed' => 'Đã xóa khung giờ.',
+                ],
+            ],
+        ],
+
+        // Tour bookings (vendor)
+        'tour_bookings' => [
+            'title' => 'Đặt tour',
+            'filter' => [
+                'status' => 'Trạng thái',
+                'from' => 'Từ',
+                'to' => 'Đến',
+                'all' => 'Tất cả',
+                'apply' => 'Lọc',
+            ],
+            'table' => [
+                'booking' => 'Đặt tour',
+                'tour' => 'Tour',
+                'customer' => 'Khách hàng',
+                'start' => 'Bắt đầu',
+                'status' => 'Trạng thái',
+                'total' => 'Tổng cộng',
+                'actions' => 'Hành động',
+            ],
+            'empty' => 'Chưa có đặt tour nào.',
+            'invoice' => 'Hóa đơn',
+            'chat' => 'Nhắn tin',
+            'flash' => [
+                'forbidden_invoice' => 'Bạn không có quyền truy cập hóa đơn này.',
+            ],
+        ],
+
+        // Tour messages (vendor)
+        'tour_messages' => [
+            'title' => 'Tin nhắn tour',
+            'chat_title' => 'Nhắn tin: :title',
+            'chat' => 'Nhắn tin',
+            'table' => [
+                'booking' => 'Đặt tour',
+                'tour' => 'Tour',
+                'customer' => 'Khách hàng',
+                'messages' => 'Tin nhắn',
+                'actions' => 'Hành động',
+            ],
+            'empty' => 'Chưa có hội thoại nào.',
+            'open' => 'Mở',
+            'detail' => [
+                'customer' => 'Khách hàng',
+                'slot' => 'Khung giờ',
+                'no_messages' => 'Chưa có tin nhắn nào.',
+                'reply_placeholder' => 'Nhập trả lời...',
+                'send' => 'Gửi',
+            ],
+            'flash' => [
+                'reply_sent' => 'Đã gửi trả lời.',
+            ],
+        ],
+
+        // Guide profiles (vendor)
+        'guide_profiles' => [
+            'title' => 'Hồ sơ hướng dẫn viên',
+            'my_title' => 'Hồ sơ hướng dẫn viên của tôi',
+            'edit' => 'Sửa hồ sơ hướng dẫn viên',
+            'table' => [
+                'business' => 'Doanh nghiệp',
+                'languages' => 'Ngôn ngữ',
+                'tours' => 'Tour',
+                'status' => 'Trạng thái',
+                'actions' => 'Hành động',
+            ],
+            'empty' => 'Chưa có hồ sơ hướng dẫn viên nào. Liên hệ hỗ trợ để tạo.',
+            'form' => [
+                'business_name' => 'Tên doanh nghiệp',
+                'bio' => 'Giới thiệu',
+                'avatar' => 'Ảnh đại diện',
+                'remove_avatar' => 'Gỡ ảnh',
+                'no_avatar' => 'Chưa có ảnh — khách hàng sẽ thấy ảnh đại diện tài khoản, sau đó là chữ cái đầu.',
+                'languages' => 'Ngôn ngữ (cách nhau bằng dấu phẩy)',
+            ],
+            'flash' => [
+                'updated' => 'Đã cập nhật hồ sơ hướng dẫn viên.',
             ],
         ],
     ],

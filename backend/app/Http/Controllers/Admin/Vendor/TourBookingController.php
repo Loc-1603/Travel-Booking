@@ -42,7 +42,7 @@ class TourBookingController extends Controller
             ->firstOrFail();
         $providerIds = TourProvider::where('vendor_id', auth()->id())->pluck('id');
         if (! $providerIds->contains($booking->provider_id)) {
-            abort(403, 'You do not have access to this invoice.');
+            abort(403, __('admin.vendor.tour_bookings.flash.forbidden_invoice'));
         }
 
         $html = view('invoice.tour_booking', ['booking' => $booking])->render();

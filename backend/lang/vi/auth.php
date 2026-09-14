@@ -86,4 +86,7 @@ return [
         'updated' => 'Mật khẩu đã được cập nhật.',
         'sent' => 'Chúng tôi đã gửi liên kết đặt lại mật khẩu đến email của bạn.',
     ],
+    'registration' => [
+        'pending_approval' => 'Đăng ký thành công. Tài khoản của bạn đang chờ phê duyệt. Bạn sẽ có thể thêm khách sạn sau khi được đội ngũ của chúng tôi phê duyệt.',
+    ],
 ];

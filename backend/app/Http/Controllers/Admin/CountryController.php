@@ -36,7 +36,7 @@ class CountryController extends Controller
             $validated['image'] = $request->file('image')->store('locations/countries', 'public');
         }
         Country::create($validated);
-        return redirect()->route('admin.countries.index')->with('success', 'Country created.');
+        return redirect()->route('admin.countries.index')->with('success', __('admin.vendor.countries.flash.created'));
     }
 
     public function edit(Country $country): View
@@ -61,7 +61,7 @@ class CountryController extends Controller
             $validated['image'] = $request->file('image')->store('locations/countries', 'public');
         }
         $country->update($validated);
-        return redirect()->route('admin.countries.index')->with('success', 'Country updated.');
+        return redirect()->route('admin.countries.index')->with('success', __('admin.vendor.countries.flash.updated'));
     }
 
     public function destroy(Country $country): RedirectResponse
@@ -70,6 +70,6 @@ class CountryController extends Controller
             Storage::disk('public')->delete($country->image);
         }
         $country->delete();
-        return redirect()->route('admin.countries.index')->with('success', 'Country deleted.');
+        return redirect()->route('admin.countries.index')->with('success', __('admin.vendor.countries.flash.deleted'));
     }
 }

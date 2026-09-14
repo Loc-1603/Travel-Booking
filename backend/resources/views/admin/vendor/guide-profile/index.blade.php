@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
-@section('title', 'My guide profiles')
+@section('title', __('admin.vendor.guide_profiles.my_title'))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="My guide profiles" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => 'Guide profiles']]" />
+    <x-page-title title="{{ __('admin.vendor.guide_profiles.my_title') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.guide_profiles.title')]]" />
     <x-alert />
     <div class="card">
         <div class="card-body">
@@ -10,11 +10,11 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Business</th>
-                        <th>Languages</th>
-                        <th>Tours</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>{{ __('admin.vendor.guide_profiles.table.business') }}</th>
+                        <th>{{ __('admin.vendor.guide_profiles.table.languages') }}</th>
+                        <th>{{ __('admin.vendor.guide_profiles.table.tours') }}</th>
+                        <th>{{ __('admin.vendor.guide_profiles.table.status') }}</th>
+                        <th>{{ __('admin.vendor.guide_profiles.table.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,10 +31,10 @@
                         <td>{{ implode(', ', $p->languages ?? []) }}</td>
                         <td>{{ $p->tours_count }}</td>
                         <td><span class="badge bg-secondary">{{ $p->status }}</span></td>
-                        <td><a href="{{ route('admin.vendor.guide-profile.edit', $p) }}" class="btn btn-sm btn-primary">Edit</a></td>
+                        <td><a href="{{ route('admin.vendor.guide-profile.edit', $p) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.edit') }}</a></td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="text-muted">No guide profiles yet. Contact support to create one.</td></tr>
+                    <tr><td colspan="6" class="text-muted">{{ __('admin.vendor.guide_profiles.empty') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

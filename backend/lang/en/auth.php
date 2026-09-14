@@ -86,4 +86,7 @@ return [
         'updated' => 'Password has been updated.',
         'sent' => 'We have emailed your password reset link.',
     ],
+    'registration' => [
+        'pending_approval' => 'Registration successful. Your account is pending approval. You will be able to add hotels once approved by our team.',
+    ],
 ];

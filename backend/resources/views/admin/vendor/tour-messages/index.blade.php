@@ -1,19 +1,19 @@
 @extends('admin.layouts.app')
-@section('title', 'Tour messages')
+@section('title', __('admin.vendor.tour_messages.title'))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="Tour messages" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => 'Tour messages']]" />
+    <x-page-title title="{{ __('admin.vendor.tour_messages.title') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.tour_messages.title')]]" />
     <x-alert />
     <div class="card">
         <div class="card-body">
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Booking</th>
-                        <th>Tour</th>
-                        <th>Customer</th>
-                        <th>Messages</th>
-                        <th>Actions</th>
+                        <th>{{ __('admin.vendor.tour_messages.table.booking') }}</th>
+                        <th>{{ __('admin.vendor.tour_messages.table.tour') }}</th>
+                        <th>{{ __('admin.vendor.tour_messages.table.customer') }}</th>
+                        <th>{{ __('admin.vendor.tour_messages.table.messages') }}</th>
+                        <th>{{ __('admin.vendor.tour_messages.table.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,10 +23,10 @@
                         <td>{{ $b->tour->title ?? '-' }}</td>
                         <td>{{ $b->customer->name ?? $b->customer->email ?? '-' }}</td>
                         <td>{{ $b->messages->count() }}</td>
-                        <td><a href="{{ route('admin.vendor.tour-messages.show', $b->uuid) }}" class="btn btn-sm btn-primary">Open</a></td>
+                        <td><a href="{{ route('admin.vendor.tour-messages.show', $b->uuid) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.tour_messages.open') }}</a></td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="text-muted">No conversations yet.</td></tr>
+                    <tr><td colspan="5" class="text-muted">{{ __('admin.vendor.tour_messages.empty') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

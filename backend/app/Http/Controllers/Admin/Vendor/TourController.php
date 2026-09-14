@@ -54,7 +54,7 @@ class TourController extends Controller
         $this->myProviderOrFail((int) $validated['provider_id']);
         TourProduct::create($validated);
 
-        return redirect()->route('admin.vendor.tours.index')->with('success', 'Tour created.');
+        return redirect()->route('admin.vendor.tours.index')->with('success', __('admin.vendor.tours.flash.created'));
     }
 
     public function edit(TourProduct $tour): RedirectResponse|View
@@ -75,7 +75,7 @@ class TourController extends Controller
         }
         $tour->update($validated);
 
-        return redirect()->route('admin.vendor.tours.index')->with('success', 'Tour updated.');
+        return redirect()->route('admin.vendor.tours.index')->with('success', __('admin.vendor.tours.flash.updated'));
     }
 
     public function destroy(TourProduct $tour): RedirectResponse
@@ -83,7 +83,7 @@ class TourController extends Controller
         $this->authorize('update', $tour);
         $tour->update(['status' => 'suspended']);
 
-        return redirect()->route('admin.vendor.tours.index')->with('success', 'Tour suspended.');
+        return redirect()->route('admin.vendor.tours.index')->with('success', __('admin.vendor.tours.flash.suspended'));
     }
 
     /**

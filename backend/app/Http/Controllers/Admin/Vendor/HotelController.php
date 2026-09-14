@@ -72,7 +72,7 @@ class HotelController extends Controller
         unset($validated['amenities']);
         $hotel = Hotel::create($validated);
         $hotel->amenities()->sync($amenityIds);
-        return redirect()->route('admin.vendor.hotels.index')->with('success', 'Hotel created.');
+        return redirect()->route('admin.vendor.hotels.index')->with('success', __('admin.vendor.hotels.flash.created'));
     }
 
     public function edit(Hotel $hotel): View
@@ -127,7 +127,7 @@ class HotelController extends Controller
         unset($validated['amenities']);
         $hotel->update($validated);
         $hotel->amenities()->sync($amenityIds);
-        return redirect()->route('admin.vendor.hotels.index')->with('success', 'Hotel updated.');
+        return redirect()->route('admin.vendor.hotels.index')->with('success', __('admin.vendor.hotels.flash.updated'));
     }
 
     /**
@@ -203,7 +203,7 @@ class HotelController extends Controller
     {
         $this->authorize('delete', $hotel);
         $hotel->update(['status' => 'inactive']);
-        return redirect()->route('admin.vendor.hotels.index')->with('success', 'Hotel deactivated.');
+        return redirect()->route('admin.vendor.hotels.index')->with('success', __('admin.vendor.hotels.flash.deactivated'));
     }
 
     /**

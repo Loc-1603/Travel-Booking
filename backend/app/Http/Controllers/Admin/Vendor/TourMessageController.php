@@ -50,6 +50,6 @@ class TourMessageController extends Controller
             'body' => $validated['body'],
         ]);
 
-        return redirect()->route('admin.vendor.tour-messages.show', $booking->uuid)->with('success', 'Reply sent.');
+        return redirect()->route('admin.vendor.tour-messages.show', $booking->uuid)->with('success', __('admin.vendor.tour_messages.flash.reply_sent'));
     }
 }

@@ -71,7 +71,7 @@ class GuideProfileController extends Controller
 
         $provider->update($validated);
 
-        return redirect()->route('admin.vendor.guide-profile.index')->with('success', 'Guide profile updated.');
+        return redirect()->route('admin.vendor.guide-profile.index')->with('success', __('admin.vendor.guide_profiles.flash.updated'));
     }
 
     private function authorizeProvider(TourProvider $provider): void

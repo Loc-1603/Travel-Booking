@@ -53,8 +53,8 @@ class PayoutController extends Controller
 
         $count = count($created);
         $message = $count > 0
-            ? "Generated {$count} payout(s) for the period."
-            : 'No unpaid bookings found for this period.';
+            ? __('admin.vendor.payouts.flash.generated', ['count' => $count])
+            : __('admin.vendor.payouts.flash.empty_period');
 
         return redirect()->route('admin.payouts.index')->with('success', $message);
     }
@@ -84,7 +84,7 @@ class PayoutController extends Controller
 
         $payout->update($data);
 
-        return redirect()->route('admin.payouts.index')->with('success', 'Payout updated.');
+        return redirect()->route('admin.payouts.index')->with('success', __('admin.vendor.payouts.flash.updated'));
     }
 
     public function markPaid(Request $request, Payout $payout): RedirectResponse
@@ -99,7 +99,7 @@ class PayoutController extends Controller
             'paid_at' => now(),
         ]);
 
-        return redirect()->route('admin.payouts.index')->with('success', 'Payout marked as paid.');
+        return redirect()->route('admin.payouts.index')->with('success', __('admin.vendor.payouts.flash.marked_paid'));
     }
 
     public function export(Request $request): StreamedResponse|Response

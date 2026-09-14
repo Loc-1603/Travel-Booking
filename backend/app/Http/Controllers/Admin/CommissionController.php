@@ -38,6 +38,6 @@ class CommissionController extends Controller
         $rate = (float) $request->commission_rate / 100;
         PlatformSetting::set(CommissionService::COMMISSION_RATE_KEY, (string) $rate);
 
-        return redirect()->route('admin.commission.index')->with('success', 'Commission rate updated.');
+        return redirect()->route('admin.commission.index')->with('success', __('admin.vendor.commission.flash.rate_updated'));
     }
 }

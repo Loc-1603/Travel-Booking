@@ -37,7 +37,7 @@ class AmenityController extends Controller
             $validated['sort_order'] = Amenity::max('sort_order') + 1;
         }
         Amenity::create($validated);
-        return redirect()->route('admin.amenities.index')->with('success', 'Amenity created.');
+        return redirect()->route('admin.amenities.index')->with('success', __('admin.vendor.amenities.flash.created'));
     }
 
     public function edit(Amenity $amenity): View
@@ -57,7 +57,7 @@ class AmenityController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
         }
         $amenity->update($validated);
-        return redirect()->route('admin.amenities.index')->with('success', 'Amenity updated.');
+        return redirect()->route('admin.amenities.index')->with('success', __('admin.vendor.amenities.flash.updated'));
     }
 
     public function destroy(Amenity $amenity): RedirectResponse
@@ -65,6 +65,6 @@ class AmenityController extends Controller
         $amenity->hotels()->detach();
         $amenity->rooms()->detach();
         $amenity->delete();
-        return redirect()->route('admin.amenities.index')->with('success', 'Amenity deleted.');
+        return redirect()->route('admin.amenities.index')->with('success', __('admin.vendor.amenities.flash.deleted'));
     }
 }

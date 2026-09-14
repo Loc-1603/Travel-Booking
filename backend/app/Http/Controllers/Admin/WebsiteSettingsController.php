@@ -80,7 +80,7 @@ class WebsiteSettingsController extends Controller
 
         return redirect()
             ->route('admin.website-settings.index')
-            ->with('success', 'Website settings updated successfully!');
+            ->with('success', __('admin.vendor.website_settings.flash.updated'));
     }
 
     public function removeLogo()
@@ -93,7 +93,7 @@ class WebsiteSettingsController extends Controller
 
         return redirect()
             ->route('admin.website-settings.index')
-            ->with('success', 'Logo removed successfully!');
+            ->with('success', __('admin.vendor.website_settings.flash.logo_removed'));
     }
 
     public function removeFavicon()
@@ -106,6 +106,6 @@ class WebsiteSettingsController extends Controller
 
         return redirect()
             ->route('admin.website-settings.index')
-            ->with('success', 'Favicon removed successfully!');
+            ->with('success', __('admin.vendor.website_settings.flash.favicon_removed'));
     }
 }

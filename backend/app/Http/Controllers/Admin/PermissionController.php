@@ -27,7 +27,7 @@ class PermissionController extends Controller
 
         Permission::create(['name' => $request->name]);
 
-        return redirect()->route('admin.permissions.index')->with('success', 'Permission created successfully.');
+        return redirect()->route('admin.permissions.index')->with('success', __('admin.vendor.permissions.flash.created'));
     }
 
     public function show(Permission $permission)
@@ -48,13 +48,13 @@ class PermissionController extends Controller
 
         $permission->update(['name' => $request->name]);
 
-        return redirect()->route('admin.permissions.index')->with('success', 'Permission updated successfully.');
+        return redirect()->route('admin.permissions.index')->with('success', __('admin.vendor.permissions.flash.updated'));
     }
 
     public function destroy(Permission $permission)
     {
         $permission->delete();
 
-        return redirect()->route('admin.permissions.index')->with('success', 'Permission deleted successfully.');
+        return redirect()->route('admin.permissions.index')->with('success', __('admin.vendor.permissions.flash.deleted'));
     }
 }

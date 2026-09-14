@@ -70,13 +70,13 @@ class BookingController extends Controller
         $booking = Booking::where('uuid', $uuid)->firstOrFail();
         $hotelIds = Hotel::where('vendor_id', auth()->id())->pluck('id');
         if (! $hotelIds->contains($booking->hotel_id)) {
-            abort(403, 'You do not have access to this booking.');
+            abort(403, __('admin.vendor.bookings.flash.forbidden_booking'));
         }
 
         $booking->update(['marked_old' => true]);
 
         return redirect()->route('admin.vendor.bookings.index')
-            ->with('success', 'Booking marked as old and moved to old bookings.');
+            ->with('success', __('admin.vendor.bookings.flash.marked_old'));
     }
 
     public function unmarkAsOld(string $uuid): RedirectResponse
@@ -84,13 +84,13 @@ class BookingController extends Controller
         $booking = Booking::where('uuid', $uuid)->firstOrFail();
         $hotelIds = Hotel::where('vendor_id', auth()->id())->pluck('id');
         if (! $hotelIds->contains($booking->hotel_id)) {
-            abort(403, 'You do not have access to this booking.');
+            abort(403, __('admin.vendor.bookings.flash.forbidden_booking'));
         }
 
         $booking->update(['marked_old' => false]);
 
         return redirect()->route('admin.vendor.bookings.old')
-            ->with('success', 'Booking restored to active list.');
+            ->with('success', __('admin.vendor.bookings.flash.restored'));
     }
 
     /**
@@ -101,7 +101,7 @@ class BookingController extends Controller
         $booking = Booking::where('uuid', $uuid)->with(['hotel', 'bookingRooms.room', 'customer', 'coupon'])->firstOrFail();
         $hotelIds = Hotel::where('vendor_id', auth()->id())->pluck('id');
         if (! $hotelIds->contains($booking->hotel_id)) {
-            abort(403, 'You do not have access to this invoice.');
+            abort(403, __('admin.vendor.bookings.flash.forbidden_invoice'));
         }
 
         $nights = $booking->check_in->diffInDays($booking->check_out);

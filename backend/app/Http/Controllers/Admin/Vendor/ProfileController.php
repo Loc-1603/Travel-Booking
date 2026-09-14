@@ -50,7 +50,7 @@ class ProfileController extends Controller
         $profile->update($validated);
 
         return redirect()->route('admin.vendor.profile.edit')
-            ->with('success', 'Business details updated.');
+            ->with('success', __('admin.vendor.profile.flash.details_updated'));
     }
 
     public function storeBankAccount(Request $request): RedirectResponse
@@ -80,7 +80,7 @@ class ProfileController extends Controller
         VendorBankAccount::create($validated);
 
         return redirect()->route('admin.vendor.profile.edit')
-            ->with('success', 'Bank account added.');
+            ->with('success', __('admin.vendor.profile.flash.bank_added'));
     }
 
     public function updateBankAccount(Request $request, VendorBankAccount $bankAccount): RedirectResponse
@@ -109,7 +109,7 @@ class ProfileController extends Controller
         $bankAccount->update($validated);
 
         return redirect()->route('admin.vendor.profile.edit')
-            ->with('success', 'Bank account updated.');
+            ->with('success', __('admin.vendor.profile.flash.bank_updated'));
     }
 
     public function destroyBankAccount(VendorBankAccount $bankAccount): RedirectResponse
@@ -121,7 +121,7 @@ class ProfileController extends Controller
         $bankAccount->delete();
 
         return redirect()->route('admin.vendor.profile.edit')
-            ->with('success', 'Bank account removed.');
+            ->with('success', __('admin.vendor.profile.flash.bank_removed'));
     }
 
     public function storeDocuments(Request $request): RedirectResponse
@@ -140,14 +140,14 @@ class ProfileController extends Controller
         $existing = count($this->documents->list($profile));
         if ($existing + count($files) > VendorBusinessDocumentService::MAX_FILES) {
             return redirect()->route('admin.vendor.profile.edit')
-                ->withErrors(['document_files' => 'You can upload at most '.VendorBusinessDocumentService::MAX_FILES.' files in total.'])
+                ->withErrors(['document_files' => __('admin.vendor.profile.flash.doc_max_files', ['max' => VendorBusinessDocumentService::MAX_FILES])])
                 ->withInput();
         }
 
         $this->documents->append($profile, $files);
 
         return redirect()->route('admin.vendor.profile.edit')
-            ->with('success', count($files).' file(s) uploaded.');
+            ->with('success', __('admin.vendor.profile.flash.doc_uploaded', ['count' => count($files)]));
     }
 
     public function destroyDocument(string $documentId): RedirectResponse
@@ -158,11 +158,11 @@ class ProfileController extends Controller
         }
         if (! $this->documents->deleteById($profile, $documentId)) {
             return redirect()->route('admin.vendor.profile.edit')
-                ->with('error', 'Document not found.');
+                ->with('error', __('admin.vendor.profile.flash.doc_not_found'));
         }
 
         return redirect()->route('admin.vendor.profile.edit')
-            ->with('success', 'Document removed.');
+            ->with('success', __('admin.vendor.profile.flash.doc_removed'));
     }
 
     public function downloadDocument(string $documentId): StreamedResponse|RedirectResponse

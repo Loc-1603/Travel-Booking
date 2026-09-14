@@ -308,6 +308,12 @@ return [
             ],
             'empty' => 'No bookings match your filters.',
             'old_empty' => 'No old bookings match your filters.',
+            'flash' => [
+                'marked_old' => 'Booking marked as old and moved to old bookings.',
+                'restored' => 'Booking restored to active list.',
+                'forbidden_booking' => 'You do not have access to this booking.',
+                'forbidden_invoice' => 'You do not have access to this invoice.',
+            ],
         ],
 
         // Hotels
@@ -367,6 +373,11 @@ return [
                 'update' => 'Update',
                 'cancel' => 'Cancel',
             ],
+            'flash' => [
+                'created' => 'Hotel created.',
+                'updated' => 'Hotel updated.',
+                'deactivated' => 'Hotel deactivated.',
+            ],
         ],
 
         // Rooms
@@ -420,6 +431,12 @@ return [
                 ],
                 'empty' => 'No availability rows. Use the form above to add dates.',
                 'back_to_rooms' => 'Back to Rooms',
+            ],
+            'flash' => [
+                'created' => 'Room created.',
+                'updated' => 'Room updated.',
+                'deleted' => 'Room deleted.',
+                'availability_updated' => 'Availability updated.',
             ],
         ],
 
@@ -486,8 +503,8 @@ return [
             'revenue_chart' => 'Revenue (last 6 months)',
         ],
 
-        // Support Tickets
-        'support_tickets' => [
+        // Support Tickets (vendor)
+        'vendor_support_tickets' => [
             'title' => 'Support Tickets',
             'new' => 'New support ticket',
             'create' => 'New ticket',
@@ -497,6 +514,11 @@ return [
                 'status' => 'Status',
                 'all' => 'All',
                 'apply' => 'Filter',
+                'status_open' => 'Open',
+                'status_assigned' => 'Assigned',
+                'status_in_progress' => 'In progress',
+                'status_resolved' => 'Resolved',
+                'status_closed' => 'Closed',
             ],
             'table' => [
                 'id' => 'ID',
@@ -527,6 +549,9 @@ return [
                 'created' => 'Created',
                 'replies' => 'Replies',
                 'no_replies' => 'No replies yet. Support will respond here.',
+            ],
+            'flash' => [
+                'created' => 'Support ticket created.',
             ],
         ],
 
@@ -587,6 +612,16 @@ return [
                     'add' => 'Add bank account',
                 ],
             ],
+            'flash' => [
+                'details_updated' => 'Business details updated.',
+                'bank_added' => 'Bank account added.',
+                'bank_updated' => 'Bank account updated.',
+                'bank_removed' => 'Bank account removed.',
+                'doc_not_found' => 'Document not found.',
+                'doc_removed' => 'Document removed.',
+                'doc_uploaded' => ':count file(s) uploaded.',
+                'doc_max_files' => 'You can upload at most :max files in total.',
+            ],
         ],
 
         // Common
@@ -641,6 +676,12 @@ return [
                 'update' => 'Update User',
             ],
             'confirm_delete' => 'Delete this user?',
+            'flash' => [
+                'created' => 'User created successfully.',
+                'updated' => 'User updated successfully.',
+                'deleted' => 'User deleted successfully.',
+                'cannot_delete_super_admin' => 'Super Admin cannot be deleted.',
+            ],
         ],
 
         // Roles
@@ -660,6 +701,11 @@ return [
                 'update' => 'Update Role',
             ],
             'confirm_delete' => 'Delete this role?',
+            'flash' => [
+                'created' => 'Role created successfully.',
+                'updated' => 'Role updated successfully.',
+                'deleted' => 'Role deleted successfully.',
+            ],
         ],
 
         // Permissions
@@ -677,6 +723,11 @@ return [
                 'update' => 'Update Permission',
             ],
             'confirm_delete' => 'Delete this permission?',
+            'flash' => [
+                'created' => 'Permission created successfully.',
+                'updated' => 'Permission updated successfully.',
+                'deleted' => 'Permission deleted successfully.',
+            ],
         ],
 
         // Countries
@@ -706,6 +757,11 @@ return [
                 'cancel' => 'Cancel',
             ],
             'confirm_delete' => 'Delete this country?',
+            'flash' => [
+                'created' => 'Country created.',
+                'updated' => 'Country updated.',
+                'deleted' => 'Country deleted.',
+            ],
         ],
 
         // Cities
@@ -730,6 +786,11 @@ return [
                 'cancel' => 'Cancel',
             ],
             'confirm_delete' => 'Delete this city?',
+            'flash' => [
+                'created' => 'City created.',
+                'updated' => 'City updated.',
+                'deleted' => 'City deleted.',
+            ],
         ],
 
         // Amenities
@@ -760,6 +821,11 @@ return [
                 'cancel' => 'Cancel',
             ],
             'confirm_delete' => 'Delete this amenity?',
+            'flash' => [
+                'created' => 'Amenity created.',
+                'updated' => 'Amenity updated.',
+                'deleted' => 'Amenity deleted.',
+            ],
         ],
 
         // Support Tickets
@@ -815,6 +881,10 @@ return [
                 'priority_normal' => 'Normal',
                 'priority_high' => 'High',
             ],
+            'flash' => [
+                'updated' => 'Ticket updated.',
+                'reply_added' => 'Reply added.',
+            ],
         ],
 
         // Reviews
@@ -859,6 +929,9 @@ return [
                 ],
                 'moderated' => 'Moderated: :date by :name',
             ],
+            'flash' => [
+                'updated' => 'Review updated.',
+            ],
         ],
 
         // Disputes
@@ -901,6 +974,9 @@ return [
                 'save' => 'Save',
                 'resolved' => 'Resolved',
                 'by' => 'By',
+            ],
+            'flash' => [
+                'updated' => 'Dispute updated.',
             ],
         ],
 
@@ -968,6 +1044,12 @@ return [
                 'generate' => 'Generate payouts',
                 'cancel' => 'Cancel',
             ],
+            'flash' => [
+                'generated' => 'Generated :count payout(s) for the period.',
+                'empty_period' => 'No unpaid bookings found for this period.',
+                'updated' => 'Payout updated.',
+                'marked_paid' => 'Payout marked as paid.',
+            ],
         ],
 
         // Commission
@@ -1003,6 +1085,9 @@ return [
                 'save' => 'Save',
                 'cancel' => 'Cancel',
             ],
+            'flash' => [
+                'rate_updated' => 'Commission rate updated.',
+            ],
         ],
 
         // Website Settings
@@ -1035,6 +1120,36 @@ return [
             'save_settings' => 'Save Settings',
             'confirm_remove_logo' => 'Are you sure you want to remove the logo?',
             'confirm_remove_favicon' => 'Are you sure you want to remove the favicon?',
+            'flash' => [
+                'updated' => 'Website settings updated successfully!',
+                'logo_removed' => 'Logo removed successfully!',
+                'favicon_removed' => 'Favicon removed successfully!',
+            ],
+            'validation' => [
+                'site_name_required' => 'The site name field is required.',
+                'site_name_max' => 'The site name may not be greater than 255 characters.',
+                'site_description_max' => 'The site description may not be greater than 1000 characters.',
+                'site_email_email' => 'Please enter a valid email address.',
+                'site_email_max' => 'The email may not be greater than 255 characters.',
+                'site_phone_max' => 'The phone number may not be greater than 50 characters.',
+                'site_address_max' => 'The address may not be greater than 500 characters.',
+                'social_facebook_url' => 'Please enter a valid URL for Facebook.',
+                'social_twitter_url' => 'Please enter a valid URL for Twitter.',
+                'social_instagram_url' => 'Please enter a valid URL for Instagram.',
+                'social_linkedin_url' => 'Please enter a valid URL for LinkedIn.',
+                'meta_title_max' => 'The meta title may not be greater than 255 characters.',
+                'meta_description_max' => 'The meta description may not be greater than 500 characters.',
+                'meta_keywords_max' => 'The meta keywords may not be greater than 500 characters.',
+                'google_analytics_max' => 'The Google Analytics code may not be greater than 500 characters.',
+                'maintenance_mode_boolean' => 'The maintenance mode must be true or false.',
+                'maintenance_message_max' => 'The maintenance message may not be greater than 1000 characters.',
+                'site_logo_image' => 'The logo must be an image file.',
+                'site_logo_mimes' => 'The logo must be a file of type: jpeg, png, jpg, gif, svg.',
+                'site_logo_max' => 'The logo may not be greater than 2MB.',
+                'site_favicon_image' => 'The favicon must be an image file.',
+                'site_favicon_mimes' => 'The favicon must be a file of type: ico, png, jpg, jpeg.',
+                'site_favicon_max' => 'The favicon may not be greater than 1MB.',
+            ],
         ],
 
         // Vendors (Admin)
@@ -1104,6 +1219,359 @@ return [
                 'download' => 'Download',
                 'back_to_list' => 'Back to list',
                 'actions' => 'Actions',
+            ],
+            'flash' => [
+                'approved' => 'Vendor approved.',
+                'rejected' => 'Vendor rejected.',
+                'activated' => 'Vendor activated.',
+                'suspended' => 'Vendor suspended.',
+            ],
+        ],
+
+        // Tour provinces
+        'tour_provinces' => [
+            'title' => 'Tour Provinces',
+            'add' => 'Add province',
+            'edit' => 'Edit tour province',
+            'table' => [
+                'image' => 'Image',
+                'name' => 'Name',
+                'slug' => 'Slug',
+                'country' => 'Country',
+                'attractions' => 'Attractions',
+                'tours' => 'Tours',
+                'featured' => 'Featured',
+                'actions' => 'Actions',
+            ],
+            'empty' => 'No tour provinces yet.',
+            'form' => [
+                'name' => 'Name',
+                'slug' => 'Slug',
+                'country' => 'Country',
+                'city' => 'City',
+                'description' => 'Description',
+                'image' => 'Image',
+                'sort_order' => 'Sort order',
+                'featured' => 'Featured',
+                'create' => 'Create',
+                'update' => 'Update',
+            ],
+            'attractions' => 'Attractions',
+            'confirm_delete' => 'Delete this province?',
+            'flash' => [
+                'created' => 'Tour province created.',
+                'updated' => 'Tour province updated.',
+                'deleted' => 'Tour province deleted.',
+            ],
+        ],
+
+        // Tour attractions
+        'tour_attractions' => [
+            'title' => 'Tour Attractions',
+            'add' => 'Add attraction',
+            'edit' => 'Edit attraction',
+            'filter' => [
+                'province' => 'Province',
+                'all' => 'All',
+                'apply' => 'Filter',
+            ],
+            'table' => [
+                'image' => 'Image',
+                'name' => 'Name',
+                'province' => 'Province',
+                'famous' => 'Famous',
+                'actions' => 'Actions',
+            ],
+            'empty' => 'No attractions yet.',
+            'form' => [
+                'province' => 'Province',
+                'name' => 'Name',
+                'description' => 'Description',
+                'image' => 'Image',
+                'latitude' => 'Latitude',
+                'longitude' => 'Longitude',
+                'famous' => 'Famous',
+                'create' => 'Create',
+                'update' => 'Update',
+            ],
+            'confirm_delete' => 'Delete this attraction?',
+            'flash' => [
+                'created' => 'Attraction created.',
+                'updated' => 'Attraction updated.',
+                'deleted' => 'Attraction deleted.',
+            ],
+        ],
+
+        // Tour providers (admin)
+        'tour_providers' => [
+            'title' => 'Tour Providers',
+            'edit_title' => 'Edit tour provider #:id',
+            'detail_title' => 'Tour provider #:id',
+            'filter' => [
+                'status' => 'Status',
+                'all' => 'All',
+                'apply' => 'Filter',
+            ],
+            'table' => [
+                'id' => 'ID',
+                'business' => 'Business',
+                'vendor' => 'Vendor',
+                'tours' => 'Tours',
+                'status' => 'Status',
+                'actions' => 'Actions',
+            ],
+            'empty' => 'No tour providers yet.',
+            'detail' => [
+                'provider' => 'Provider',
+                'business' => 'Business',
+                'vendor' => 'Vendor',
+                'edit_profile' => 'Edit profile + avatar',
+                'status' => 'Status',
+                'bio' => 'Bio',
+                'moderation' => 'Moderation',
+                'approve' => 'Approve',
+                'reject' => 'Reject',
+                'tours' => 'Tours (:count)',
+                'no_tours' => 'No tours yet.',
+            ],
+            'form' => [
+                'business_name' => 'Business name',
+                'bio' => 'Bio',
+                'avatar' => 'Avatar',
+                'remove_avatar' => 'Remove photo (falls back to vendor account avatar)',
+                'no_avatar' => 'No photo yet — the storefront falls back to the vendor account avatar, then to an initial.',
+                'languages' => 'Languages (comma separated)',
+            ],
+            'flash' => [
+                'updated' => 'Tour provider updated.',
+                'approved' => 'Tour provider approved.',
+                'rejected' => 'Tour provider rejected.',
+            ],
+        ],
+
+        // Tour disputes (admin)
+        'tour_disputes' => [
+            'title' => 'Tour Disputes',
+            'detail_title' => 'Tour dispute #:id',
+            'filter' => [
+                'status' => 'Status',
+                'all' => 'All',
+                'apply' => 'Filter',
+            ],
+            'table' => [
+                'id' => 'ID',
+                'booking' => 'Booking',
+                'tour' => 'Tour',
+                'status' => 'Status',
+                'created' => 'Created',
+                'actions' => 'Actions',
+            ],
+            'empty' => 'No tour disputes.',
+            'detail' => [
+                'booking' => 'Booking',
+                'uuid' => 'UUID',
+                'tour' => 'Tour',
+                'customer' => 'Customer',
+                'total' => 'Total',
+                'contact' => 'Contact',
+                'name' => 'Name',
+                'email' => 'Email',
+                'phone' => 'Phone',
+                'customer_notes' => 'Customer notes',
+                'update' => 'Update',
+                'status' => 'Status',
+                'internal_notes' => 'Internal notes',
+                'refund_hint' => 'Full-refund completed tour payments on save (settled in VNPay portal; local accounting only)',
+                'save' => 'Save',
+                'resolved' => 'Resolved',
+                'by' => 'By',
+            ],
+            'flash' => [
+                'updated' => 'Tour dispute updated.',
+                'updated_refunded' => 'Tour dispute updated and payments refunded.',
+            ],
+        ],
+
+        // Tour reviews (admin)
+        'tour_reviews' => [
+            'title' => 'Tour Reviews',
+            'detail_title' => 'Tour review #:id',
+            'filter' => [
+                'label' => 'Filter',
+                'all' => 'All',
+                'apply' => 'Filter',
+            ],
+            'table' => [
+                'id' => 'ID',
+                'tour' => 'Tour',
+                'rating' => 'Rating',
+                'comment' => 'Comment',
+                'approved' => 'Approved',
+                'hidden' => 'Hidden',
+            ],
+            'empty' => 'No tour reviews.',
+            'detail' => [
+                'tour' => 'Tour',
+                'customer' => 'Customer',
+                'rating' => 'Rating',
+                'comment' => 'Comment',
+                'state' => 'State',
+                'approve' => 'Approve',
+                'reject' => 'Reject',
+                'hide' => 'Hide',
+                'unhide' => 'Unhide',
+            ],
+            'flash' => [
+                'updated' => 'Tour review updated.',
+            ],
+        ],
+
+        // Tours (vendor)
+        'tours' => [
+            'title' => 'My Tours',
+            'add' => 'Add tour',
+            'edit' => 'Edit tour',
+            'table' => [
+                'title' => 'Title',
+                'provider' => 'Provider',
+                'province' => 'Province',
+                'fixed' => 'Fixed',
+                'hourly' => 'Hourly',
+                'daily' => 'Daily',
+                'status' => 'Status',
+                'actions' => 'Actions',
+            ],
+            'empty' => 'No tours yet. Create your first 1vs1 tour.',
+            'actions' => [
+                'slots' => 'Slots',
+                'edit' => 'Edit',
+                'suspend' => 'Suspend',
+                'suspend_confirm' => 'Suspend this tour?',
+            ],
+            'form' => [
+                'provider' => 'Provider',
+                'province' => 'Province',
+                'title' => 'Title',
+                'description' => 'Description',
+                'base_fixed' => 'Base fixed (VND)',
+                'per_hour' => 'Per hour (VND)',
+                'per_day' => 'Per day (VND)',
+                'transport_fee' => 'Transport fee (VND)',
+                'transport_desc' => 'Transport description',
+                'meeting_point' => 'Meeting point',
+                'status' => 'Status',
+                'create_draft' => 'Create (draft)',
+                'save' => 'Save',
+            ],
+            'flash' => [
+                'created' => 'Tour created.',
+                'updated' => 'Tour updated.',
+                'suspended' => 'Tour suspended.',
+            ],
+            'slots' => [
+                'title' => 'Slots: :title',
+                'heading' => 'Add / update slot (capacity always 1)',
+                'date' => 'Date',
+                'start' => 'Start',
+                'end' => 'End',
+                'status' => 'Status',
+                'price_override' => 'Price override (VND)',
+                'save' => 'Save slot',
+                'table' => [
+                    'date' => 'Date',
+                    'start' => 'Start',
+                    'end' => 'End',
+                    'status' => 'Status',
+                    'booking' => 'Booking',
+                    'price_override' => 'Price override',
+                ],
+                'empty' => 'No slots yet.',
+                'remove' => 'Remove',
+                'remove_confirm' => 'Remove this slot?',
+                'flash' => [
+                    'saved' => 'Slot saved.',
+                    'remove_booked' => 'Booked slots cannot be removed.',
+                    'removed' => 'Slot removed.',
+                ],
+            ],
+        ],
+
+        // Tour bookings (vendor)
+        'tour_bookings' => [
+            'title' => 'Tour Bookings',
+            'filter' => [
+                'status' => 'Status',
+                'from' => 'From',
+                'to' => 'To',
+                'all' => 'All',
+                'apply' => 'Filter',
+            ],
+            'table' => [
+                'booking' => 'Booking',
+                'tour' => 'Tour',
+                'customer' => 'Customer',
+                'start' => 'Start',
+                'status' => 'Status',
+                'total' => 'Total',
+                'actions' => 'Actions',
+            ],
+            'empty' => 'No tour bookings yet.',
+            'invoice' => 'Invoice',
+            'chat' => 'Chat',
+            'flash' => [
+                'forbidden_invoice' => 'You do not have access to this invoice.',
+            ],
+        ],
+
+        // Tour messages (vendor)
+        'tour_messages' => [
+            'title' => 'Tour Messages',
+            'chat_title' => 'Chat: :title',
+            'chat' => 'Chat',
+            'table' => [
+                'booking' => 'Booking',
+                'tour' => 'Tour',
+                'customer' => 'Customer',
+                'messages' => 'Messages',
+                'actions' => 'Actions',
+            ],
+            'empty' => 'No conversations yet.',
+            'open' => 'Open',
+            'detail' => [
+                'customer' => 'Customer',
+                'slot' => 'Slot',
+                'no_messages' => 'No messages yet.',
+                'reply_placeholder' => 'Type a reply...',
+                'send' => 'Send',
+            ],
+            'flash' => [
+                'reply_sent' => 'Reply sent.',
+            ],
+        ],
+
+        // Guide profiles (vendor)
+        'guide_profiles' => [
+            'title' => 'Guide Profiles',
+            'my_title' => 'My Guide Profiles',
+            'edit' => 'Edit guide profile',
+            'table' => [
+                'business' => 'Business',
+                'languages' => 'Languages',
+                'tours' => 'Tours',
+                'status' => 'Status',
+                'actions' => 'Actions',
+            ],
+            'empty' => 'No guide profiles yet. Contact support to create one.',
+            'form' => [
+                'business_name' => 'Business name',
+                'bio' => 'Bio',
+                'avatar' => 'Avatar',
+                'remove_avatar' => 'Remove photo',
+                'no_avatar' => 'No photo yet — shoppers see your account avatar, then an initial.',
+                'languages' => 'Languages (comma separated)',
+            ],
+            'flash' => [
+                'updated' => 'Guide profile updated.',
             ],
         ],
     ],

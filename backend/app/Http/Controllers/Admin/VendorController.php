@@ -62,7 +62,7 @@ class VendorController extends Controller
         ]);
         $vendor->update(['status' => 'active']);
 
-        return redirect()->back()->with('success', 'Vendor approved.');
+        return redirect()->back()->with('success', __('admin.vendor.vendors.flash.approved'));
     }
 
     public function reject(Request $request, User $vendor): RedirectResponse
@@ -82,7 +82,7 @@ class VendorController extends Controller
             'approved_by' => null,
         ]);
 
-        return redirect()->back()->with('success', 'Vendor rejected.');
+        return redirect()->back()->with('success', __('admin.vendor.vendors.flash.rejected'));
     }
 
     public function updateStatus(Request $request, User $vendor): RedirectResponse
@@ -92,7 +92,9 @@ class VendorController extends Controller
         }
         $request->validate(['status' => 'required|in:active,suspended']);
         $vendor->update(['status' => $request->status]);
-        $message = $request->status === 'active' ? 'Vendor activated.' : 'Vendor suspended.';
+        $message = $request->status === 'active'
+            ? __('admin.vendor.vendors.flash.activated')
+            : __('admin.vendor.vendors.flash.suspended');
 
         return redirect()->back()->with('success', $message);
     }

@@ -58,6 +58,6 @@ class TourReviewModerationController extends Controller
         }
         $tourReview->update($data);
 
-        return redirect()->route('admin.tour-reviews.show', $tourReview)->with('success', 'Tour review updated.');
+        return redirect()->route('admin.tour-reviews.show', $tourReview)->with('success', __('admin.vendor.tour_reviews.flash.updated'));
     }
 }

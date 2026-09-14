@@ -46,7 +46,7 @@ class SupportTicketController extends Controller
             'priority' => $validated['priority'] ?? 'normal',
             'status' => 'open',
         ]);
-        return redirect()->route('admin.vendor.support-tickets.index')->with('success', 'Support ticket created.');
+        return redirect()->route('admin.vendor.support-tickets.index')->with('success', __('admin.vendor.vendor_support_tickets.flash.created'));
     }
 
     public function show(Request $request, SupportTicket $supportTicket): View|RedirectResponse

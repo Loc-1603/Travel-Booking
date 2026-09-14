@@ -60,7 +60,7 @@ class UserController extends Controller
         }
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully.');
+            ->with('success', __('admin.vendor.users.flash.created'));
     }
 
     public function edit(User $user)
@@ -117,14 +117,14 @@ class UserController extends Controller
         }
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User updated successfully.');
+            ->with('success', __('admin.vendor.users.flash.updated'));
     }
 
     public function destroy(User $user)
     {
         // Protect super admin
         if ($user->hasRole('super-admin')) {
-            return back()->with('error', 'Super Admin cannot be deleted.');
+            return back()->with('error', __('admin.vendor.users.flash.cannot_delete_super_admin'));
         }
 
         if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
@@ -134,6 +134,6 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User deleted successfully.');
+            ->with('success', __('admin.vendor.users.flash.deleted'));
     }
 }

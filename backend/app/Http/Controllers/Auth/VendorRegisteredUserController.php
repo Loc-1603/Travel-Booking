@@ -53,6 +53,6 @@ class VendorRegisteredUserController extends Controller
         Auth::login($user);
 
         return redirect()->route('admin.vendor.dashboard')
-            ->with('success', 'Registration successful. Your account is pending approval. You will be able to add hotels once approved by our team.');
+            ->with('success', __('auth.registration.pending_approval'));
     }
 }

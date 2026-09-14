@@ -60,7 +60,7 @@ class RoomController extends Controller
         unset($validated['cancellation_policy_preset'], $validated['cancellation_policy_custom'], $validated['amenities']);
         $room = Room::create($validated);
         $room->amenities()->sync($amenityIds);
-        return redirect()->route('admin.vendor.rooms.index', ['hotel_id' => $hotel->id])->with('success', 'Room created.');
+        return redirect()->route('admin.vendor.rooms.index', ['hotel_id' => $hotel->id])->with('success', __('admin.vendor.rooms.flash.created'));
     }
 
     public function edit(Room $room): View
@@ -89,14 +89,14 @@ class RoomController extends Controller
         unset($validated['cancellation_policy_preset'], $validated['cancellation_policy_custom'], $validated['amenities']);
         $room->update($validated);
         $room->amenities()->sync($amenityIds);
-        return redirect()->route('admin.vendor.rooms.index')->with('success', 'Room updated.');
+        return redirect()->route('admin.vendor.rooms.index')->with('success', __('admin.vendor.rooms.flash.updated'));
     }
 
     public function destroy(Room $room): RedirectResponse
     {
         $this->authorize('delete', $room);
         $room->delete();
-        return redirect()->route('admin.vendor.rooms.index')->with('success', 'Room deleted.');
+        return redirect()->route('admin.vendor.rooms.index')->with('success', __('admin.vendor.rooms.flash.deleted'));
     }
 
     public function availability(Room $room): View
@@ -122,7 +122,7 @@ class RoomController extends Controller
                 'price_override' => $request->price_override ?: null,
             ]
         );
-        return redirect()->route('admin.vendor.rooms.availability', $room)->with('success', 'Availability updated.');
+        return redirect()->route('admin.vendor.rooms.availability', $room)->with('success', __('admin.vendor.rooms.flash.availability_updated'));
     }
 
     /**

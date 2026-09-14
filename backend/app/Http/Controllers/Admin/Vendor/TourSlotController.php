@@ -51,7 +51,7 @@ class TourSlotController extends Controller
             ]
         );
 
-        return redirect()->route('admin.vendor.tours.slots', $tour)->with('success', 'Slot saved.');
+        return redirect()->route('admin.vendor.tours.slots', $tour)->with('success', __('admin.vendor.tours.slots.flash.saved'));
     }
 
     public function destroy(TourProduct $tour, TourAvailabilitySlot $slot): RedirectResponse
@@ -61,10 +61,10 @@ class TourSlotController extends Controller
             abort(404);
         }
         if ($slot->status === 'booked') {
-            return redirect()->route('admin.vendor.tours.slots', $tour)->with('error', 'Booked slots cannot be removed.');
+            return redirect()->route('admin.vendor.tours.slots', $tour)->with('error', __('admin.vendor.tours.slots.flash.remove_booked'));
         }
         $slot->delete();
 
-        return redirect()->route('admin.vendor.tours.slots', $tour)->with('success', 'Slot removed.');
+        return redirect()->route('admin.vendor.tours.slots', $tour)->with('success', __('admin.vendor.tours.slots.flash.removed'));
     }
 }

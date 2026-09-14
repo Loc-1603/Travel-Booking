@@ -35,7 +35,7 @@ class CityController extends Controller
             $validated['image'] = $request->file('image')->store('locations/cities', 'public');
         }
         City::create($validated);
-        return redirect()->route('admin.cities.index')->with('success', 'City created.');
+        return redirect()->route('admin.cities.index')->with('success', __('admin.vendor.cities.flash.created'));
     }
 
     public function edit(City $city): View
@@ -58,7 +58,7 @@ class CityController extends Controller
             $validated['image'] = $request->file('image')->store('locations/cities', 'public');
         }
         $city->update($validated);
-        return redirect()->route('admin.cities.index')->with('success', 'City updated.');
+        return redirect()->route('admin.cities.index')->with('success', __('admin.vendor.cities.flash.updated'));
     }
 
     public function destroy(City $city): RedirectResponse
@@ -67,6 +67,6 @@ class CityController extends Controller
             Storage::disk('public')->delete($city->image);
         }
         $city->delete();
-        return redirect()->route('admin.cities.index')->with('success', 'City deleted.');
+        return redirect()->route('admin.cities.index')->with('success', __('admin.vendor.cities.flash.deleted'));
     }
 }

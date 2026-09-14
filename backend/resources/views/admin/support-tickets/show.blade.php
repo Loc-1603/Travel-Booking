@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
-@section('title', 'Ticket #' . $supportTicket->id)
+@section('title', __('admin.vendor.support_tickets.detail.title', ['id' => $supportTicket->id]))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="Ticket #{{ $supportTicket->id }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.support_tickets.title'), 'url' => route('admin.support-tickets.index')], ['label' => __('admin.vendor.support_tickets.detail.view')]]" />
+    <x-page-title title="{{ __('admin.vendor.support_tickets.detail.title', ['id' => $supportTicket->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.support_tickets.title'), 'url' => route('admin.support-tickets.index')], ['label' => __('admin.vendor.common.view')]]" />
     <x-alert />
     <div class="row">
         <div class="col-md-6">

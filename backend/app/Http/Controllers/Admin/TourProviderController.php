@@ -74,14 +74,14 @@ class TourProviderController extends Controller
 
         $tourProvider->update($validated);
 
-        return redirect()->route('admin.tour-providers.show', $tourProvider)->with('success', 'Tour provider updated.');
+        return redirect()->route('admin.tour-providers.show', $tourProvider)->with('success', __('admin.vendor.tour_providers.flash.updated'));
     }
 
     public function approve(TourProvider $tourProvider): RedirectResponse
     {
         $tourProvider->update(['status' => 'approved']);
 
-        return redirect()->back()->with('success', 'Tour provider approved.');
+        return redirect()->back()->with('success', __('admin.vendor.tour_providers.flash.approved'));
     }
 
     public function reject(Request $request, TourProvider $tourProvider): RedirectResponse
@@ -89,6 +89,6 @@ class TourProviderController extends Controller
         $request->validate(['reason' => 'nullable|string|max:500']);
         $tourProvider->update(['status' => 'rejected']);
 
-        return redirect()->back()->with('success', 'Tour provider rejected.');
+        return redirect()->back()->with('success', __('admin.vendor.tour_providers.flash.rejected'));
     }
 }
