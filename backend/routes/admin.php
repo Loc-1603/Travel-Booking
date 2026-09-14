@@ -21,7 +21,7 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
         Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class);
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 
-        // Admin only (no vendor): disputes, review moderation, support tickets
+        // Admin + Super Admin: tour catalog moderation (mở rộng theo yêu cầu: cả admin_only)
         Route::middleware('admin_only')->group(function () {
             Route::get('/disputes', [\App\Http\Controllers\Admin\DisputeController::class, 'index'])->name('disputes.index');
             Route::get('/disputes/{dispute}', [\App\Http\Controllers\Admin\DisputeController::class, 'show'])->name('disputes.show');
@@ -33,6 +33,25 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::get('/support-tickets/{supportTicket}', [\App\Http\Controllers\Admin\SupportTicketController::class, 'show'])->name('support-tickets.show');
             Route::patch('/support-tickets/{supportTicket}', [\App\Http\Controllers\Admin\SupportTicketController::class, 'update'])->name('support-tickets.update');
             Route::post('/support-tickets/{supportTicket}/replies', [\App\Http\Controllers\Admin\SupportTicketController::class, 'storeReply'])->name('support-tickets.replies.store');
+
+            // Tour catalog & moderation (admin + super admin)
+            Route::resource('tour-provinces', \App\Http\Controllers\Admin\TourProvinceController::class)->except(['show']);
+            Route::resource('tour-attractions', \App\Http\Controllers\Admin\TourAttractionController::class);
+            Route::get('/tour-providers', [\App\Http\Controllers\Admin\TourProviderController::class, 'index'])->name('tour-providers.index');
+            Route::get('/tour-providers/{tourProvider}', [\App\Http\Controllers\Admin\TourProviderController::class, 'show'])->name('tour-providers.show');
+            Route::get('/tour-providers/{tourProvider}/edit', [\App\Http\Controllers\Admin\TourProviderController::class, 'edit'])->name('tour-providers.edit');
+            Route::put('/tour-providers/{tourProvider}', [\App\Http\Controllers\Admin\TourProviderController::class, 'update'])->name('tour-providers.update');
+            Route::patch('/tour-providers/{tourProvider}', [\App\Http\Controllers\Admin\TourProviderController::class, 'update']);
+            Route::post('/tour-providers/{tourProvider}/approve', [\App\Http\Controllers\Admin\TourProviderController::class, 'approve'])->name('tour-providers.approve');
+            Route::post('/tour-providers/{tourProvider}/reject', [\App\Http\Controllers\Admin\TourProviderController::class, 'reject'])->name('tour-providers.reject');
+            Route::get('/tour-disputes', [\App\Http\Controllers\Admin\TourDisputeController::class, 'index'])->name('tour-disputes.index');
+            Route::get('/tour-disputes/{tourDispute}', [\App\Http\Controllers\Admin\TourDisputeController::class, 'show'])->name('tour-disputes.show');
+            Route::patch('/tour-disputes/{tourDispute}', [\App\Http\Controllers\Admin\TourDisputeController::class, 'update'])->name('tour-disputes.update');
+            Route::put('/tour-disputes/{tourDispute}', [\App\Http\Controllers\Admin\TourDisputeController::class, 'update']);
+            Route::get('/tour-reviews', [\App\Http\Controllers\Admin\TourReviewModerationController::class, 'index'])->name('tour-reviews.index');
+            Route::get('/tour-reviews/{tourReview}', [\App\Http\Controllers\Admin\TourReviewModerationController::class, 'show'])->name('tour-reviews.show');
+            Route::patch('/tour-reviews/{tourReview}', [\App\Http\Controllers\Admin\TourReviewModerationController::class, 'update'])->name('tour-reviews.update');
+            Route::put('/tour-reviews/{tourReview}', [\App\Http\Controllers\Admin\TourReviewModerationController::class, 'update']);
         });
 
         // Super Admin only: vendors, commission & website settings
@@ -106,5 +125,20 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::put('hotels/{hotel}/images/{image}', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'update'])->name('hotels.images.update');
             Route::delete('hotels/{hotel}/images/{image}', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'destroy'])->name('hotels.images.destroy');
             Route::post('hotels/{hotel}/images/reorder', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'reorder'])->name('hotels.images.reorder');
+
+            // Tours (vendor owns via TourProvider)
+            Route::resource('tours', \App\Http\Controllers\Admin\Vendor\TourController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+            Route::get('tours/{tour}/slots', [\App\Http\Controllers\Admin\Vendor\TourSlotController::class, 'index'])->name('tours.slots');
+            Route::post('tours/{tour}/slots', [\App\Http\Controllers\Admin\Vendor\TourSlotController::class, 'store'])->name('tours.slots.store');
+            Route::delete('tours/{tour}/slots/{slot}', [\App\Http\Controllers\Admin\Vendor\TourSlotController::class, 'destroy'])->name('tours.slots.destroy');
+            Route::get('/tour-bookings', [\App\Http\Controllers\Admin\Vendor\TourBookingController::class, 'index'])->name('tour-bookings.index');
+            Route::get('/tour-bookings/{uuid}/invoice', [\App\Http\Controllers\Admin\Vendor\TourBookingController::class, 'invoice'])->name('tour-bookings.invoice');
+            Route::get('/tour-messages', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'index'])->name('tour-messages.index');
+            Route::get('/tour-messages/{uuid}', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'show'])->name('tour-messages.show');
+            Route::post('/tour-messages/{uuid}/reply', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'reply'])->name('tour-messages.reply');
+            Route::get('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'index'])->name('guide-profile.index');
+            Route::get('/guide-profile/{provider}/edit', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'edit'])->name('guide-profile.edit');
+            Route::put('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update'])->name('guide-profile.update');
+            Route::patch('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update']);
         });
     });

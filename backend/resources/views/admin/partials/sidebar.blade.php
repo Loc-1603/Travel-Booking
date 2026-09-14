@@ -33,6 +33,30 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('admin.vendor.tours.index') }}">
+                        <i data-feather="map"></i>
+                        <span>{{ __('admin.sidebar.tours') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.vendor.guide-profile.index') }}">
+                        <i data-feather="user"></i>
+                        <span>{{ __('admin.sidebar.guide_profiles') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.vendor.tour-bookings.index') }}">
+                        <i data-feather="calendar"></i>
+                        <span>{{ __('admin.sidebar.tour_bookings') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.vendor.tour-messages.index') }}">
+                        <i data-feather="message-circle"></i>
+                        <span>{{ __('admin.sidebar.tour_messages') }}</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('admin.vendor.bookings.index') }}">
                         <i data-feather="calendar"></i>
                         <span>{{ __('admin.sidebar.bookings') }}</span>
@@ -83,6 +107,37 @@
                     <a href="{{ route('admin.amenities.index') }}">
                         <i data-feather="check-square"></i>
                         <span>{{ __('admin.sidebar.amenities') }}</span>
+                    </a>
+                </li>
+                {{-- Tours catalog & moderation (admin + super admin) --}}
+                <li>
+                    <a href="{{ route('admin.tour-provinces.index') }}">
+                        <i data-feather="map"></i>
+                        <span>{{ __('admin.sidebar.tour_provinces') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tour-attractions.index') }}">
+                        <i data-feather="camera"></i>
+                        <span>{{ __('admin.sidebar.tour_attractions') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tour-providers.index') }}">
+                        <i data-feather="user"></i>
+                        <span>{{ __('admin.sidebar.tour_providers') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tour-disputes.index') }}">
+                        <i data-feather="alert-circle"></i>
+                        <span>{{ __('admin.sidebar.tour_disputes') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tour-reviews.index') }}">
+                        <i data-feather="star"></i>
+                        <span>{{ __('admin.sidebar.tour_reviews') }}</span>
                     </a>
                 </li>
                 {{-- Partners & revenue --}}
@@ -147,7 +202,37 @@
                     </a>
                 </li>
                 @else
-                {{-- Admin (non-super): Moderation only --}}
+                {{-- Admin (non-super): Moderation only (gồm cả tour) --}}
+                <li>
+                    <a href="{{ route('admin.tour-provinces.index') }}">
+                        <i data-feather="map"></i>
+                        <span>{{ __('admin.sidebar.tour_provinces') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tour-attractions.index') }}">
+                        <i data-feather="camera"></i>
+                        <span>{{ __('admin.sidebar.tour_attractions') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tour-providers.index') }}">
+                        <i data-feather="user"></i>
+                        <span>{{ __('admin.sidebar.tour_providers') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tour-disputes.index') }}">
+                        <i data-feather="alert-circle"></i>
+                        <span>{{ __('admin.sidebar.tour_disputes') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tour-reviews.index') }}">
+                        <i data-feather="star"></i>
+                        <span>{{ __('admin.sidebar.tour_reviews') }}</span>
+                    </a>
+                </li>
                 <li>
                     <a href="{{ route('admin.disputes.index') }}">
                         <i data-feather="alert-circle"></i>
