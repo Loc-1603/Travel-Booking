@@ -7,6 +7,22 @@
     <x-alert />
 
     @php
+        $segment = $segment ?? 'hotel';
+    @endphp
+    <ul class="nav nav-pills mb-3 gap-2">
+        <li class="nav-item">
+            <a href="{{ route('admin.dashboard', ['segment' => 'hotel']) }}" class="nav-link {{ $segment === 'hotel' ? 'active' : '' }}">
+                <i class="mdi mdi-office-building me-1"></i>{{ __('admin.segment_hotel') }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.dashboard', ['segment' => 'tour']) }}" class="nav-link {{ $segment === 'tour' ? 'active' : '' }}">
+                <i class="mdi mdi-map-marker-path me-1"></i>{{ __('admin.segment_tour') }}
+            </a>
+        </li>
+    </ul>
+
+    @php
         $dashUser = auth()->user();
         $dashRoleLabel = match ($dashUser->role) {
             \App\Enums\Role::SUPER_ADMIN => __('admin.role_labels.super_admin'),
@@ -27,7 +43,7 @@
                             @if($isSuperAdmin && isset($kpis['confirmed_bookings']))
                                 <p class="mb-0 mt-2 small" style="opacity: 0.9;">
                                     <span class="me-3"><i class="mdi mdi-check-circle-outline me-1"></i>{{ number_format($kpis['confirmed_bookings']) }} {{ __('admin.confirmed_bookings') }}</span>
-                                    <span><i class="mdi mdi-office-building-outline me-1"></i>{{ number_format($kpis['total_hotels']) }} {{ __('admin.properties') }}</span>
+                                    <span><i class="mdi {{ $segment === 'tour' ? 'mdi-map-marker-path' : 'mdi-office-building-outline' }} me-1"></i>{{ number_format($kpis['total_hotels']) }} {{ $segment === 'tour' ? __('admin.total_tours') : __('admin.properties') }}</span>
                                 </p>
                             @endif
                         </div>
@@ -43,7 +59,7 @@
             <div class="card dash-stat-card">
                 <div class="card-body d-flex align-items-start justify-content-between gap-2">
                     <div class="min-w-0">
-                        <div class="dash-stat-label">{{ __('admin.total_hotels') }}</div>
+                        <div class="dash-stat-label">{{ $segment === 'tour' ? __('admin.total_tours') : __('admin.total_hotels') }}</div>
                         <div class="dash-stat-value">{{ number_format($kpis['total_hotels']) }}</div>
                     </div>
                     <div class="dash-stat-icon bg-primary bg-opacity-10 text-primary">
@@ -56,7 +72,7 @@
             <div class="card dash-stat-card">
                 <div class="card-body d-flex align-items-start justify-content-between gap-2">
                     <div class="min-w-0">
-                        <div class="dash-stat-label">{{ __('admin.total_bookings') }}</div>
+                        <div class="dash-stat-label">{{ $segment === 'tour' ? __('admin.total_tour_bookings') : __('admin.total_bookings') }}</div>
                         <div class="dash-stat-value">{{ number_format($kpis['total_bookings']) }}</div>
                     </div>
                     <div class="dash-stat-icon bg-info bg-opacity-10 text-info">

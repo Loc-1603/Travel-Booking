@@ -7,6 +7,22 @@
     <x-alert />
 
     @php
+        $segment = $segment ?? 'hotel';
+    @endphp
+    <ul class="nav nav-pills mb-3 gap-2">
+        <li class="nav-item">
+            <a href="{{ route('admin.vendor.dashboard', ['segment' => 'hotel']) }}" class="nav-link {{ $segment === 'hotel' ? 'active' : '' }}">
+                <i class="mdi mdi-office-building me-1"></i>{{ __('admin.segment_hotel') }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.vendor.dashboard', ['segment' => 'tour']) }}" class="nav-link {{ $segment === 'tour' ? 'active' : '' }}">
+                <i class="mdi mdi-map-marker-path me-1"></i>{{ __('admin.segment_tour') }}
+            </a>
+        </li>
+    </ul>
+
+    @php
         $vendorUser = auth()->user();
         $vendorUser->loadMissing('vendorProfile');
     @endphp
@@ -55,7 +71,7 @@
             <div class="card dash-stat-card">
                 <div class="card-body d-flex align-items-start justify-content-between gap-2">
                     <div class="min-w-0">
-                        <div class="dash-stat-label">{{ __('admin.total_bookings') }}</div>
+                        <div class="dash-stat-label">{{ $segment === 'tour' ? __('admin.total_tour_bookings') : __('admin.total_bookings') }}</div>
                         <div class="dash-stat-value">{{ number_format($bookingCount) }}</div>
                     </div>
                     <div class="dash-stat-icon bg-info bg-opacity-10 text-info">
@@ -145,17 +161,26 @@
                     <a href="{{ route('admin.vendor.profile.edit') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-domain me-2"></i>{{ __('admin.sidebar.business_details') }}
                     </a>
+                    @if($segment === 'tour')
+                    <a href="{{ route('admin.vendor.tours.index') }}" class="btn btn-outline-primary btn-sm text-start">
+                        <i class="mdi mdi-map-marker-path me-2"></i>{{ __('admin.sidebar.tours') }}
+                    </a>
+                    <a href="{{ route('admin.vendor.tour-bookings.index') }}" class="btn btn-outline-primary btn-sm text-start">
+                        <i class="mdi mdi-calendar-multiple me-2"></i>{{ __('admin.sidebar.tour_bookings') }}
+                    </a>
+                    @else
                     <a href="{{ route('admin.vendor.hotels.index') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-office-building me-2"></i>{{ __('admin.vendor.my_hotels') }}
                     </a>
                     <a href="{{ route('admin.vendor.rooms.index') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-bed-outline me-2"></i>{{ __('admin.vendor.my_rooms') }}
                     </a>
-                    <a href="{{ route('admin.vendor.reports.index') }}" class="btn btn-outline-primary btn-sm text-start">
-                        <i class="mdi mdi-chart-box-outline me-2"></i>{{ __('admin.sidebar.reports') }}
-                    </a>
                     <a href="{{ route('admin.vendor.bookings.index') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-calendar-multiple me-2"></i>{{ __('admin.sidebar.bookings') }}
+                    </a>
+                    @endif
+                    <a href="{{ route('admin.vendor.reports.index') }}" class="btn btn-outline-primary btn-sm text-start">
+                        <i class="mdi mdi-chart-box-outline me-2"></i>{{ __('admin.sidebar.reports') }}
                     </a>
                     <a href="{{ route('admin.vendor.payouts.index') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-bank-transfer me-2"></i>{{ __('admin.sidebar.payouts') }}
@@ -170,8 +195,8 @@
         <div class="col-xl-8 col-lg-12">
             <div class="card dash-chart-card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">{{ __('admin.vendor.top_hotels') }}</h5>
-                    <p class="card-subtitle mb-0">{{ __('admin.vendor.top_hotels_subtitle') }}</p>
+                    <h5 class="card-title mb-0">{{ $segment === 'tour' ? __('admin.vendor.top_providers') : __('admin.vendor.top_hotels') }}</h5>
+                    <p class="card-subtitle mb-0">{{ $segment === 'tour' ? __('admin.vendor.top_providers_subtitle') : __('admin.vendor.top_hotels_subtitle') }}</p>
                 </div>
                 <div class="card-body">
                     <div style="height: 280px; position: relative;">
