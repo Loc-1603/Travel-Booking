@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\DB;
 
 class TourCommissionService
 {
+    /**
+     * Booking statuses that count as earned revenue. Paid tours move
+     * confirmed → ongoing → completed via TourAutoComplete, so counting
+     * only 'confirmed' would drop every tour that already took place.
+     */
+    public const REVENUE_STATUSES = ['confirmed', 'ongoing', 'completed'];
+
     protected float $commissionRate;
 
     public function __construct(?float $commissionRate = null)
@@ -46,7 +53,7 @@ class TourCommissionService
     }
 
     /**
-     * Admin reporting: aggregates confirmed tour bookings by vendor
+     * Admin reporting: aggregates revenue-eligible tour bookings by vendor
      * (tour_providers.vendor_id) with optional date range on start_at.
      * Mirrors CommissionService::reportByVendor for hotels.
      */
@@ -54,7 +61,7 @@ class TourCommissionService
     {
         $query = DB::table('tour_bookings')
             ->join('tour_providers', 'tour_bookings.provider_id', '=', 'tour_providers.id')
-            ->where('tour_bookings.status', 'confirmed')
+            ->whereIn('tour_bookings.status', self::REVENUE_STATUSES)
             ->whereNull('tour_bookings.deleted_at')
             ->select(
                 'tour_providers.vendor_id',
@@ -83,7 +90,7 @@ class TourCommissionService
     public function platformTotals(?string $from = null, ?string $to = null): array
     {
         $query = DB::table('tour_bookings')
-            ->where('tour_bookings.status', 'confirmed')
+            ->whereIn('tour_bookings.status', self::REVENUE_STATUSES)
             ->whereNull('tour_bookings.deleted_at');
         if ($from) {
             $query->whereDate('tour_bookings.start_at', '>=', $from);

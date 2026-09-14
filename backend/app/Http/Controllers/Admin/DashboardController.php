@@ -219,7 +219,7 @@ class DashboardController extends Controller
     protected function tourRevenueChartData(): array
     {
         $rows = DB::table('tour_bookings')
-            ->where('tour_bookings.status', 'confirmed')
+            ->whereIn('tour_bookings.status', TourCommissionService::REVENUE_STATUSES)
             ->whereNull('tour_bookings.deleted_at')
             ->where('tour_bookings.start_at', '>=', now()->subMonths(6)->startOfMonth())
             ->selectRaw($this->monthExpression('tour_bookings.start_at')." as month, SUM(tour_bookings.total_price) as total")
@@ -274,7 +274,7 @@ class DashboardController extends Controller
         $rows = DB::table('tour_bookings')
             ->join('tour_providers', 'tour_bookings.provider_id', '=', 'tour_providers.id')
             ->join('users', 'tour_providers.vendor_id', '=', 'users.id')
-            ->where('tour_bookings.status', 'confirmed')
+            ->whereIn('tour_bookings.status', TourCommissionService::REVENUE_STATUSES)
             ->whereNull('tour_bookings.deleted_at')
             ->selectRaw('users.name as vendor_name, SUM(tour_bookings.total_price) as total')
             ->groupBy('users.id', 'users.name')

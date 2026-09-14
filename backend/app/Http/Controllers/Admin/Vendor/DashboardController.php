@@ -34,7 +34,7 @@ class DashboardController extends Controller
 
         if ($segment === 'tour') {
             $revenue = (float) TourBooking::whereIn('provider_id', $providerIds)
-                ->where('status', 'confirmed')
+                ->whereIn('status', TourCommissionService::REVENUE_STATUSES)
                 ->whereNull('deleted_at')
                 ->sum('total_price');
             $bookingCount = TourBooking::whereIn('provider_id', $providerIds)->whereNull('deleted_at')->count();
@@ -159,7 +159,7 @@ class DashboardController extends Controller
     {
         $rows = DB::table('tour_bookings')
             ->whereIn('provider_id', $providerIds)
-            ->where('status', 'confirmed')
+            ->whereIn('status', TourCommissionService::REVENUE_STATUSES)
             ->whereNull('deleted_at')
             ->where('start_at', '>=', now()->subMonths(6)->startOfMonth())
             ->selectRaw($this->monthExpression('start_at').' as month, SUM(total_price) as total')
@@ -219,7 +219,7 @@ class DashboardController extends Controller
         $rows = DB::table('tour_bookings')
             ->join('tour_providers', 'tour_bookings.provider_id', '=', 'tour_providers.id')
             ->whereIn('tour_bookings.provider_id', $providerIds)
-            ->where('tour_bookings.status', 'confirmed')
+            ->whereIn('tour_bookings.status', TourCommissionService::REVENUE_STATUSES)
             ->whereNull('tour_bookings.deleted_at')
             ->selectRaw('tour_providers.business_name as provider_name, SUM(tour_bookings.total_price) as total')
             ->groupBy('tour_providers.id', 'tour_providers.business_name')
