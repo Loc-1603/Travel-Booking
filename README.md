@@ -1,344 +1,269 @@
-# Hotel Booking Platform
+# Nền tảng đặt phòng khách sạn & du lịch
 
-A **production-ready, enterprise-grade multi-hotel booking system** built with Laravel, Blade, and React. This platform enables hotels to manage properties and bookings while providing customers with a seamless booking experience.
+Một hệ thống đặt phòng khách sạn và tour du lịch **sẵn sàng sản xuất, cấp doanh nghiệp** được xây dựng với Laravel, Blade và React. Nền tảng cho phép các khách sạn và nhà cung cấp tour quản lý tài sản và đặt chỗ trong khi cung cấp cho khách hàng trải nghiệm đặt chỗ liền mạch.
 
-## 🎯 Overview
+## 🎯 Tổng quan
 
-Hotel Booking is a complete SaaS solution for managing hotel reservations at scale. It supports multiple independent hotels (vendors), dynamic pricing, integrated payments, and comprehensive admin dashboards—all built with clean architecture principles and modern web technologies.
+Travel-Booking là giải pháp SaaS hoàn chỉnh để quản lý đặt phòng khách sạn và tour du lịch ở quy mô lớn. Hỗ trợ đa khách sạn (vendors), đa tour provider, định giá động, thanh toán tích hợp và các bảng điều khiển quản trị toàn diện — tất cả được xây dựng theo nguyên tắc Clean Architecture và công nghệ web hiện đại.
 
-**Build as if real hotels and customers will use it tomorrow—no shortcuts, no toy logic.**
+**Xây dựng như thể khách sạn và khách hàng thực sẽ sử dụng nó vào ngày mai — không cắt góp, không logic đồ chơi.**
 
-## ✨ Key Features
+## ✨ Tính năng chính
 
-### Platform & Operations
-- **Multi-Hotel Management** — Independent vendors with complete isolation and custom branding
-- **Dynamic Room Management** — Create, update, and manage multiple room types per hotel
-- **Smart Availability & Pricing** — Real-time availability tracking with dynamic pricing rules
-- **Integrated Payments** — VNPay and PayPal integration with webhooks and async confirmation
-- **Commission System** — Automatic calculation and tracking of platform commissions
-- **Vendor Payouts** — Super Admin generates payouts by period, marks as paid with reference, exports CSV; vendors view payout history
-- **Website Settings** — Dynamic site name, logo, and favicon in admin, vendor dashboard, and customer frontend
-- **Role-Based Access** — Hotel managers, platform admins, and customers with granular permissions
-- **Redis Queues** — Async processing for emails, webhooks, and background jobs
-- **API-First Design** — RESTful API for both customer and admin operations
+### Nền tảng & Vận hành
+- **Quản lý đa khách sạn & đa tour** — Vendors độc lập với cô lập hoàn toàn và thương hiệu tùy chỉnh; tour provider riêng biệt cho mỗi vendor
+- **Quản lý phòng & tour động** — Tạo, cập nhật nhiều loại phòng/tour mỗi khách sạn/provider
+- **Tính khả dụng & giá thông minh** — Theo dõi khả dụng thời gian thực với quy tắc giá động, slot tour, mùa vụ
+- **Thanh toán tích hợp** — VNPay và PayPal với webhook và xác nhận bất đồng bộ
+- **Hệ thống hoa hồng** — Tính toán và theo dõi hoa hồng tự động cho khách sạn và tour
+- **Thanh toán nhà cung cấp** — Super Admin tạo payout theo kỳ, đánh dấu đã thanh toán kèm tham chiếu, xuất CSV; vendor xem lịch sử payout
+- **Cài đặt website động** — Tên site, logo, favicon trong admin, vendor dashboard và frontend khách hàng
+- **Phân quyền theo vai trò** — Quản lý khách sạn, quản trị nền tảng, khách hàng
+- **Redis Queues** — Xử lý bất đồng bộ email, webhook, background jobs
+- **Thiết kế API-First** — RESTful API cho khách hàng và admin
+- **Coupon, Thuế, Chính sách hủy** — Áp dụng mã giảm giá, thuế theo khu vực, chính sách hủy phòng/tour
+- **Hỗ trợ khách hàng** — Hệ thống support tickets với phản hồi hai chiều
+- **Tranh chấp đặt chỗ** — Quản lý dispute cho booking khách sạn và tour
+- **AI hỗ trợ** — Chat AI trên site, đề xuất cá nhân hóa, phân tích sentiment review
 
 ### Vendor Dashboard
-- **Analytics & Reports** — Revenue charts, bookings by status, top hotels
-- **Booking Management** — Full lifecycle with status tracking; mark bookings as old to clean display; view old bookings separately
-- **Business Details** — Multiple bank accounts for payouts (account holder, bank name, routing, SWIFT, currency)
-- **Payout History** — View past payouts with period, gross, commission, net, and status
+- **Phân tích & báo cáo** — Biểu đồ doanh thu, booking theo trạng thái, top khách sạn/tour
+- **Quản lý booking** — Toàn vòng đời với theo dõi trạng thái; đánh dấu booking cũ để dọn hiển thị; xem booking cũ riêng
+- **Thông tin doanh nghiệp** — Nhiều tài khoản ngân hàng cho payout (người nhận, ngân hàng, routing, SWIFT, currency)
+- **Lịch sử payout** — Xem payout quá khứ với kỳ, gross, commission, net, trạng thái
+- **Hồ sơ provider/guide** — Quản lý hồ sơ tour provider, avatar, ngôn ngữ, trạng thái phê duyệt
+- **Tin nhắn tour** — Hộp thư trao đổi giữa khách và provider
 
-### Customer Experience
-- **Customer Portal** — Modern search, filtering, and booking experience
-- **Booking Management** — Full lifecycle with status tracking and refunds
-- **Dynamic Branding** — Site name, logo, and favicon from website settings across all pages
+### Trải nghiệm khách hàng
+- **Cổng khách hàng hiện đại** — Tìm kiếm khách sạn và tour, lọc, bản đồ
+- **Wishlist & Lưu** — Lưu khách sạn và tour yêu thích
+- **Quản lý đặt chỗ** — Toàn vòng đời, hoàn tiền, dispute
+- **Support trực tiếp** — Tạo ticket hỗ trợ, theo dõi phản hồi
+- **Thương hiệu động** — Tên site, logo, favicon từ cài đặt website trên mọi trang
 
-## 🏗️ Architecture
+## 🏗️ Kiến trúc
 
-The project follows **Clean Architecture** principles with clear separation of concerns:
+Dự án tuân thủ **Clean Architecture** với tách biệt mối quan tâm rõ ràng:
 
 ```
 backend/
 ├── app/
-│   ├── Actions/          # Single-purpose, reusable operations
-│   ├── DTOs/             # Type-safe data transfer objects
-│   ├── Enums/            # Domain enums (BookingStatus, PaymentStatus, etc.)
-│   ├── Services/         # Core business logic & domain services
-│   ├── Repositories/     # Data access layer (interfaces + implementations)
-│   ├── Models/           # Eloquent models (no business logic)
-│   ├── Http/Controllers/ # Thin orchestration layer
-│   ├── Http/Requests/    # Form request validation
-│   ├── Http/Resources/   # API response formatting
-│   └── Policies/         # Authorization rules per model
-├── database/
-│   └── migrations/       # Database schema
-└── routes/
-    └── api.php           # API endpoints (/api/v1)
-
+│   ├── Actions/          # Thao tác một mục đích, tái sử dụng
+│   ├── DTOs/             # Data Transfer Objects kiểu an toàn
+│   ├── Enums/            # Enum miền (BookingStatus, PaymentStatus, ...)
+│   ├── Services/         # Logic nghiệp vụ cốt lõi
+│   ├── Repositories/     # Lớp truy cập dữ liệu (interface + Eloquent)
+│   ├── Models/           # Eloquent models (không logic nghiệp vụ)
+│   ├── Http/Controllers/ # Lớp điều phối mỏng
+│   ├── Http/Requests/    # Validation Form Request
+│   ├── Http/Resources/   # Định dạng phản hồi API
+│   └── Policies/         # Quy tắc ủy quyền
 frontend/
 ├── src/
-│   ├── components/       # Reusable React components
-│   ├── pages/            # Page components
-│   ├── hooks/            # Custom React hooks
-│   └── services/         # API client services
-└── public/               # Static assets
+│   ├── components/       # Component React tái sử dụng
+│   ├── pages/            # Trang
+│   ├── hooks/            # Custom hooks
+│   └── services/         # Client API
 ```
 
 ## 🛠️ Tech Stack
 
 ### Backend
-- **Framework:** Laravel 11 (LTS)
-- **Authentication:** Laravel Sanctum (token-based API auth)
+- **Framework:** Laravel 12
+- **Authentication:** Laravel Sanctum (token API)
 - **Database:** MySQL 8.0+ / PostgreSQL 13+
 - **Cache & Queues:** Redis
-- **Payments:** VNPay & PayPal SDKs
+- **Payments:** VNPay & PayPal SDK
 - **Task Scheduling:** Laravel Scheduler & Queue Workers
 
 ### Admin Dashboards
-- **Template Engine:** Blade components
-- **UI Framework:** Tailwind CSS
+- **Template:** Blade components
+- **UI:** Tailwind CSS
 - **Charts:** Chart.js
-- **Layout:** Responsive sidebar navigation
+- **Layout:** Responsive sidebar
 
-### Customer Frontend
-- **Framework:** React 18+
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS
-- **State Management & Data Fetching:** React Query
-- **HTTP Client:** Axios
-- **Routing:** React Router
+### Frontend Khách hàng
+- **Framework:** React 19
+- **Build:** Vite 7
+- **Styling:** Tailwind CSS 4
+- **State & Data:** React Query
+- **HTTP:** Axios
+- **Routing:** React Router v7
+- **i18n:** i18next
+- **Bản đồ:** Leaflet / React-Leaflet
 
-## 🚀 Getting Started
+## 🚀 Bắt đầu
 
-### Prerequisites
+### Yêu cầu
 - PHP 8.2+
 - Composer
 - Node.js 18+
-- MySQL 8.0+ or PostgreSQL 13+
-- Redis (for queues and caching)
+- MySQL 8.0+ hoặc PostgreSQL 13+
+- Redis
 
 ### Backend Setup
-
 ```bash
 cd backend
-
-# Install dependencies
 composer install
-
-# Copy environment file
-cp .env.example .env
-
-# Generate app key
+cp .env.example .env   # nếu không có, copy thủ công từ .env hiện tại
 php artisan key:generate
-
-# Configure database in .env
-# DATABASE_URL=mysql://user:password@localhost/hotel_booking
-
-# Run migrations
 php artisan migrate
-
-# Create admin user (optional)
-php artisan tinker
-# Then in tinker: User::factory()->admin()->create(['email' => 'admin@example.com'])
-
-# Start Laravel development server
 php artisan serve
-
-# In another terminal, start queue worker
 php artisan queue:work
-
-# In another terminal, start scheduler (for production)
 php artisan schedule:work
 ```
-
-**API Base URL:** `http://localhost:8000/api/v1`
-
-**Public API Endpoints (no auth):**
-- `GET /api/v1/website-settings` — Site name, logo, favicon, contact info, social links, meta tags (for frontend branding)
+API Base URL: `http://localhost:8000/api/v1`
 
 ### Frontend Setup
-
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Configure API endpoint in .env
-echo "VITE_API_URL=http://localhost:8000" > .env.local
-
-# Start development server
 npm run dev
 ```
+Frontend URL: `http://localhost:5173`
 
-**Frontend URL:** `http://localhost:5173`
+Vite proxy `/api` → backend. Hoặc tạo `.env.local` với `VITE_API_URL=http://localhost:8000/api/v1`
 
 ### Admin Dashboard
+- Super Admin: `http://localhost:8000/admin`
+- Vendor: `http://localhost:8000/admin/vendor`
 
-The admin dashboard is served by Laravel/Blade and is accessible at:
-- **Admin/Super Admin:** `http://localhost:8000/admin` — Dashboard, vendors, commission, payouts, website settings, disputes, reviews
-- **Vendor:** `http://localhost:8000/admin/vendor` — Dashboard, hotels, rooms, bookings (with mark-as-old), payouts, business details (including bank accounts)
+## 📚 Tài liệu triển khai
 
-## 📚 Implementation Documentation
+- `backend/app/README.md` — Quy ước thư mục
+- `backend/docs/INFRASTRUCTURE.md` — Queue/Scheduler
+- `backend/PAYMENTS.md` — Luồng VNPay, IPN, hoàn tiền
 
-This repository includes comprehensive implementation guides in the root directory:
+## 🔑 Thực thể cốt lõi
 
-- **IMPLEMENTATION-GUIDE.md** — Detailed 11-phase implementation plan covering:
-  - Project foundation & setup
-  - Authentication & authorization
-  - Database design
-  - Business logic services
-  - API development
-  - Admin dashboard implementation
-  - React frontend development
-  - Payment integration
-  - Event handling
-  - Quality & security
-  - Deployment
+### Khách sạn & Phòng
+- Hồ sơ khách sạn, liên hệ, thành phố/quốc gia
+- Nhiều loại phòng, tiện nghi, giá cơ sở, quy tắc chiếm chỗ
+- Lịch khả dụng, hình ảnh
 
-## 🔑 Core Entities
+### Đặt phòng khách sạn
+- Vòng đời pending → confirmed → completed/cancelled
+- Chi tiết khách, nhiều phòng, theo dõi thanh toán
 
-### Hotels (Vendors)
-- Hotel profile with contact details
-- Multiple properties per hotel
-- Custom branding options
-- Commission rate configuration
+### Tour & Provider
+- Tour provider / guide với bio, ngôn ngữ, avatar
+- Tour products, điểm đến, tỉnh, hình ảnh
+- Slot khả dụng theo ngày, giá động
+- Đặt tour, tin nhắn, review
 
-### Rooms
-- Multiple room types per hotel
-- Amenities and features
-- Base pricing and occupancy rules
-- Availability calendar
+### Thanh toán
+- Phương thức VNPay/PayPal, ghi nhận giao dịch, hoàn tiền
+- Tính hoa hồng, payout vendor với trạng thái Pending → Processing → Paid
 
-### Bookings
-- Complete booking lifecycle (pending → confirmed → completed/cancelled)
-- Guest details and preferences
-- Multiple room selections
-- Payment tracking
+### Cài đặt website
+- Tên, mô tả, logo, favicon
+- Thông tin liên hệ, mạng xã hội, meta tags
 
-### Payments
-- Payment method storage (VNPay, PayPal)
-- Transaction recording
-- Refund management
-- Commission calculation
-- Vendor payouts with status (Pending → Processing → Paid) and reference tracking
+### Coupon, Thuế, Hỗ trợ
+- Mã giảm giá với giới hạn sử dụng
+- Thuế theo khu vực, thuế bao gồm
+- Support tickets với category và replies
+- Booking disputes
 
-### Website Settings
-- Site name, description, logo, favicon
-- Contact info (email, phone, address)
-- Social links (Facebook, Twitter, Instagram, LinkedIn)
-- Meta title, description, keywords
-- Displayed dynamically in admin, vendor dashboard, and React frontend
+## 🔐 Xác thực & Ủy quyền
 
-### Reviews & Ratings
-- Guest reviews post-booking
-- Hotel ratings and feedback
-- Review management by vendors
+- Guest Users: truy cập công khai
+- Registered Customers: lịch sử đặt chỗ, review
+- Hotel Managers / Tour Providers: quản lý tài sản riêng
+- Platform Admins: quản trị toàn nền tảng
 
-## 🔐 Authentication & Authorization
+Sử dụng **Laravel Sanctum** cho API token và **Laravel Policies** cho ủy quyền.
 
-- **Guest Users:** Public access to search and book
-- **Registered Customers:** Account creation, booking history, reviews
-- **Hotel Managers:** Manage own hotel properties, bookings, analytics
-- **Platform Admins:** Full platform management, vendor oversight, payouts, website settings
+## 💳 Tích hợp thanh toán
 
-Uses **Laravel Sanctum** for API token authentication and **Laravel Policies** for authorization.
+- VNPay & PayPal cho thanh toán an toàn
+- Webhook xử lý xác nhận thanh toán
+- Xác nhận bất đồng bộ với xác thực webhook
+- Xử lý hoàn tiền
+- Theo dõi hoa hồng và payout
 
-## 💳 Payment Integration
+## 🔄 Xử lý bất đồng bộ
 
-- **VNPay & PayPal** integration for secure payments
-- **Webhook handling** for payment confirmations
-- **Async confirmation** with webhook verification
-- **Refund processing** with proper reversal
-- **Commission tracking** and vendor payouts
-- **Vendor Payouts** — Generate payouts by period, mark as paid with bank reference, export CSV
+Jobs Redis cho:
+- Gửi email xác nhận đặt chỗ
+- Xử lý webhook thanh toán
+- Tính hoa hồng
+- Tổng hợp phân tích
 
-## 🔄 Async Processing
+## 📊 Điểm nhấn Schema DB
 
-Background jobs handled via **Redis queues** for:
-- Sending booking confirmation emails
-- Payment webhook processing
-- Commission calculations
-- Analytics aggregation
-- Report generation
-
-## 📊 Database Schema Highlights
-
-- **Multi-tenancy** with vendor isolation via `hotel_id` foreign keys
-- **Polymorphic relationships** for flexible auditing and logging
-- **UUID primary keys** for enhanced security
-- **Soft deletes** for data preservation
-- **Timestamps** for audit trails
+- Multi-tenancy qua `hotel_id` / `vendor_id`
+- UUID primary keys, soft deletes
+- Quan hệ polymorphic cho audit log
+- Timestamp cho audit trail
 
 ## 🧪 Testing
 
 ```bash
-# Run all tests
 php artisan test
-
-# Run with coverage
 php artisan test --coverage
-
-# Run specific test
 php artisan test --filter TestName
 ```
 
-## 📦 Deployment
+## 📦 Triển khai
 
-### Production Checklist
-- [ ] Set `APP_ENV=production` and `APP_DEBUG=false`
-- [ ] Generate application key
-- [ ] Run migrations with `--force` flag
-- [ ] Set up Redis for caching and queues
-- [ ] Configure VNPay/PayPal credentials
-- [ ] Set up queue worker supervisor
-- [ ] Configure task scheduler with cron
-- [ ] Set up SSL/TLS certificates
-- [ ] Configure CORS for frontend domain
-- [ ] Set up monitoring and logging
-- [ ] Configure backups for database
+Checklist production:
+- `APP_ENV=production`, `APP_DEBUG=false`
+- Chạy migration với `--force`
+- Redis cho cache & queue
+- Cấu hình VNPay/PayPal
+- Supervisor cho queue worker
+- Cron cho scheduler
+- SSL/TLS, CORS, backup DB
 
-### Recommended Hosting
-- **Backend:** Laravel-optimized hosting (Laravel Forge, Ploi, AWS)
-- **Frontend:** Static hosting (Vercel, Netlify, AWS S3 + CloudFront)
-- **Database:** Managed database service (AWS RDS, DigitalOcean)
-- **Cache/Queue:** Managed Redis (AWS ElastiCache, DigitalOcean)
+## 🎓 Quy tắc tuyệt đối
 
-## 🎓 Absolute Rules
+1. **Clean Architecture** — Logic nghiệp vụ không trong controller
+2. **Cô lập multi-vendor** — Không rò rỉ dữ liệu
+3. **Bảo mật trước** — Validate input, escape output, CSRF, rate limit
+4. **Khả mở rộng** — Async, cache, tối ưu DB, API stateless
+5. **Khả kiểm thử** — Unit test services/actions, integration test workflow
+6. **Tài liệu** — Code tự giải thích, naming rõ ràng, PHPDoc
 
-These principles guide all development:
+## 🤝 Đóng góp
 
-1. **Clean Architecture** — Strict separation of concerns; business logic never in controllers
-2. **Multi-Vendor Isolation** — Complete data separation between vendors; no data leaks
-3. **Security First** — Input validation, output escaping, CSRF protection, rate limiting
-4. **Scalability** — Async processing, caching, database optimization, stateless APIs
-5. **Testability** — Unit tests for services and actions, integration tests for workflows
-6. **Documentation** — Self-documenting code with clear naming and PHPDoc comments
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Fork repo
+2. Tạo feature branch
+3. Commit thay đổi
+4. Push branch
+5. Mở Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License
 
-## 👤 Author
+## 👤 Tác giả
 
 Created by Ho Xuan Loc
-## 📞 Support
 
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Check existing documentation in the root directory
-- Review Laravel/React documentation
+## 📞 Hỗ trợ
+
+- Mở issue trên GitHub
+- Xem tài liệu trong thư mục gốc
+- Tham khảo Laravel/React docs
 
 ## 🗺️ Roadmap
 
-- [x] Core booking system
-- [x] Multi-hotel support
-- [x] Payment integration
-- [x] Vendor payouts (generate, mark paid, export)
-- [x] Vendor bank accounts (multiple per vendor)
-- [x] Booking mark-as-old for clean vendor display
-- [x] Dynamic website settings (name, logo, favicon)
-- [ ] Advanced analytics
-- [ ] Mobile app
-- [ ] AI-powered recommendations
-- [ ] Multi-language support
-- [ ] Advanced reporting
-
-## 🙏 Acknowledgments
-
-- Laravel community and documentation
-- React and Vue.js communities
-- VNPay and PayPal for payment infrastructure
-- All contributors and supporters
-
----
+- [x] Hệ thống đặt phòng khách sạn
+- [x] Hỗ trợ đa khách sạn
+- [x] Tích hợp thanh toán
+- [x] Payout vendor (tạo, đánh dấu đã trả, xuất CSV)
+- [x] Tài khoản ngân hàng vendor
+- [x] Đánh dấu booking cũ
+- [x] Cài đặt website động
+- [x] Quản lý tour & tour provider
+- [x] Đặt tour, slot khả dụng, tin nhắn tour
+- [x] Wishlist & Saved hotels/tours
+- [x] Support tickets
+- [x] Coupon, thuế, chính sách hủy
+- [x] AI chat & review sentiment
+- [ ] Phân tích nâng cao
+- [ ] Ứng dụng di động
+- [ ] Gợi ý AI nâng cao
+- [ ] Đa ngôn ngữ
+- [ ] Báo cáo nâng cao
