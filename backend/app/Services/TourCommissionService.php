@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\DB;
 class TourCommissionService
 {
     /**
-     * Booking statuses that count as earned revenue. Paid tours move
-     * confirmed → ongoing → completed via TourAutoComplete, so counting
-     * only 'confirmed' would drop every tour that already took place.
+     * Booking statuses that count as earned revenue. Only 'completed' counts:
+     * confirmed/ongoing tour bookings can still be cancelled, so counting
+     * them would overstate vendor revenue (mirrors hotel policy).
      */
-    public const REVENUE_STATUSES = ['confirmed', 'ongoing', 'completed'];
+    public const REVENUE_STATUSES = ['completed'];
 
     protected float $commissionRate;
 

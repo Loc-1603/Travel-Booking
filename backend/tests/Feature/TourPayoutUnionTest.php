@@ -34,7 +34,7 @@ test('union payout merges hotel and tour bookings per vendor', function (): void
     $checkIn = Carbon::tomorrow()->toDateString();
     Booking::create([
         'customer_id' => $this->customer->id, 'hotel_id' => $hotel->id,
-        'status' => 'confirmed', 'check_in' => $checkIn,
+        'status' => 'completed', 'check_in' => $checkIn,
         'check_out' => Carbon::tomorrow()->addDay()->toDateString(),
         'total_price' => 1000000, 'currency' => 'VND',
     ]);
@@ -64,7 +64,7 @@ test('union payout merges hotel and tour bookings per vendor', function (): void
         'end_at' => $checkIn.' 10:00:00', 'pricing_mode' => 'hour',
         'duration_value' => 2, 'base_fixed' => 200000, 'unit_price' => 100000,
         'subtotal' => 400000, 'total_price' => 500000, 'currency' => 'VND',
-        'status' => TourBookingStatus::CONFIRMED->value,
+        'status' => TourBookingStatus::COMPLETED->value,
     ]);
 
     $start = Carbon::today()->toDateString();

@@ -154,7 +154,7 @@ test('tour commission report aggregates by vendor', function (): void {
         'pricing_mode' => 'hour', 'duration_value' => 2,
         'base_fixed' => 200000, 'unit_price' => 100000, 'subtotal' => 400000,
         'total_price' => 1000000, 'currency' => 'VND',
-        'status' => TourBookingStatus::CONFIRMED->value,
+        'status' => TourBookingStatus::COMPLETED->value,
     ]);
 
     $report = app(TourCommissionService::class)->reportByVendor();

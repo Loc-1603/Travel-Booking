@@ -70,6 +70,12 @@
                         <td>{{ format_vnd($b->total_price ?? 0) }}</td>
                         <td>
                             <a href="{{ route('admin.vendor.bookings.invoice', $b->uuid) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="{{ __('admin.vendor.bookings.view_invoice') }}">{{ __('admin.vendor.bookings.invoice') }}</a>
+                            @if($b->status === 'confirmed')
+                            <form method="POST" action="{{ route('admin.vendor.bookings.complete', $b->uuid) }}" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.bookings.complete_confirm') }}');">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="{{ __('admin.vendor.bookings.complete') }}">{{ __('admin.vendor.bookings.complete') }}</button>
+                            </form>
+                            @endif
                             <form method="POST" action="{{ route('admin.vendor.bookings.mark-old', $b->uuid) }}" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.bookings.mark_as_old_confirm') }}');">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-outline-secondary" title="{{ __('admin.vendor.bookings.mark_as_old') }}">{{ __('admin.vendor.bookings.mark_as_old') }}</button>

@@ -54,12 +54,13 @@ class CommissionService
 
     /**
      * Admin reporting: aggregates by vendor (hotel.vendor_id) and optional date range.
+     * Only completed stays count as earned revenue.
      */
     public function reportByVendor(?string $from = null, ?string $to = null): array
     {
         $query = DB::table('bookings')
             ->join('hotels', 'bookings.hotel_id', '=', 'hotels.id')
-            ->where('bookings.status', 'confirmed')
+            ->where('bookings.status', 'completed')
             ->whereNull('bookings.deleted_at')
             ->select(
                 'hotels.vendor_id',
@@ -126,13 +127,14 @@ class CommissionService
 
     /**
      * Platform-wide totals for KPIs (revenue, commission, booking count).
+     * Only completed stays count as earned revenue.
      *
      * @return array{revenue: float, commission: float, booking_count: int}
      */
     public function platformTotals(?string $from = null, ?string $to = null): array
     {
         $query = DB::table('bookings')
-            ->where('bookings.status', 'confirmed')
+            ->where('bookings.status', 'completed')
             ->whereNull('bookings.deleted_at');
         if ($from) {
             $query->whereDate('bookings.check_in', '>=', $from);

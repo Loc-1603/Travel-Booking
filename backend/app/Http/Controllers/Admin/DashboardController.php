@@ -118,12 +118,12 @@ class DashboardController extends Controller
     }
 
     /**
-     * Revenue per month for last 6 months (confirmed bookings).
+     * Revenue per month for last 6 months (completed bookings).
      */
     protected function revenueChartData(): array
     {
         $rows = DB::table('bookings')
-            ->where('bookings.status', 'confirmed')
+            ->where('bookings.status', 'completed')
             ->whereNull('bookings.deleted_at')
             ->where('bookings.check_in', '>=', now()->subMonths(6)->startOfMonth())
             ->selectRaw($this->monthExpression('bookings.check_in')." as month, SUM(bookings.total_price) as total")
@@ -195,14 +195,14 @@ class DashboardController extends Controller
     }
 
     /**
-     * Top 5 vendors by revenue (confirmed bookings).
+     * Top 5 vendors by revenue (completed bookings).
      */
     protected function topVendorsByRevenueData(): array
     {
         $rows = DB::table('bookings')
             ->join('hotels', 'bookings.hotel_id', '=', 'hotels.id')
             ->join('users', 'hotels.vendor_id', '=', 'users.id')
-            ->where('bookings.status', 'confirmed')
+            ->where('bookings.status', 'completed')
             ->whereNull('bookings.deleted_at')
             ->selectRaw('users.name as vendor_name, SUM(bookings.total_price) as total')
             ->groupBy('users.id', 'users.name')

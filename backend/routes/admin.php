@@ -104,6 +104,7 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::get('/bookings', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'index'])->name('bookings.index');
             Route::get('/bookings/old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'oldBookings'])->name('bookings.old');
             Route::post('/bookings/{uuid}/mark-old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'markAsOld'])->name('bookings.mark-old');
+            Route::post('/bookings/{uuid}/complete', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'markCompleted'])->name('bookings.complete');
             Route::post('/bookings/{uuid}/unmark-old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'unmarkAsOld'])->name('bookings.unmark-old');
             Route::get('/bookings/{uuid}/invoice', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'invoice'])->name('bookings.invoice');
             Route::get('/payouts', [\App\Http\Controllers\Admin\Vendor\PayoutController::class, 'index'])->name('payouts.index');

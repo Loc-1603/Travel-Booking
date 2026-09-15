@@ -58,7 +58,7 @@
             <div class="card dash-stat-card">
                 <div class="card-body d-flex align-items-start justify-content-between gap-2">
                     <div class="min-w-0">
-                        <div class="dash-stat-label">{{ __('admin.vendor.revenue_confirmed') }}</div>
+                        <div class="dash-stat-label">{{ __('admin.vendor.revenue_completed') }}</div>
                         <div class="dash-stat-value">{{ format_vnd($revenue) }}</div>
                     </div>
                     <div class="dash-stat-icon bg-success bg-opacity-10 text-success">

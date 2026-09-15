@@ -28,6 +28,7 @@ class BookingService
                 return false;
             }
         }
+
         return true;
     }
 
@@ -57,7 +58,7 @@ class BookingService
             throw new \InvalidArgumentException('Cannot set both customer_id and guest fields.');
         }
 
-        return DB::transaction(function () use ($customerId, $hotelId, $roomQuantities, $checkIn, $checkOut, $currency, $couponCode, $guestEmail, $guestName, $lateCheckout) {
+        return DB::transaction(function () use ($customerId, $hotelId, $roomQuantities, $checkIn, $checkOut, $couponCode, $guestEmail, $guestName, $lateCheckout) {
             foreach (array_keys($roomQuantities) as $roomId) {
                 $this->availabilityService->ensureAvailabilityRows($roomId, $checkIn, $checkOut);
             }
@@ -113,6 +114,7 @@ class BookingService
                         'unit_price' => $up,
                     ]);
                 }
+
                 return $booking;
             } catch (\Throwable $e) {
                 foreach ($roomQuantities as $roomId => $quantity) {
@@ -121,6 +123,19 @@ class BookingService
                 throw $e;
             }
         });
+    }
+
+    /**
+     * Mark a confirmed booking as completed (stay finished / checked out).
+     * Only confirmed bookings can be completed; pending or cancelled ones stay untouched.
+     */
+    public function completeBooking(Booking $booking): void
+    {
+        if ($booking->status !== BookingStatus::CONFIRMED->value) {
+            throw new \RuntimeException('Only confirmed bookings can be marked as completed.');
+        }
+
+        $booking->update(['status' => BookingStatus::COMPLETED->value]);
     }
 
     /**

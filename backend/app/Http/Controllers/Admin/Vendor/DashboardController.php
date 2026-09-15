@@ -48,7 +48,7 @@ class DashboardController extends Controller
             $topHotelsChart = $this->topProvidersByRevenueData($providerIds);
         } else {
             $revenue = (float) Booking::whereIn('hotel_id', $hotelIds)
-                ->where('status', 'confirmed')
+                ->where('status', 'completed')
                 ->whereNull('deleted_at')
                 ->sum('total_price');
             $bookingCount = Booking::whereIn('hotel_id', $hotelIds)->whereNull('deleted_at')->count();
@@ -72,7 +72,7 @@ class DashboardController extends Controller
     {
         $rows = DB::table('bookings')
             ->whereIn('hotel_id', $hotelIds)
-            ->where('status', 'confirmed')
+            ->where('status', 'completed')
             ->whereNull('deleted_at')
             ->where('check_in', '>=', now()->subMonths(6)->startOfMonth())
             ->selectRaw($this->monthExpression('check_in').' as month, SUM(total_price) as total')
@@ -141,7 +141,7 @@ class DashboardController extends Controller
         $rows = DB::table('bookings')
             ->join('hotels', 'bookings.hotel_id', '=', 'hotels.id')
             ->whereIn('bookings.hotel_id', $hotelIds)
-            ->where('bookings.status', 'confirmed')
+            ->where('bookings.status', 'completed')
             ->whereNull('bookings.deleted_at')
             ->selectRaw('hotels.name as hotel_name, SUM(bookings.total_price) as total')
             ->groupBy('hotels.id', 'hotels.name')
@@ -212,7 +212,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Top 5 providers of this vendor by confirmed tour revenue.
+     * Top 5 providers of this vendor by completed tour revenue.
      */
     protected function topProvidersByRevenueData($providerIds): array
     {

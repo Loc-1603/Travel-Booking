@@ -95,7 +95,7 @@ test('vendor explicit hotel segment still works', function (): void {
 test('vendor tour segment shows only own tour revenue', function (): void {
     $this->actingAs($this->vendor)->get('/admin/vendor/dashboard?segment=tour')
         ->assertOk()
-        ->assertSee('900.000', false); // confirmed 500k + completed 400k; pending/cancelled excluded
+        ->assertSee('400.000', false); // only completed 400k; confirmed/pending/cancelled excluded
 });
 
 test('super admin toggles both segments', function (): void {

@@ -13,6 +13,9 @@ class VendorReportService
     /**
      * Occupancy % for vendor's hotels by period.
      * Occupancy = booked room-nights / available room-nights * 100.
+     * NOTE: intentionally counts 'confirmed' (not 'completed') — occupancy
+     * measures inventory usage including upcoming stays, unlike revenue
+     * which only counts completed stays.
      *
      * @param  array<int>  $hotelIds
      * @return array{occupancy: float, booked_nights: int, available_nights: int, period_label: string}
@@ -85,7 +88,7 @@ class VendorReportService
             ->join('bookings', 'booking_rooms.booking_id', '=', 'bookings.id')
             ->join('rooms', 'booking_rooms.room_id', '=', 'rooms.id')
             ->whereIn('bookings.hotel_id', $hotelIds)
-            ->where('bookings.status', 'confirmed')
+            ->where('bookings.status', 'completed')
             ->whereNull('bookings.deleted_at');
 
         if ($from) {
@@ -151,6 +154,7 @@ class VendorReportService
 
     /**
      * Revenue chart data for last N months (for dashboard).
+     * Only completed stays count as earned revenue.
      *
      * @param  array<int>  $hotelIds
      * @return array{labels: array<string>, data: array<float>}
@@ -159,7 +163,7 @@ class VendorReportService
     {
         $rows = DB::table('bookings')
             ->whereIn('hotel_id', $hotelIds)
-            ->where('status', 'confirmed')
+            ->where('status', 'completed')
             ->whereNull('deleted_at')
             ->where('check_in', '>=', now()->subMonths($months)->startOfMonth())
             ->selectRaw("DATE_FORMAT(check_in, '%Y-%m') as month, SUM(total_price) as total")
@@ -238,7 +242,7 @@ class VendorReportService
     {
         $row = DB::table('bookings')
             ->whereIn('hotel_id', $hotelIds)
-            ->where('status', 'confirmed')
+            ->where('status', 'completed')
             ->whereNull('deleted_at')
             ->where('check_in', '<', date('Y-m-d', strtotime($to . ' +1 day')))
             ->where('check_out', '>', $from)

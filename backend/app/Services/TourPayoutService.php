@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\DB;
 class TourPayoutService
 {
     /**
-     * Confirmed tour bookings in a period not yet included in any payout.
+     * Completed tour bookings in a period not yet included in any payout.
+     * Only completed tours count as earned revenue (confirmed/ongoing
+     * bookings can still be cancelled).
      *
      * @return Collection<int, TourBooking>
      */
@@ -17,7 +19,7 @@ class TourPayoutService
     {
         return TourBooking::query()
             ->join('tour_providers', 'tour_bookings.provider_id', '=', 'tour_providers.id')
-            ->where('tour_bookings.status', 'confirmed')
+            ->where('tour_bookings.status', 'completed')
             ->whereNull('tour_bookings.deleted_at')
             ->whereDate('tour_bookings.start_at', '>=', $periodStart)
             ->whereDate('tour_bookings.start_at', '<=', $periodEnd)

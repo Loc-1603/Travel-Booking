@@ -66,7 +66,7 @@ class VnpayService
             'payload' => ['txn_ref' => $txnRef],
         ]);
 
-        $now = now();
+        $now = now('Asia/Ho_Chi_Minh');
         $expire = $now->copy()->addMinutes((int) config('services.vnpay.expire_minutes', 30));
 
         $params = [

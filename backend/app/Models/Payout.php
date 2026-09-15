@@ -49,6 +49,11 @@ class Payout extends Model
         return $this->belongsToMany(Booking::class, 'payout_booking');
     }
 
+    public function tourBookings(): BelongsToMany
+    {
+        return $this->belongsToMany(TourBooking::class, 'payout_tour_booking');
+    }
+
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;

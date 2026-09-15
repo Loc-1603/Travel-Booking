@@ -79,6 +79,28 @@ class BookingController extends Controller
             ->with('success', __('admin.vendor.bookings.flash.marked_old'));
     }
 
+    /**
+     * Mark a confirmed booking as completed (stay finished / checked out).
+     */
+    public function markCompleted(string $uuid, \App\Services\BookingService $bookings): RedirectResponse
+    {
+        $booking = Booking::where('uuid', $uuid)->firstOrFail();
+        $hotelIds = Hotel::where('vendor_id', auth()->id())->pluck('id');
+        if (! $hotelIds->contains($booking->hotel_id)) {
+            abort(403, __('admin.vendor.bookings.flash.forbidden_booking'));
+        }
+
+        try {
+            $bookings->completeBooking($booking);
+        } catch (\RuntimeException $e) {
+            return redirect()->route('admin.vendor.bookings.index')
+                ->with('error', __('admin.vendor.bookings.flash.complete_invalid'));
+        }
+
+        return redirect()->route('admin.vendor.bookings.index')
+            ->with('success', __('admin.vendor.bookings.flash.completed'));
+    }
+
     public function unmarkAsOld(string $uuid): RedirectResponse
     {
         $booking = Booking::where('uuid', $uuid)->firstOrFail();
