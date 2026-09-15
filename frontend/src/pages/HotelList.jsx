@@ -9,11 +9,10 @@ import { HotelCard } from '../components/HotelCard';
 import { HotelListSkeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
 import { AmenityIcon } from '../components/AmenityIcon';
-import { calculateNights } from '../lib/utils';
+import { calculateNights, formatPrice } from '../lib/utils';
+import { getAmenityLabel } from '../lib/amenities';
 import { parseHotelSearchResponse } from '../lib/hotelSearch';
 import { useTranslation } from 'react-i18next';
-
-const PRICE_MAX = 500;
 
 const REVIEW_SCORE_OPTIONS = [
   { label: 'hotels.reviewScore.excellent', value: 5 },
@@ -83,6 +82,7 @@ function HeartIcon({ filled }) {
 }
 
 function FilterDrawer({ open, onClose, children }) {
+  const { t } = useTranslation();
   if (!open) return null;
   return (
     <>
@@ -95,15 +95,15 @@ function FilterDrawer({ open, onClose, children }) {
         className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-[0_20px_40px_rgb(26_26_26_/0.1)] z-50 overflow-y-auto lg:hidden rounded-l-2xl"
         role="dialog"
         aria-modal="true"
-        aria-label="Filters"
+        aria-label={t('hotels.filters.title')}
       >
         <div className="sticky top-0 bg-white border-b border-[#e8e4dd] px-4 py-4 flex items-center justify-between rounded-tl-2xl">
-          <h2 className="font-semibold text-[#1a1a1a]">Filters</h2>
+          <h2 className="font-semibold text-[#1a1a1a]">{t('hotels.filters.title')}</h2>
           <button
             type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[#f5f2ed]"
-            aria-label="Close filters"
+            aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -111,6 +111,168 @@ function FilterDrawer({ open, onClose, children }) {
         <div className="p-4">{children}</div>
       </aside>
     </>
+  );
+}
+
+export function HotelFilterPanel({
+  minCapacity,
+  minRating,
+  minPrice,
+  maxPrice,
+  priceError,
+  onCommitPriceRange,
+  amenities,
+  selectedAmenities,
+  onApply,
+  onClear,
+}) {
+  const { t } = useTranslation();
+  const [priceEdit, setPriceEdit] = useState(null);
+
+  const displayMin = minPrice === '0' ? '' : minPrice;
+  const displayMax = maxPrice;
+
+  const priceSummary = useMemo(() => {
+    const min = minPrice !== '' && Number(minPrice) > 0 ? Number(minPrice) : null;
+    const max = maxPrice !== '' ? Number(maxPrice) : null;
+    if (min != null && max != null) return `${formatPrice(min)} Đến ${formatPrice(max)}`;
+    if (max != null) return `${t('hotels.filters.maxPrice')}: ${formatPrice(max)}`;
+    if (min != null) return `${t('hotels.filters.minPrice')}: ${formatPrice(min)}`;
+    return null;
+  }, [t, minPrice, maxPrice]);
+
+  const commitPrice = () => {
+    if (!priceEdit) return;
+    const draft = {
+      min: priceEdit.field === 'min' ? priceEdit.value : displayMin,
+      max: priceEdit.field === 'max' ? priceEdit.value : displayMax,
+    };
+    setPriceEdit(null);
+    onCommitPriceRange(draft);
+  };
+
+  return (
+    <div className="space-y-6">
+      <section>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1a1a1a] mb-3">{t('hotels.filters.guests')}</h3>
+        <p className="text-xs text-[#7a756d] mb-2">{t('hotels.filters.roomsFitAtLeast')}</p>
+        <select
+          value={minCapacity}
+          onChange={(e) => onApply({ min_capacity: e.target.value })}
+          className="w-full rounded-xl border border-[#e8e4dd] px-4 py-2.5 text-sm text-[#45423d] bg-white focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b]"
+        >
+          <option value="">{t('common.any')}</option>
+          {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
+            <option key={n} value={n}>{n} {n === 1 ? t('common.guest') : t('common.guests')}+</option>
+          ))}
+        </select>
+      </section>
+
+      <section>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1a1a1a] mb-3">{t('hotels.filters.minimumRating')}</h3>
+        <p className="text-xs text-[#7a756d] mb-2">{t('hotels.filters.basedOnGuestReviews')}</p>
+        <div className="space-y-2">
+          {REVIEW_SCORE_OPTIONS.map((opt) => (
+            <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="min_rating"
+                checked={minRating === String(opt.value)}
+                onChange={() => onApply({ min_rating: minRating === String(opt.value) ? '' : opt.value })}
+                className="rounded-full border-[#e8e4dd] text-[#b8860b] focus:ring-[#b8860b]/30"
+              />
+              <span className="text-sm text-[#45423d]">{t(opt.label)}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1a1a1a] mb-3">{t('hotels.filters.priceRange')}</h3>
+        <div className="space-y-3">
+          <div className="flex gap-2 items-center">
+            <input
+              type="number"
+              min="0"
+              step="10000"
+              value={priceEdit?.field === 'min' ? priceEdit.value : displayMin}
+              onFocus={() => setPriceEdit({ field: 'min', value: displayMin })}
+              onChange={(e) => setPriceEdit({ field: 'min', value: e.target.value })}
+              onBlur={commitPrice}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  commitPrice();
+                }
+              }}
+              placeholder={t('hotels.filters.minPrice')}
+              aria-label={t('hotels.filters.minPrice')}
+              className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b]"
+            />
+            <span className="text-[#7a756d]">Đến</span>
+            <input
+              type="number"
+              min="0"
+              step="10000"
+              value={priceEdit?.field === 'max' ? priceEdit.value : displayMax}
+              onFocus={() => setPriceEdit({ field: 'max', value: displayMax })}
+              onChange={(e) => setPriceEdit({ field: 'max', value: e.target.value })}
+              onBlur={commitPrice}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  commitPrice();
+                }
+              }}
+              placeholder={t('hotels.filters.maxPrice')}
+              aria-label={t('hotels.filters.maxPrice')}
+              className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b]"
+            />
+          </div>
+          {priceError ? (
+            <p className="text-xs font-medium text-red-600" role="alert">{priceError}</p>
+          ) : priceSummary ? (
+            <p className="text-xs text-[#5c5852]">{priceSummary}</p>
+          ) : null}
+        </div>
+      </section>
+
+      {amenities.length > 0 && (
+        <section>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1a1a1a] mb-3">{t('hotels.filters.amenities')}</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {amenities.map((a) => (
+              <label key={a.id} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedAmenities.includes(a.slug)}
+                  onChange={() => {
+                    const next = selectedAmenities.includes(a.slug)
+                      ? selectedAmenities.filter((s) => s !== a.slug)
+                      : [...selectedAmenities, a.slug];
+                    onApply({ amenities: next.join(',') });
+                  }}
+                  className="rounded border-[#e8e4dd] text-[#b8860b] focus:ring-[#b8860b]/30"
+                />
+                <span className="flex min-w-0 items-center gap-1.5 text-sm text-[#45423d]">
+                  <AmenityIcon slug={a.slug} className="w-4 h-4 shrink-0 text-[#b8860b]" />
+                  <span className="truncate">{getAmenityLabel(t, a)}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <button
+        type="button"
+        onClick={onClear}
+        aria-label={t('hotels.filters.clearAll')}
+        className="w-full py-2.5 text-sm font-medium text-[#b8860b] hover:text-[#996f09] border border-[#e5c261] rounded-xl transition-colors hover:bg-[#f9edd1]"
+      >
+        {t('common.clearFilters')}
+      </button>
+    </div>
   );
 }
 
@@ -136,6 +298,7 @@ function HotelList() {
   const amenitiesParam = searchParams.get('amenities') || '';
   const selectedAmenities = amenitiesParam ? amenitiesParam.split(',').filter(Boolean) : [];
 
+  const [priceError, setPriceError] = useState('');
 
   const applyFilters = (updates) => {
     const next = new URLSearchParams(searchParams);
@@ -145,6 +308,41 @@ function HotelList() {
       else next.set(k, String(v));
     });
     setSearchParams(next);
+  };
+
+  const commitPriceRange = (draft) => {
+    const minStr = String(draft.min ?? '').trim();
+    const maxStr = String(draft.max ?? '').trim();
+    const min = minStr !== '' ? Number(minStr) : null;
+    const max = maxStr !== '' ? Number(maxStr) : null;
+    const invalid = (v) => v != null && (!Number.isFinite(v) || v < 0);
+    if (invalid(min) || invalid(max)) {
+      setPriceError(t('hotels.filters.priceInvalid'));
+      return;
+    }
+    if (min != null && max != null && min > max) {
+      setPriceError(t('hotels.filters.priceError'));
+      return;
+    }
+    setPriceError('');
+    const effMin = min != null && min > 0 ? String(min) : '';
+    const effMax = max != null && max > 0 ? String(max) : '';
+    if (effMax !== '') {
+      applyFilters({ min_price: effMin !== '' ? effMin : '0', max_price: effMax });
+    } else {
+      applyFilters({ min_price: effMin, max_price: '' });
+    }
+  };
+
+  const clearFilters = () => {
+    const base = { check_in: checkIn, check_out: checkOut };
+    if (cityId) base.city_id = cityId;
+    else if (city) base.city = city;
+    if (countryId) base.country_id = countryId;
+    else if (country) base.country = country;
+    setSearchParams(new URLSearchParams(base));
+    setPriceError('');
+    setFilterDrawerOpen(false);
   };
 
   const handleSearch = (e) => {
@@ -251,7 +449,8 @@ function HotelList() {
     return new URLSearchParams(p).toString();
   };
 
-  const filterCount = [minRating, minCapacity, minPrice, maxPrice].filter(Boolean).length + (selectedAmenities.length ? 1 : 0);
+  const effectiveMinPrice = minPrice !== '' && Number(minPrice) > 0 ? minPrice : '';
+  const filterCount = [minRating, minCapacity, effectiveMinPrice, maxPrice].filter(Boolean).length + (selectedAmenities.length ? 1 : 0);
 
   const resultsHeadline = useMemo(() => {
     const n = total;
@@ -266,7 +465,7 @@ function HotelList() {
       return { line1: `${country}: ${n} ${unit}`, line2: t('hotels.results.totalsUpdate') };
     }
     return { line1: `${n} ${unit} ${t('hotels.results.found')}`, line2: t('hotels.results.totalsUpdate') };
-  }, [total, city, country, latitude, longitude, radiusKm]);
+  }, [t, total, city, country, latitude, longitude, radiusKm]);
 
   const { today, tomorrow } = useMemo(() => {
     const d = new Date();
@@ -275,128 +474,6 @@ function HotelList() {
     next.setDate(next.getDate() + 1);
     return { today: t, tomorrow: next.toISOString().split('T')[0] };
   }, []);
-
-  const priceMax = maxPrice ? Number(maxPrice) : PRICE_MAX;
-
-  const FilterContent = () => (
-    <div className="space-y-6">
-      <section>
-        <h3 className="text-sm font-medium text-[#45423d] mb-3">{t('hotels.filters.guests')}</h3>
-        <p className="text-xs text-[#5c5852] mb-2">{t('hotels.filters.roomsFitAtLeast')}</p>
-        <select
-          value={minCapacity}
-          onChange={(e) => applyFilters({ min_capacity: e.target.value })}
-          className="w-full rounded-xl border border-[#e8e4dd]200 px-4 py-2.5 text-sm text-[#45423d] bg-white focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b]"
-        >
-          <option value="">{t('common.any')}</option>
-          {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
-            <option key={n} value={n}>{n} {n === 1 ? t('common.guest') : t('common.guests')}+</option>
-          ))}
-        </select>
-      </section>
-
-      <section>
-        <h3 className="text-sm font-medium text-[#45423d] mb-3">{t('hotels.filters.minimumRating')}</h3>
-        <p className="text-xs text-[#5c5852] mb-2">{t('hotels.filters.basedOnGuestReviews')}</p>
-        <div className="space-y-2">
-          {REVIEW_SCORE_OPTIONS.map((opt) => (
-            <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="min_rating"
-                checked={minRating === String(opt.value)}
-                onChange={() => applyFilters({ min_rating: minRating === String(opt.value) ? '' : opt.value })}
-                className="rounded-full border-[#e8e4dd]300 text-[#b8860b] focus:ring-[#b8860b]/30"
-              />
-              <span className="text-sm text-[#45423d]">{t(opt.label)}</span>
-            </label>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h3 className="text-sm font-medium text-[#45423d] mb-3">{t('hotels.filters.priceRange')}</h3>
-        <div className="space-y-4">
-          <div className="flex gap-2 items-center">
-            <input
-              type="number"
-              min="0"
-              max={PRICE_MAX}
-              step="10"
-              value={minPrice || ''}
-              onChange={(e) => applyFilters({ min_price: e.target.value })}
-              placeholder={t('common.min')}
-              className="w-24 rounded-xl border border-[#e8e4dd]200 px-3 py-2 text-sm focus:ring-2 focus:ring-[#b8860b]/30"
-            />
-            <span className="text-[#7a756d]">–</span>
-            <input
-              type="number"
-              min="0"
-              max={PRICE_MAX}
-              step="10"
-              value={maxPrice || ''}
-              onChange={(e) => applyFilters({ max_price: e.target.value })}
-              placeholder={t('common.max')}
-              className="w-24 rounded-xl border border-[#e8e4dd]200 px-3 py-2 text-sm focus:ring-2 focus:ring-[#b8860b]/30"
-            />
-          </div>
-          <div className="space-y-2">
-            <input
-              type="range"
-              min="0"
-              max={PRICE_MAX}
-              step="10"
-              value={priceMax}
-              onChange={(e) => applyFilters({ max_price: e.target.value })}
-              className="w-full h-2 rounded-lg appearance-none bg-stone-200 accent-[#b8860b]"
-            />
-            <p className="text-xs text-[#5c5852]">Max: ${priceMax}</p>
-          </div>
-        </div>
-      </section>
-
-      {amenities.length > 0 && (
-        <section>
-          <h3 className="text-sm font-medium text-[#45423d] mb-3">{t('hotels.filters.amenities')}</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {amenities.map((a) => (
-              <label key={a.id} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedAmenities.includes(a.slug)}
-                  onChange={() => {
-                    const next = selectedAmenities.includes(a.slug)
-                      ? selectedAmenities.filter((s) => s !== a.slug)
-                      : [...selectedAmenities, a.slug];
-                    applyFilters({ amenities: next.join(',') });
-                  }}
-                  className="rounded border-[#e8e4dd]300 text-[#b8860b] focus:ring-[#b8860b]/30"
-                />
-                <span className="text-sm text-[#45423d] truncate">{a.name}</span>
-              </label>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <button
-        type="button"
-        onClick={() => {
-          const base = { check_in: checkIn, check_out: checkOut };
-          if (cityId) base.city_id = cityId;
-          else if (city) base.city = city;
-          if (countryId) base.country_id = countryId;
-          else if (country) base.country = country;
-          setSearchParams(new URLSearchParams(base));
-          setFilterDrawerOpen(false);
-        }}
-        aria-label={t('hotels.filters.clearAll')}
-        className="w-full py-2.5 text-sm font-medium text-[#b8860b] hover:text-[#996f09] border border-[#e5c261] rounded-xl transition-colors hover:bg-[#f9edd1]"
-      >
-        {t('common.clearFilters')}
-      </button>
-    </div>
-  );
 
   if (isError) {
     return (
@@ -408,7 +485,7 @@ function HotelList() {
 
   return (
     <div className="py-6 sm:py-8">
-      {/* Sticky search bar — persist params from home, editable */}
+      {/* Sticky search bar â€” persist params from home, editable */}
       <form
         onSubmit={handleSearch}
         className="sticky top-16 z-30 bg-white/98 backdrop-blur-md border-b border-[#e8e4dd] -mx-4 px-4 py-5 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 mb-8 shadow-sm"
@@ -494,13 +571,35 @@ function HotelList() {
         <aside className="hidden lg:block lg:w-72 shrink-0">
           <div className="sticky top-24 space-y-6 rounded-2xl border border-[#e8e4dd] bg-white p-6 shadow-[0_4px_12px_rgb(26_26_26_/0.06)]">
             <h2 className="font-semibold text-[#1a1a1a] text-lg">{t('hotels.filters.title')}</h2>
-            <FilterContent />
+            <HotelFilterPanel
+              minCapacity={minCapacity}
+              minRating={minRating}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              priceError={priceError}
+              onCommitPriceRange={commitPriceRange}
+              amenities={amenities}
+              selectedAmenities={selectedAmenities}
+              onApply={applyFilters}
+              onClear={clearFilters}
+            />
           </div>
         </aside>
 
         {/* Mobile: filter drawer */}
         <FilterDrawer open={filterDrawerOpen} onClose={() => setFilterDrawerOpen(false)}>
-          <FilterContent />
+          <HotelFilterPanel
+            minCapacity={minCapacity}
+            minRating={minRating}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            priceError={priceError}
+            onCommitPriceRange={commitPriceRange}
+            amenities={amenities}
+            selectedAmenities={selectedAmenities}
+            onApply={applyFilters}
+            onClear={clearFilters}
+          />
         </FilterDrawer>
 
         {/* Main: results */}
@@ -509,7 +608,7 @@ function HotelList() {
             <Link to="/" className="hover:text-[#b8860b]">{t('common.home')}</Link>
             {(country || city || (latitude && longitude)) && (
               <>
-                <span className="mx-1">›</span>
+                <span className="mx-1">  </span>
                 <span className="text-[#1a1a1a] font-medium">
                   {city || country || (latitude && longitude ? t('header.mapSearch') : t('header.hotels'))}
                 </span>
@@ -589,7 +688,7 @@ function HotelList() {
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f9edd1] text-[#996f09] text-sm font-medium hover:bg-[#f0d999]"
                   >
                     <AmenityIcon slug={slug} className="w-3.5 h-3.5" />
-                    {a?.name || slug}
+                    {a ? getAmenityLabel(t, a) : slug}
                     <X className="w-3.5 h-3.5" />
                   </button>
                 );

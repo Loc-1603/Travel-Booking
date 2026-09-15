@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Api;
 
+use Illuminate\Contracts\Validation\Validator;
+
 class HotelSearchRequest extends BaseApiRequest
 {
     public function authorize(): bool
@@ -25,7 +27,7 @@ class HotelSearchRequest extends BaseApiRequest
             'check_in' => 'nullable|date|after_or_equal:today',
             'check_out' => 'nullable|date|after:check_in',
             'min_price' => 'nullable|numeric|min:0',
-            'max_price' => 'nullable|numeric|min:0|gte:min_price',
+            'max_price' => 'nullable|numeric|min:0',
             'min_rating' => 'nullable|numeric|min:0|max:5',
             'min_capacity' => 'nullable|integer|min:1|max:20',
             'amenities' => 'nullable|array',
@@ -34,5 +36,16 @@ class HotelSearchRequest extends BaseApiRequest
             'per_page' => 'nullable|integer|min:1|max:50',
             'page' => 'nullable|integer|min:1',
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $min = $this->input('min_price');
+            $max = $this->input('max_price');
+            if (is_numeric($min) && is_numeric($max) && (float) $max < (float) $min) {
+                $validator->errors()->add('max_price', 'The max price must be greater than or equal to the min price.');
+            }
+        });
     }
 }

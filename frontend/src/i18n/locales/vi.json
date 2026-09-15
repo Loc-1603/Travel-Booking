@@ -92,6 +92,23 @@
     "total": "tổng",
     "any": "Tất cả"
   },
+  "amenities": {
+    "wifi": "Wi-Fi miễn phí",
+    "pool": "Hồ bơi",
+    "parking": "Bãi đỗ xe",
+    "breakfast": "Bữa sáng miễn phí",
+    "gym": "Phòng gym",
+    "spa": "Spa",
+    "restaurant": "Nhà hàng",
+    "bar": "Quầy bar",
+    "air-conditioning": "Điều hòa",
+    "room-service": "Dịch vụ phòng",
+    "pet-friendly": "Cho phép thú cưng",
+    "business-center": "Trung tâm hội nghị",
+    "beach-access": "Lối ra biển",
+    "balcony": "Ban công",
+    "minibar": "Minibar"
+  },
   "header": {
     "home": "Trang chủ",
     "hotels": "Khách sạn",
@@ -206,6 +223,8 @@
       "priceRange": "Khoảng giá (mỗi đêm)",
       "minPrice": "Tối thiểu",
       "maxPrice": "Tối đa",
+      "priceError": "Giá tối thiểu không được lớn hơn giá tối đa",
+      "priceInvalid": "Giá không hợp lệ",
       "amenities": "Tiện ích",
       "sortBy": "Sắp xếp theo",
       "clearAll": "Xóa bộ lọc"

@@ -8,6 +8,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { HotelDetailSkeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
 import { formatPrice, getRatingLabel, calculateNights, cn } from '../lib/utils';
+import { getAmenityLabel } from '../lib/amenities';
 import { AmenityIcon } from '../components/AmenityIcon';
 import { useTranslation } from 'react-i18next';
 
@@ -310,7 +311,7 @@ export default function HotelDetail() {
                     {hotel.amenities.map((a) => (
                       <span key={a.id} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#f5f2ed] text-[#45423d] text-sm">
                         <AmenityIcon slug={a.slug} className="w-4 h-4 text-[#b8860b]600" />
-                        {a.name}
+                        {getAmenityLabel(t, a)}
                       </span>
                     ))}
                   </div>
@@ -366,9 +367,9 @@ export default function HotelDetail() {
                               {room.amenities?.length > 0 && (
                                 <div className="mt-2 flex flex-wrap gap-2">
                                   {room.amenities?.slice(0, 5).map((a) => (
-                                    <span key={a.id} className="inline-flex items-center gap-1 text-[#5c5852] text-sm" title={a.name}>
+                                    <span key={a.id} className="inline-flex items-center gap-1 text-[#5c5852] text-sm" title={getAmenityLabel(t, a)}>
                                       <AmenityIcon slug={a.slug} className="w-3.5 h-3.5" />
-                                      {a.name}
+                                      {getAmenityLabel(t, a)}
                                     </span>
                                   ))}
                                 </div>

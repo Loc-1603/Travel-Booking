@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { AmenityIcon } from './AmenityIcon';
 import { formatPrice, getRatingLabel } from '../lib/utils';
+import { getAmenityLabel } from '../lib/amenities';
 
 function getHotelMinPrice(hotel) {
   if (!hotel?.rooms?.length) return null;
@@ -10,6 +12,7 @@ function getHotelMinPrice(hotel) {
 }
 
 export function HotelCard({ hotel, nights, dealLabel, originalPrice, to, currency = 'VND', imageOverlay, children }) {
+  const { t } = useTranslation();
   const minPrice = getHotelMinPrice(hotel);
   const dealPrice = minPrice != null && originalPrice != null && originalPrice > minPrice ? minPrice : null;
   const displayPrice = dealPrice ?? minPrice;
@@ -48,7 +51,7 @@ export function HotelCard({ hotel, nights, dealLabel, originalPrice, to, currenc
         {hotel.amenities?.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Amenities">
             {hotel.amenities.slice(0, 5).map((a) => (
-              <span key={a.id} className="inline-flex items-center gap-1 text-[#7a756d]" title={a.name}>
+              <span key={a.id} className="inline-flex items-center gap-1 text-[#7a756d]" title={getAmenityLabel(t, a)}>
                 <AmenityIcon slug={a.slug} className="w-3.5 h-3.5" />
               </span>
             ))}

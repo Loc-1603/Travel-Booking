@@ -92,6 +92,23 @@
     "total": "total",
     "any": "All"
   },
+  "amenities": {
+    "wifi": "Free Wi-Fi",
+    "pool": "Swimming Pool",
+    "parking": "Free Parking",
+    "breakfast": "Breakfast Included",
+    "gym": "Fitness Center",
+    "spa": "Spa",
+    "restaurant": "Restaurant",
+    "bar": "Bar",
+    "air-conditioning": "Air Conditioning",
+    "room-service": "Room Service",
+    "pet-friendly": "Pet Friendly",
+    "business-center": "Business Center",
+    "beach-access": "Beach Access",
+    "balcony": "Balcony",
+    "minibar": "Minibar"
+  },
   "header": {
     "home": "Home",
     "hotels": "Hotels",
@@ -206,6 +223,8 @@
       "priceRange": "Price Range (per night)",
       "minPrice": "Min",
       "maxPrice": "Max",
+      "priceError": "Min price cannot be greater than max price",
+      "priceInvalid": "Invalid price",
       "amenities": "Amenities",
       "sortBy": "Sort by",
       "clearAll": "Clear filters"

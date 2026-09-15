@@ -8,6 +8,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import { HotelDetailSkeleton } from '../components/Skeleton';
 import { AmenityIcon } from '../components/AmenityIcon';
 import { formatPrice, formatDate, calculateNights } from '../lib/utils';
+import { getAmenityLabel } from '../lib/amenities';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -240,7 +241,7 @@ export default function Booking() {
                 {room.amenities?.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {room.amenities.slice(0, 4).map((a) => (
-                      <span key={a.id} className="inline-flex items-center gap-1 text-stone-500 text-sm" title={a.name}>
+                      <span key={a.id} className="inline-flex items-center gap-1 text-stone-500 text-sm" title={getAmenityLabel(t, a)}>
                         <AmenityIcon slug={a.slug} className="w-3.5 h-3.5" />
                       </span>
                     ))}
