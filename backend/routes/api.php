@@ -23,10 +23,13 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | VNPay IPN: server-to-server callback (no auth, checksum verified).
 | Frontend return page is separate (VNPAY_RETURN_URL, no trust for confirmation).
+| Single unified handler for hotel + tour (VNPay allows one IPN URL per TmnCode;
+| txn_ref prefix decides the payment type). The tour-specific URL is kept as a
+| legacy alias so previously configured portal callbacks keep working.
 |--------------------------------------------------------------------------
 */
-Route::get('/v1/payments/vnpay-ipn', [\App\Http\Controllers\Api\V1\VnpayIpnController::class, '__invoke'])->name('api.v1.payments.vnpay-ipn');
-Route::get('/v1/payments/tour-vnpay-ipn', [\App\Http\Controllers\Api\V1\TourVnpayIpnController::class, '__invoke'])->name('api.v1.payments.tour-vnpay-ipn');
+Route::get('/v1/payments/vnpay-ipn', [\App\Http\Controllers\Api\V1\UnifiedVnpayIpnController::class, '__invoke'])->name('api.v1.payments.vnpay-ipn');
+Route::get('/v1/payments/tour-vnpay-ipn', [\App\Http\Controllers\Api\V1\UnifiedVnpayIpnController::class, '__invoke'])->name('api.v1.payments.tour-vnpay-ipn');
 
 /*
 |--------------------------------------------------------------------------

@@ -39,6 +39,10 @@ return [
     |--------------------------------------------------------------------------
     | VNPay (payments)
     |--------------------------------------------------------------------------
+    |
+    | Single IPN URL serves hotel + tour (UnifiedVnpayIpnController routes by
+    | vnp_TxnRef prefix). Register VNPAY_IPN_URL once on the VNPay portal.
+    |
     */
     'vnpay' => [
         'tmn_code' => env('VNPAY_TMN_CODE'),

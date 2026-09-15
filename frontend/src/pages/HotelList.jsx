@@ -511,11 +511,11 @@ function HotelList() {
               <>
                 <span className="mx-1">›</span>
                 <span className="text-[#1a1a1a] font-medium">
-                  {city || country || (latitude && longitude ? t('hotels.search.mapSearch') : t('hotels.search.results'))}
+                  {city || country || (latitude && longitude ? t('header.mapSearch') : t('header.hotels'))}
                 </span>
               </>
             )}
-            {!country && !city && !latitude && !longitude && <span className="text-[#1a1a1a] font-medium">{t('hotels.search.results')}</span>}
+            {!country && !city && !latitude && !longitude && <span className="text-[#1a1a1a] font-medium">{t('header.hotels')}</span>}
           </nav>
 
           <div className="flex flex-wrap items-start justify-between gap-4 mb-6">

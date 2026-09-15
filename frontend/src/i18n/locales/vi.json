@@ -79,7 +79,18 @@
     "humanSupport": "Hỗ trợ trực tiếp, không phải kịch bản",
     "humanSupportDesc": "Liên lạc với đội ngũ thực sự bất cứ lúc nào — dù là điều chỉnh đặt phòng hay câu hỏi trước chuyến đi.",
     "verifiedReviews": "Đánh giá từ người đã lưu trú thực tế",
-    "verifiedReviewsDesc": "Đánh giá đến từ khách đã hoàn tất đặt phòng — nên bạn thấy phản hồi thực sự phản ánh trải nghiệm lưu trú."
+    "verifiedReviewsDesc": "Đánh giá đến từ khách đã hoàn tất đặt phòng — nên bạn thấy phản hồi thực sự phản ánh trải nghiệm lưu trú.",
+    "booking": "đặt phòng",
+    "bookings": "đặt phòng",
+    "hotel": "khách sạn",
+    "hotels": "khách sạn",
+    "room": "phòng",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "continue": "Tiếp tục",
+    "home": "Trang chủ",
+    "total": "tổng",
+    "any": "Tất cả"
   },
   "header": {
     "home": "Trang chủ",
@@ -672,7 +683,8 @@
       "starDistribution": "Phân bố sao",
       "verifiedStay": "Đã lưu trú thực tế",
       "noReviews": "Chưa có đánh giá nào.",
-      "paginationAriaLabel": "Phân trang đánh giá"
+      "paginationAriaLabel": "Phân trang đánh giá",
+      "page": "Trang {{current}} / {{total}}"
     },
     "location": {
       "title": "Vị trí",

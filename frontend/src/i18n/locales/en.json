@@ -79,7 +79,18 @@
     "humanSupport": "Support, not scripts",
     "humanSupportDesc": "Reach a real team any time — whether it's a booking tweak or a question before you travel.",
     "verifiedReviews": "Reviews from real stays",
-    "verifiedReviewsDesc": "Ratings come from guests who completed a booking — so you see feedback that actually reflects the stay."
+    "verifiedReviewsDesc": "Ratings come from guests who completed a booking — so you see feedback that actually reflects the stay.",
+    "booking": "booking",
+    "bookings": "bookings",
+    "hotel": "hotel",
+    "hotels": "hotels",
+    "room": "room",
+    "login": "Log in",
+    "register": "Sign up",
+    "continue": "Continue",
+    "home": "Home",
+    "total": "total",
+    "any": "All"
   },
   "header": {
     "home": "Home",
@@ -672,7 +683,8 @@
       "starDistribution": "Star distribution",
       "verifiedStay": "Verified stay",
       "noReviews": "No reviews yet.",
-      "paginationAriaLabel": "Reviews pagination"
+      "paginationAriaLabel": "Reviews pagination",
+      "page": "Page {{current}} / {{total}}"
     },
     "location": {
       "title": "Location",
