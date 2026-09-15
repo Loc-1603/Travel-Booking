@@ -299,7 +299,7 @@ export default function Home() {
                   className="flex-1 h-12 px-6 rounded-xl border-2 border-[#b8860b]/60 text-[#b8860b] font-semibold hover:bg-[#b8860b]/10 flex items-center justify-center gap-2 transition-colors"
                 >
                   <MapPin className="w-5 h-5" />
-                  {t('home.mapSearch')}
+                  {t('home.mapSearchCta')}
                 </Link>
               </div>
             </form>

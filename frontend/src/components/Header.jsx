@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ChevronDown, User, Headphones, LogOut, CalendarCheck, MapPin } from 'lucide-react';
+import { ChevronDown, User, Headphones, LogOut, CalendarCheck, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useWebsiteSettings } from '../contexts/WebsiteSettingsContext';
@@ -43,7 +43,7 @@ export default function Header() {
             <img src={settings.site_logo} alt="" className="h-9 w-auto max-h-10 object-contain" />
           ) : (
             <div className="w-9 h-9 rounded-lg bg-[#1a1a1a] flex items-center justify-center" aria-hidden>
-              <MapPin className="w-5 h-5 text-[#f9edd1]" />
+              <Home className="w-5 h-5 text-[#f9edd1]" />
             </div>
           )}
         </Link>
@@ -51,19 +51,19 @@ export default function Header() {
         <nav className="flex items-center gap-1" aria-label="Main navigation">
           <Link
             to="/hotels"
-            className="px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors"
+            className="inline-flex items-center px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors"
           >
             {t('header.hotels')}
           </Link>
           <Link
-            to="/map"
-            className="px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
+            to="/hotels/map"
+            className="inline-flex items-center px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
           >
             {t('header.mapSearch')}
           </Link>
           <Link
             to="/tours"
-            className="px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors"
+            className="inline-flex items-center px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors"
           >
             {t('header.tours')}
           </Link>
@@ -71,7 +71,7 @@ export default function Header() {
             <>
               <Link
                 to="/wishlist"
-                className="px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
+                className="inline-flex items-center px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
               >
                 {t('header.wishlist')}
               </Link>
@@ -147,14 +147,14 @@ export default function Header() {
             <>
               <Link
                 to="/support"
-                className="px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
+                className="inline-flex items-center px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
               >
                 {t('header.support')}
               </Link>
               <LanguageSwitcher />
               <Link
                 to="/login"
-                className="px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
+                className="inline-flex items-center px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
               >
                 {t('header.login')}
               </Link>
