@@ -163,6 +163,8 @@ return [
         'business_details' => 'Thông tin kinh doanh',
         'support' => 'Hỗ trợ',
         'access_control' => 'Kiểm soát truy cập',
+        'hotel_management' => 'Quản lý khách sạn',
+        'tour_management' => 'Quản lý Tour',
     ],
     'navbar' => [
         'home' => 'Trang chủ',

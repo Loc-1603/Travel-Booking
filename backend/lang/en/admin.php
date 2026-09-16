@@ -160,6 +160,8 @@ return [
         'business_details' => 'Business Details',
         'support' => 'Support',
         'access_control' => 'Access Control',
+        'hotel_management' => 'Hotel Management',
+        'tour_management' => 'Tour Management',
     ],
     'navbar' => [
         'home' => 'Home',

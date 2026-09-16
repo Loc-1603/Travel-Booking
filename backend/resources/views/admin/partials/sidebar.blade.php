@@ -8,6 +8,15 @@
 
                 @if(auth()->user()->role === \App\Enums\Role::VENDOR)
                 {{-- Vendor menu: Overview → Profile → Inventory → Operations → Finance → Support --}}
+                @php
+                    $unreadTourMessages = 0;
+                    $providerIds = \App\Models\TourProvider::where('vendor_id', auth()->id())->pluck('id');
+                    if($providerIds->isNotEmpty()){
+                        $unreadTourMessages = \App\Models\TourMessage::whereHas('booking', function($q) use ($providerIds){
+                            $q->whereIn('provider_id', $providerIds);
+                        })->where('sender_id','!=', auth()->id())->whereNull('read_at')->count();
+                    }
+                @endphp
                 <li>
                     <a href="{{ route('admin.vendor.dashboard') }}">
                         <i data-feather="home"></i>
@@ -20,47 +29,35 @@
                         <span>{{ __('admin.sidebar.business_details') }}</span>
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('admin.vendor.hotels.index') }}">
+                @php
+                    $hotelActive = request()->routeIs('admin.vendor.hotels.*','admin.vendor.rooms.*','admin.vendor.bookings.*');
+                    $tourActive = request()->routeIs('admin.vendor.tours.*','admin.vendor.guide-profile.*','admin.vendor.tour-bookings.*','admin.vendor.tour-messages.*');
+                @endphp
+                <li class="{{ $hotelActive ? 'mm-active' : '' }}">
+                    <a href="javascript: void(0);" class="has-arrow {{ $hotelActive ? 'mm-active' : '' }}">
                         <i data-feather="layers"></i>
-                        <span>{{ __('admin.sidebar.hotels') }}</span>
+                        <span>{{ __('admin.sidebar.hotel_management') }}</span>
                     </a>
+                    <ul class="sub-menu" aria-expanded="{{ $hotelActive ? 'true' : 'false' }}">
+                        <li><a href="{{ route('admin.vendor.hotels.index') }}" class="{{ request()->routeIs('admin.vendor.hotels.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.hotels') }}</span></a></li>
+                        <li><a href="{{ route('admin.vendor.rooms.index') }}" class="{{ request()->routeIs('admin.vendor.rooms.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.rooms') }}</span></a></li>
+                        <li><a href="{{ route('admin.vendor.bookings.index') }}" class="{{ request()->routeIs('admin.vendor.bookings.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.bookings') }}</span></a></li>
+                    </ul>
                 </li>
-                <li>
-                    <a href="{{ route('admin.vendor.rooms.index') }}">
-                        <i data-feather="box"></i>
-                        <span>{{ __('admin.sidebar.rooms') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.vendor.tours.index') }}">
+                <li class="{{ $tourActive ? 'mm-active' : '' }}">
+                    <a href="javascript: void(0);" class="has-arrow {{ $tourActive ? 'mm-active' : '' }}">
                         <i data-feather="map"></i>
-                        <span>{{ __('admin.sidebar.tours') }}</span>
+                        <span>{{ __('admin.sidebar.tour_management') }}</span>
+                        @if($unreadTourMessages > 0)
+                            <span class="badge bg-danger rounded-pill ms-2">{{ $unreadTourMessages }}</span>
+                        @endif
                     </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.vendor.guide-profile.index') }}">
-                        <i data-feather="user"></i>
-                        <span>{{ __('admin.sidebar.guide_profiles') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.vendor.tour-bookings.index') }}">
-                        <i data-feather="calendar"></i>
-                        <span>{{ __('admin.sidebar.tour_bookings') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.vendor.tour-messages.index') }}">
-                        <i data-feather="message-circle"></i>
-                        <span>{{ __('admin.sidebar.tour_messages') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.vendor.bookings.index') }}">
-                        <i data-feather="calendar"></i>
-                        <span>{{ __('admin.sidebar.bookings') }}</span>
-                    </a>
+                    <ul class="sub-menu" aria-expanded="{{ $tourActive ? 'true' : 'false' }}">
+                        <li><a href="{{ route('admin.vendor.tours.index') }}" class="{{ request()->routeIs('admin.vendor.tours.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tours') }}</span></a></li>
+                        <li><a href="{{ route('admin.vendor.guide-profile.index') }}" class="{{ request()->routeIs('admin.vendor.guide-profile.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.guide_profiles') }}</span></a></li>
+                        <li><a href="{{ route('admin.vendor.tour-bookings.index') }}" class="{{ request()->routeIs('admin.vendor.tour-bookings.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_bookings') }}</span></a></li>
+                        <li><a href="{{ route('admin.vendor.tour-messages.index') }}" class="{{ request()->routeIs('admin.vendor.tour-messages.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_messages') }}</span></a></li>
+                    </ul>
                 </li>
                 <li>
                     <a href="{{ route('admin.vendor.reports.index') }}">

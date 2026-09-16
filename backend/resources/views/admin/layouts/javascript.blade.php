@@ -18,6 +18,8 @@
 <!-- dashboard init -->
 <script src="{{asset('admin/dist/assets/js/pages/dashboard.init.js')}}"></script>
 
+<script src="{{asset('admin/dist/assets/js/pages/pass-addon.init.js')}}"></script>
+
 <script src="{{asset('admin/dist/assets/js/app.js')}}"></script>
 
 </body>

@@ -16,7 +16,7 @@ return [
         'log_in' => 'Đăng nhập',
         'no_account' => 'Chưa có tài khoản?',
         'sign_up_customer' => 'Đăng ký làm khách',
-        'register_vendor' => 'Đăng ký làm chủ nhà',
+        'register_vendor' => 'Đăng ký',
     ],
     'register' => [
         'title' => 'Đăng ký',
@@ -34,8 +34,8 @@ return [
         'register' => 'Đăng ký',
     ],
     'register_vendor' => [
-        'title' => 'Đăng ký chủ nhà',
-        'register_vendor' => 'Đăng ký làm chủ nhà',
+        'title' => 'Đăng ký nhà cung cấp',
+        'register_vendor' => 'Đăng ký làm nhà cung cấp',
         'apply_list_properties' => 'Đăng ký để đăng tải khách sạn và quản lý đặt phòng.',
         'name' => 'Họ và tên',
         'name_placeholder' => 'Họ và tên đầy đủ',

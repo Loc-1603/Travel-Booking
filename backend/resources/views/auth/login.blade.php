@@ -75,7 +75,7 @@
                                         <div class="row mb-4">
                                             <div class="col">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="remember-check" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                                                    <input class="form-check-input" type="checkbox" id="remember-check" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="remember-check">
                                                         {{ __('auth.login.remember_me') }}
                                                     </label>
@@ -93,8 +93,7 @@
 
 
                                     <div class="mt-5 text-center">
-                                        <p class="text-muted mb-0">{{ __('auth.login.no_account') }} <a href="{{ route('register') }}" class="text-primary fw-semibold">{{ __('auth.login.sign_up_customer') }}</a></p>
-                                        <p class="text-muted mb-0 mt-1">{{ __('auth.login.register_vendor') }} <a href="{{ route('register.vendor') }}" class="text-primary fw-semibold">{{ __('auth.login.register_vendor') }}</a></p>
+                                        <p class="text-muted mb-0">{{ __('auth.login.register_vendor') }} <a href="{{ route('register.vendor') }}" class="text-primary fw-semibold">{{ __('auth.login.register_vendor') }}</a></p>
                                     </div>
                                 </div>
 
