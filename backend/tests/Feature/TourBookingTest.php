@@ -184,6 +184,16 @@ test('customer and vendor can chat in booking thread, stranger cannot', function
     ])->assertCreated();
     $uuid = $store->json('data.booking.uuid');
 
+    // Chưa thanh toán (pending_payment) -> chat bị chặn 403 PAYMENT_REQUIRED.
+    $this->actingAs($this->customer)->postJson("/api/v1/tour-bookings/{$uuid}/messages", [
+        'body' => 'Hello before payment',
+    ])->assertForbidden()
+        ->assertJsonPath('code', 'PAYMENT_REQUIRED');
+    $this->actingAs($this->customer)->getJson("/api/v1/tour-bookings/{$uuid}/messages")->assertForbidden();
+
+    // Giả lập đã thanh toán -> chat mở.
+    TourBooking::where('uuid', $uuid)->update(['status' => TourBookingStatus::CONFIRMED->value]);
+
     // Customer sends first message
     $this->actingAs($this->customer)->postJson("/api/v1/tour-bookings/{$uuid}/messages", [
         'body' => 'Hello, where should we meet tomorrow?',
@@ -261,6 +271,50 @@ test('saved tours crud', function (): void {
 
     $this->actingAs($this->customer)->deleteJson('/api/v1/saved-tours/'.$this->tour->id)->assertNoContent();
     expect(\App\Models\SavedTour::count())->toBe(0);
+});
+
+test('guide 1-day flow: availability, preview and booking by provider', function (): void {
+    $providerUuid = $this->tour->provider->uuid;
+    $date = Carbon::tomorrow()->toDateString();
+
+    // Lịch trống theo ngày của guide (public).
+    $avail = $this->getJson("/api/v1/tour-providers/{$providerUuid}/availability?date={$date}")->assertOk();
+    $slots = $avail->json('data');
+    expect($slots)->not->toBeEmpty()
+        ->and((int) $slots[0]['id'])->toBe($this->slot->id)
+        // Giá 1 ngày = base_price_daily (không override).
+        ->and((float) $slots[0]['price'])->toBe(1200000.0);
+
+    // Preview giá 1 ngày (không cần slot_id — backend tự resolve theo ngày).
+    $preview = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings/guide-preview', [
+        'provider_uuid' => $providerUuid, 'travel_date' => $date,
+    ])->assertOk();
+    // subtotal = 300000 + 1200000*1 = 1500000; + transport 200000 = 1700000; tax 8% = 136000 -> 1836000
+    expect((float) $preview->json('data.subtotal'))->toBe(1500000.0)
+        ->and((float) $preview->json('data.total'))->toBe(1836000.0)
+        ->and($preview->json('data.pricing_mode'))->toBe('day');
+
+    // Đặt theo guide (không cần slot_id).
+    $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings/guide', [
+        'provider_uuid' => $providerUuid, 'travel_date' => $date,
+    ])->assertCreated();
+    $uuid = $store->json('data.booking.uuid');
+    $booking = TourBooking::where('uuid', $uuid)->first();
+    expect($booking->pricing_mode)->toBe('day')
+        ->and((int) $booking->duration_value)->toBe(1)
+        ->and($booking->status)->toBe(TourBookingStatus::PENDING_PAYMENT->value);
+
+    // Slot của guide khác -> 422.
+    $otherVendor = User::create([
+        'name' => 'Other Vendor', 'email' => 'other-vendor@test.local',
+        'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
+    ]);
+    $otherProvider = \App\Models\TourProvider::create([
+        'vendor_id' => $otherVendor->id, 'business_name' => 'Other Guide', 'status' => 'approved',
+    ]);
+    $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings/guide-preview', [
+        'provider_uuid' => $otherProvider->uuid, 'slot_id' => $this->slot->id, 'travel_date' => $date,
+    ])->assertStatus(422);
 });
 
 test('slot must belong to the booked tour', function (): void {

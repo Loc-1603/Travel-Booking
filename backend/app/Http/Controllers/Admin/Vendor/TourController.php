@@ -96,8 +96,10 @@ class TourController extends Controller
             'province_id' => 'required|exists:tour_provinces,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'base_fixed' => 'required|numeric|min:0',
-            'base_price_hourly' => 'required|numeric|min:0',
+            // Luồng 1 ngày: chỉ giá ngày là bắt buộc (giá guide tự đặt cho khách).
+            // Giữ 2 trường cũ optional = 0 để tương thích dữ liệu/API cũ.
+            'base_fixed' => 'nullable|numeric|min:0',
+            'base_price_hourly' => 'nullable|numeric|min:0',
             'base_price_daily' => 'required|numeric|min:0',
             'transport_fee' => 'nullable|numeric|min:0',
             'transport_desc' => 'nullable|string|max:1000',
@@ -109,6 +111,8 @@ class TourController extends Controller
         }
         $validated = $request->validate($rules);
         $validated['status'] ??= 'draft';
+        $validated['base_fixed'] ??= 0;
+        $validated['base_price_hourly'] ??= 0;
         if (empty($validated['transport_fee'])) {
             $validated['transport_fee'] = null;
         }

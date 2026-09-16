@@ -18,6 +18,9 @@ class SubmitTourReviewRequest extends BaseApiRequest
             'tour_booking_id' => 'required|exists:tour_bookings,id',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string|max:2000',
+            // Ảnh minh hoạ: tối đa 5 ảnh, mỗi ảnh ≤ 4MB.
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:4096',
         ];
     }
 }

@@ -86,6 +86,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     Route::get('/tour-provinces', [TourProvinceController::class, 'index'])->name('tour-provinces.index');
     Route::get('/tour-provinces/{slug}', [TourProvinceController::class, 'show'])->name('tour-provinces.show');
     Route::get('/tour-providers', [TourProviderController::class, 'index'])->name('tour-providers.index');
+    Route::get('/tour-providers/{uuid}/availability', [TourProviderController::class, 'availability'])->name('tour-providers.availability');
     Route::get('/tour-providers/{uuid}', [TourProviderController::class, 'show'])->name('tour-providers.show');
     Route::get('/tours', [TourSearchController::class, 'index'])->name('tours.index');
     Route::get('/tours/{uuid}', [TourSearchController::class, 'show'])->name('tours.show');
@@ -106,6 +107,8 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('/bookings/{uuid}/claim', [BookingController::class, 'claim'])->name('bookings.claim');
         // Tour 1vs1 bookings (auth required — no guest flow by design)
         Route::post('/tour-bookings/preview', [TourBookingController::class, 'preview'])->name('tour-bookings.preview');
+        Route::post('/tour-bookings/guide-preview', [TourBookingController::class, 'previewGuide'])->name('tour-bookings.guide-preview');
+        Route::post('/tour-bookings/guide', [TourBookingController::class, 'storeGuide'])->name('tour-bookings.guide-store');
         Route::apiResource('tour-bookings', TourBookingController::class)->only(['index', 'store']);
         Route::get('/tour-bookings/{uuid}', [TourBookingController::class, 'show'])->name('tour-bookings.show');
         Route::post('/tour-bookings/{uuid}/checkout-session', [TourBookingController::class, 'createCheckoutSession'])->name('tour-bookings.checkout-session');

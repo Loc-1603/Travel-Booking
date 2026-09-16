@@ -33,11 +33,11 @@ class TourProviderResource extends JsonResource
             ]);
         });
 
-        // Primary tour = cheapest published offer, used as booking entry point.
+        // Primary tour = cheapest daily offer (giá 1 ngày do guide đặt), used as booking entry point.
         $primaryTour = null;
         if ($this->relationLoaded('tours') && $this->tours->isNotEmpty()) {
             $primary = $this->tours
-                ->sortBy(fn ($t) => ((float) $t->base_fixed) + ((float) $t->base_price_hourly))
+                ->sortBy(fn ($t) => (float) $t->base_price_daily)
                 ->first();
             $primaryTour = [
                 'id' => $primary->id,
@@ -51,6 +51,9 @@ class TourProviderResource extends JsonResource
             'uuid' => $this->uuid,
             'business_name' => $this->business_name,
             'bio' => $this->bio,
+            // Mô tả rich (TipTap): JSON doc + HTML đã sanitize.
+            'bio_json' => $this->bio_json ?? null,
+            'bio_html' => $this->bio_html ?? null,
             // Own upload first, then the vendor account avatar (may be null → frontend shows initial fallback).
             'avatar' => $this->resource->resolvedAvatarUrl(),
             'languages' => $this->languages ?? [],

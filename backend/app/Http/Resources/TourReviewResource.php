@@ -19,6 +19,11 @@ class TourReviewResource extends JsonResource
             'comment' => $this->comment,
             'approved' => $this->approved,
             'created_at' => $this->created_at?->toIso8601String(),
+            // Ảnh minh hoạ của review (chỉ khi đã eager-load).
+            'images' => $this->when(
+                $this->relationLoaded('images'),
+                fn () => $this->images->map(fn ($img) => ['id' => $img->id, 'url' => $img->url])->values()
+            ),
             // Guide profile context: who booked and which tour (only when booking eager-loaded).
             'customer_name' => $this->when(
                 $this->relationLoaded('booking') && $this->booking?->relationLoaded('customer'),

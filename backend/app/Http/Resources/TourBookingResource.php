@@ -32,6 +32,11 @@ class TourBookingResource extends JsonResource
             'customer_notes' => $this->customer_notes,
             'tour' => new TourProductResource($this->whenLoaded('tour')),
             'slot' => new TourSlotResource($this->whenLoaded('slot')),
+            // true khi booking đã có review (cần withCount('review') hoặc load relation review).
+            'has_review' => $this->when(
+                isset($this->review_count) || $this->relationLoaded('review'),
+                fn () => isset($this->review_count) ? (int) $this->review_count > 0 : $this->review !== null
+            ),
             'can_open_dispute' => $this->when($this->resource->exists, fn () => $this->resource->canOpenDispute()),
         ];
     }

@@ -11,6 +11,7 @@ import {
   ExternalLink,
   AlertTriangle,
   MessageCircle,
+  Star,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -139,7 +140,7 @@ export default function MyTourBookings() {
           {bookings.map((b) => (
             <article key={b.uuid} className="rounded-2xl border border-[#e8e4dd] bg-white overflow-hidden">
               <div className="p-5 sm:p-6">
-                <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:justify-between gap-4 lg:items-center">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <h3 className="font-semibold text-lg truncate">{b.tour?.title ?? 'Tour'}</h3>
@@ -151,32 +152,41 @@ export default function MyTourBookings() {
                     <p className="font-semibold text-lg mt-2">{formatPrice(b.total_price, b.currency)}</p>
                     <p className="text-xs text-stone-500 mt-1 font-mono">#{b.uuid}</p>
                   </div>
-                  <div className="flex flex-wrap gap-2 shrink-0">
+                  <div className="shrink-0 min-w-0 max-w-full lg:max-w-[50%] flex lg:justify-end self-stretch lg:self-center py-1">
+                    <div className="flex flex-nowrap items-center gap-2 overflow-x-auto max-w-full px-1 py-1">
                     <Link
                       to={`/tour-checkout/${b.uuid}`}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5]"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5] whitespace-nowrap shrink-0"
                     >
                       <ExternalLink className="w-4 h-4" /> {t('tours.bookings.view')}
                     </Link>
                     <button
                       type="button"
                       onClick={() => openInvoice(b.uuid)}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5]"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5] whitespace-nowrap shrink-0"
                     >
                       <FileDown className="w-4 h-4" /> {t('tours.bookings.invoice')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setChatUuid(chatUuid === b.uuid ? null : b.uuid)}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5]"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5] whitespace-nowrap shrink-0"
                     >
-                      <MessageCircle className="w-4 h-4" /> {t('tours.chat.title')}
+                      <MessageCircle className="w-4 h-4" /> {t('tours.bookings.message')}
                     </button>
+                    {['confirmed', 'ongoing', 'completed'].includes(b.status) && !b.has_review && (
+                      <Link
+                        to={`/tour-bookings/${b.uuid}/review`}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-green-200 text-sm font-medium text-green-700 hover:bg-green-50 whitespace-nowrap shrink-0"
+                      >
+                        <Star className="w-4 h-4" /> {t('tours.bookings.review')}
+                      </Link>
+                    )}
                     {b.can_open_dispute && (
                       <button
                         type="button"
                         onClick={() => { setDisputeModalUuid(b.uuid); setDisputeNotes(''); setDisputeFormError(null); }}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-amber-200 bg-amber-50 text-sm font-medium text-amber-900 hover:bg-amber-100"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-amber-200 bg-amber-50 text-sm font-medium text-amber-900 hover:bg-amber-100 whitespace-nowrap shrink-0"
                       >
                         <AlertTriangle className="w-4 h-4" /> {t('tours.bookings.report')}
                       </button>
@@ -192,17 +202,21 @@ export default function MyTourBookings() {
                             alert(e?.response?.data?.message);
                           }
                         }}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 text-sm font-medium text-red-700 hover:bg-red-50"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 text-sm font-medium text-red-700 hover:bg-red-50 whitespace-nowrap shrink-0"
                       >
                         {t('tours.bookings.cancel')}
                       </button>
                     )}
+                    </div>
                   </div>
                 </div>
                 {chatUuid === b.uuid && (
                   <div className="mt-4">
                     <TourChatBox bookingUuid={b.uuid} />
                   </div>
+                )}
+                {['confirmed', 'ongoing', 'completed'].includes(b.status) && !!b.has_review && (
+                  <p className="mt-4 text-sm text-[#7a756d]">{t('tours.bookings.reviewDone')}</p>
                 )}
               </div>
             </article>

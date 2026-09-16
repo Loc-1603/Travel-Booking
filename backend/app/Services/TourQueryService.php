@@ -89,7 +89,8 @@ class TourQueryService
             ->selectRaw("{$countSql} as review_count")
             ->selectRaw("({$avgSql}) * ({$countSql}) as score")
             ->selectRaw("(SELECT COUNT(*) FROM tour_products WHERE {$toursWhere}) as tours_count")
-            ->selectRaw("(SELECT MIN(base_fixed + base_price_hourly) FROM tour_products WHERE {$toursWhere}) as price_from");
+            // Giá 1 ngày do guide tự thiết lập: dùng giá ngày để sort/hiển thị.
+            ->selectRaw("(SELECT MIN(base_price_daily) FROM tour_products WHERE {$toursWhere}) as price_from");
     }
 
     /**
@@ -108,7 +109,34 @@ class TourQueryService
     }
 
     /**
+     * Vendor IDs free on a single travel_date (luồng 1 ngày khám phá tỉnh).
+     * Một guide đạt nếu có >=1 slot available đúng ngày đó
+     * trên các tour published của họ trong tỉnh.
+     *
+     * @return array<int>
+     */
+    public function providerIdsFreeOnDate(int $provinceId, string $date): array
+    {
+        $day = Carbon::parse($date)->toDateString();
+
+        $rows = TourAvailabilitySlot::query()
+            ->join('tour_products', 'tour_products.id', '=', 'tour_availability_slots.tour_id')
+            ->join('tour_providers', 'tour_providers.id', '=', 'tour_products.provider_id')
+            ->where('tour_availability_slots.status', 'available')
+            ->whereDate('tour_availability_slots.date', '=', $day)
+            ->where('tour_products.status', 'published')
+            ->where('tour_products.province_id', $provinceId)
+            ->where('tour_providers.status', 'approved')
+            ->distinct()
+            ->pluck('tour_products.provider_id')
+            ->all();
+
+        return array_map('intval', $rows);
+    }
+
+    /**
      * Vendor IDs free for EVERY day in [from, to] (AND logic).
+     * Giữ lại để tương thích ngược với filter khoảng ngày cũ.
      * A vendor passes only if each date in the range has >=1 available
      * slot across their published tours in the province.
      *
@@ -149,6 +177,31 @@ class TourQueryService
             ->all();
 
         return array_map('intval', $rows);
+    }
+
+    /**
+     * Slot trống của 1 guide trong đúng 1 ngày (kèm tour + giá ngày).
+     * Chỉ tour published của provider đã duyệt, đúng province (nếu lọc).
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, TourAvailabilitySlot>
+     */
+    public function providerSlotsOnDate(string $providerUuid, string $date, ?int $provinceId = null)
+    {
+        $day = Carbon::parse($date)->toDateString();
+
+        return TourAvailabilitySlot::query()
+            ->with('tour:id,uuid,title,province_id,base_price_daily,transport_fee,meeting_point')
+            ->join('tour_products', 'tour_products.id', '=', 'tour_availability_slots.tour_id')
+            ->join('tour_providers', 'tour_providers.id', '=', 'tour_products.provider_id')
+            ->where('tour_providers.uuid', $providerUuid)
+            ->where('tour_providers.status', 'approved')
+            ->where('tour_products.status', 'published')
+            ->when($provinceId !== null, fn ($q) => $q->where('tour_products.province_id', $provinceId))
+            ->where('tour_availability_slots.status', 'available')
+            ->whereDate('tour_availability_slots.date', '=', $day)
+            ->orderBy('tour_availability_slots.start_time')
+            ->select('tour_availability_slots.*')
+            ->get();
     }
 
     public function applyProviderSort($query, ?string $sort): void

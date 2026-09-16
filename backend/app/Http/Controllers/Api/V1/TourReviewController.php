@@ -38,14 +38,25 @@ class TourReviewController extends BaseApiController
             return $this->error('One review per booking.', 422, 'REVIEW_EXISTS');
         }
 
-        $review = TourReview::create([
-            'tour_booking_id' => $booking->id,
-            'rating' => $request->rating,
-            'comment' => $request->comment,
-            'approved' => false,
-        ]);
+        $review = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $booking) {
+            $created = TourReview::create([
+                'tour_booking_id' => $booking->id,
+                'rating' => $request->rating,
+                'comment' => $request->comment,
+                'approved' => false,
+            ]);
 
-        return $this->success(new TourReviewResource($review), 201);
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $i => $file) {
+                    $path = $file->store('review-images', 'public');
+                    $created->images()->create(['path' => $path, 'sort_order' => $i]);
+                }
+            }
+
+            return $created;
+        });
+
+        return $this->success(new TourReviewResource($review->load('images')), 201);
     }
 
     /**
@@ -83,7 +94,7 @@ class TourReviewController extends BaseApiController
         }
 
         $perPage = (int) $request->input('per_page', 15);
-        $paginator = $query->with(['booking.customer:id,name', 'booking.tour:id,uuid,title'])->latest()->paginate($perPage);
+        $paginator = $query->with(['images', 'booking.customer:id,name', 'booking.tour:id,uuid,title'])->latest()->paginate($perPage);
 
         return $this->success([
             'data' => TourReviewResource::collection($paginator->items()),

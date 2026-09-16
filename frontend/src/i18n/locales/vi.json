@@ -922,7 +922,14 @@
       "invoiceError": "Không tải được hóa đơn.",
       "loginRequired": "Đăng nhập để xem tour đã đặt",
       "disputeTitle": "Báo cáo sự cố",
-      "disputeMin": "Hãy mô tả sự cố (tối thiểu 20 ký tự)."
+      "disputeMin": "Hãy mô tả sự cố (tối thiểu 20 ký tự).",
+      "review": "Đánh giá",
+      "message": "Nhắn tin",
+      "reviewDone": "Bạn đã đánh giá tour này. Cảm ơn bạn!",
+      "backToBookings": "Về tour đã đặt",
+      "reviewPageTitle": "Đánh giá chuyến đi",
+      "reviewPageHint": "Chia sẻ trải nghiệm để giúp guide tốt hơn và khách sau yên tâm đặt.",
+      "reviewNotEligible": "Chỉ đánh giá được tour đã thanh toán."
     },
     "saved": {
       "title": "Tour đã lưu",
@@ -937,14 +944,18 @@
       "empty": "Chưa có tin nhắn. Hãy chào hướng dẫn viên!",
       "placeholder": "Nhập tin nhắn...",
       "send": "Gửi",
-      "couldNotLoad": "Không tải được tin nhắn."
+      "couldNotLoad": "Không tải được tin nhắn.",
+      "payRequired": "Bạn chỉ có thể nhắn tin với guide sau khi đã thanh toán tour."
     },
     "reviews": {
       "title": "Đánh giá của khách",
       "empty": "Chưa có đánh giá nào.",
       "writeTitle": "Viết đánh giá",
       "commentPlaceholder": "Chia sẻ trải nghiệm tour của bạn...",
-      "submit": "Gửi đánh giá"
+      "submit": "Gửi đánh giá",
+      "addPhotos": "Thêm ảnh (còn {{count}})",
+      "removePhoto": "Gỡ ảnh",
+      "closePhoto": "Đóng ảnh"
     },
     "provinceDetail": {
       "back": "Tất cả tỉnh thành",
@@ -953,13 +964,15 @@
       "guidesHint": "Xếp hạng theo điểm = số sao × lượt đánh giá.",
       "from": "Từ ngày",
       "to": "Đến ngày",
+      "travelDate": "Ngày đi",
       "filter": "Lọc lịch trống",
       "clear": "Xóa lọc",
       "sort": "Sắp xếp",
       "sortScore": "Điểm cao nhất",
       "sortRating": "Sao cao nhất",
       "sortPriceLow": "Giá thấp nhất",
-      "emptyGuides": "Chưa có hướng dẫn viên trống lịch trong những ngày này.",
+      "emptyGuides": "Chưa có hướng dẫn viên trống lịch vào ngày này. Hãy chọn ngày khác.",
+      "emptyGuidesNoFilter": "Chọn ngày đi rồi nhấn Lọc lịch trống để xem guide còn trống.",
       "results": "hướng dẫn viên"
     },
     "guides": {
@@ -967,7 +980,16 @@
       "score": "điểm",
       "reviewsCount": "đánh giá",
       "priceFrom": "Từ",
+      "perDay": "ngày",
       "about": "Về hướng dẫn viên",
+      "bookDayTitle": "Đặt guide 1 ngày",
+      "fixedDate": "Ngày đi",
+      "changeDate": "Đổi ngày",
+      "noDateHint": "Vui lòng chọn ngày đi ở trang tỉnh trước khi đặt guide.",
+      "pickSlot": "Chọn khung giờ trống",
+      "pickSlotHint": "Chọn khung giờ trống để xem giá và đặt.",
+      "noSlots": "Guide không còn lịch trống vào ngày này. Hãy chọn ngày khác.",
+      "loginToSeePrice": "Đăng nhập để xem giá và đặt guide.",
       "offers": "Nhận chở tới",
       "availability": "Lịch trống",
       "pickTourHint": "Chọn tour và khung giờ trống để tiếp tục.",

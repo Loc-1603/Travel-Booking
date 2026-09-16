@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, MapPin, Search } from 'lucide-react';
@@ -12,17 +12,22 @@ import { todayISO } from '../lib/guideSearch';
 
 /**
  * Province detail: hero + attractions with photos, then ranked 1vs1 guides.
- * Pick travel days -> only guides free on EVERY selected day are listed.
+ * Luồng mới 1 ngày: chọn ngày đi -> lọc guide trống đúng ngày đó.
+ * GIỮ NGUYÊN: hero ảnh tỉnh + Điểm nổi bật (attractions) như hiện tại.
  */
 export default function TourProvinceDetail() {
   const { t } = useTranslation();
   const { slug } = useParams();
   const today = todayISO();
+  // Đồng bộ bộ lọc vào URL (?date=&sort=) để từ GuideDetail quay lại
+  // (nút back hoặc browser back) vẫn giữ nguyên trạng thái lọc.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialDate = searchParams.get('date') || '';
+  const initialSort = searchParams.get('sort') || 'score';
 
-  const [fromInput, setFromInput] = useState('');
-  const [toInput, setToInput] = useState('');
-  const [sort, setSort] = useState('score');
-  const [applied, setApplied] = useState({ from: '', to: '', sort: 'score' });
+  const [travelDateInput, setTravelDateInput] = useState(initialDate);
+  const [sort, setSort] = useState(initialSort);
+  const [applied, setApplied] = useState({ travel_date: initialDate, sort: initialSort });
 
   const {
     data: provinceData,
@@ -53,22 +58,26 @@ export default function TourProvinceDetail() {
     queryKey: ['tour-providers', slug, applied],
     queryFn: async () => {
       const params = { province_slug: slug, per_page: 24, sort: applied.sort || 'score' };
-      if (applied.from) params.from = applied.from;
-      if (applied.to) params.to = applied.to;
+      if (applied.travel_date) params.travel_date = applied.travel_date;
       const res = await api.get('/tour-providers', { params });
       if (!res.data?.success) throw new Error(res.data?.message || 'Failed to load guides');
       return res.data;
     },
-    enabled: !!slug,
+    enabled: !!slug && !!applied.travel_date,
   });
   const { guides, total } = parseGuideSearchResponse(guidesData);
+  const hasFiltered = !!applied.travel_date;
 
-  const applyDates = () => setApplied({ from: fromInput, to: toInput, sort });
-  const clearDates = () => {
-    setFromInput('');
-    setToInput('');
+  const applyFilter = () => {
+    const next = { travel_date: travelDateInput, sort };
+    setApplied(next);
+    setSearchParams({ date: next.travel_date, sort: next.sort });
+  };
+  const clearFilter = () => {
+    setTravelDateInput('');
     setSort('score');
-    setApplied({ from: '', to: '', sort: 'score' });
+    setApplied({ travel_date: '', sort: 'score' });
+    setSearchParams({});
   };
 
   if (provinceLoading) {
@@ -162,22 +171,12 @@ export default function TourProvinceDetail() {
 
         <div className="rounded-2xl border border-[#e8e4dd] bg-white p-4 mb-6 flex flex-col sm:flex-row gap-3 sm:items-end">
           <div>
-            <label className="block text-sm font-medium text-[#45423d] mb-1">{t('tours.provinceDetail.from')}</label>
+            <label className="block text-sm font-medium text-[#45423d] mb-1">{t('tours.provinceDetail.travelDate')}</label>
             <input
               type="date"
-              value={fromInput}
+              value={travelDateInput}
               min={today}
-              onChange={(e) => setFromInput(e.target.value)}
-              className="rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#45423d] mb-1">{t('tours.provinceDetail.to')}</label>
-            <input
-              type="date"
-              value={toInput}
-              min={fromInput || today}
-              onChange={(e) => setToInput(e.target.value)}
+              onChange={(e) => setTravelDateInput(e.target.value)}
               className="rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
             />
           </div>
@@ -196,16 +195,17 @@ export default function TourProvinceDetail() {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={applyDates}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-[#1a1a1a] text-white text-sm font-medium hover:bg-[#2d2a28]"
+              onClick={applyFilter}
+              disabled={!travelDateInput}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-[#1a1a1a] text-white text-sm font-medium hover:bg-[#2d2a28] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Search className="w-4 h-4" />
               {t('tours.provinceDetail.filter')}
             </button>
-            {(applied.from || applied.to) && (
+            {applied.travel_date && (
               <button
                 type="button"
-                onClick={clearDates}
+                onClick={clearFilter}
                 className="px-4 py-2 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5]"
               >
                 {t('tours.provinceDetail.clear')}
@@ -214,25 +214,28 @@ export default function TourProvinceDetail() {
           </div>
         </div>
 
-        {guidesLoading && (
+        {!hasFiltered && (
+          <p className="text-[#5c5852] py-8 text-center">{t('tours.provinceDetail.emptyGuidesNoFilter')}</p>
+        )}
+        {hasFiltered && guidesLoading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <Skeleton key={i} />
             ))}
           </div>
         )}
-        {guidesError && <ErrorMessage message={guidesErr?.response?.data?.message || guidesErr?.message} onRetry={() => refetchGuides()} />}
-        {!guidesLoading && !guidesError && guides.length === 0 && (
+        {hasFiltered && guidesError && <ErrorMessage message={guidesErr?.response?.data?.message || guidesErr?.message} onRetry={() => refetchGuides()} />}
+        {hasFiltered && !guidesLoading && !guidesError && guides.length === 0 && (
           <p className="text-[#5c5852] py-8 text-center">{t('tours.provinceDetail.emptyGuides')}</p>
         )}
-        {!guidesLoading && !guidesError && guides.length > 0 && (
+        {hasFiltered && !guidesLoading && !guidesError && guides.length > 0 && (
           <>
             <p className="text-sm text-[#7a756d] mb-4">
               {total} {t('tours.provinceDetail.results')}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {guides.map((g) => (
-                <VendorGuideCard key={g.uuid} guide={g} provinceSlug={slug} />
+                <VendorGuideCard key={g.uuid} guide={g} provinceSlug={slug} travelDate={applied.travel_date} sort={applied.sort} />
               ))}
             </div>
           </>

@@ -922,7 +922,14 @@
       "invoiceError": "Could not load invoice.",
       "loginRequired": "Log in to view your tour bookings",
       "disputeTitle": "Report a problem",
-      "disputeMin": "Please describe the issue (min 20 characters)."
+      "disputeMin": "Please describe the issue (min 20 characters).",
+      "review": "Review",
+      "message": "Message",
+      "reviewDone": "You have reviewed this tour. Thank you!",
+      "backToBookings": "Back to my tour bookings",
+      "reviewPageTitle": "Review your trip",
+      "reviewPageHint": "Share your experience to help the guide improve and future guests book with confidence.",
+      "reviewNotEligible": "Only paid tours can be reviewed."
     },
     "saved": {
       "title": "Saved tours",
@@ -931,20 +938,24 @@
       "loginRequired": "Log in to view saved tours"
     },
     "chat": {
-      "title": "Chat with your guide",
+      "title": "Message the guide",
       "live": "Live",
-      "polling": "Auto-refresh",
-      "empty": "No messages yet. Say hello to your guide!",
+      "polling": "Polling",
+      "empty": "No messages yet. Say hello!",
       "placeholder": "Type a message...",
       "send": "Send",
-      "couldNotLoad": "Could not load messages."
+      "couldNotLoad": "Could not load messages.",
+      "payRequired": "You can message the guide only after payment is completed."
     },
     "reviews": {
       "title": "Guest reviews",
       "empty": "No reviews yet.",
       "writeTitle": "Write a review",
       "commentPlaceholder": "Share your experience with this tour...",
-      "submit": "Submit review"
+      "submit": "Submit review",
+      "addPhotos": "Add photos ({{count}} left)",
+      "removePhoto": "Remove photo",
+      "closePhoto": "Close photo"
     },
     "provinceDetail": {
       "back": "All provinces",
@@ -953,13 +964,15 @@
       "guidesHint": "Ranked by score = stars × reviews.",
       "from": "From",
       "to": "To",
+      "travelDate": "Travel date",
       "filter": "Filter by free days",
       "clear": "Clear",
       "sort": "Sort",
       "sortScore": "Highest score",
       "sortRating": "Highest rated",
       "sortPriceLow": "Lowest price",
-      "emptyGuides": "No guides are free on these days.",
+      "emptyGuides": "No guides are free on this date. Try another day.",
+      "emptyGuidesNoFilter": "Pick a travel date then press Filter to see free guides.",
       "results": "guides"
     },
     "guides": {
@@ -967,7 +980,16 @@
       "score": "pts",
       "reviewsCount": "reviews",
       "priceFrom": "From",
+      "perDay": "day",
       "about": "About the guide",
+      "bookDayTitle": "Book this guide for 1 day",
+      "fixedDate": "Travel date",
+      "changeDate": "Change date",
+      "noDateHint": "Please pick a travel date on the province page before booking.",
+      "pickSlot": "Pick a free time slot",
+      "pickSlotHint": "Pick a free slot to see the price and book.",
+      "noSlots": "No free slots on this date. Try another day.",
+      "loginToSeePrice": "Log in to see the price and book.",
       "offers": "Can take you to",
       "availability": "Availability",
       "pickTourHint": "Pick a tour and a free time slot to continue.",

@@ -39,6 +39,23 @@ a:focus-visible, button:focus-visible {
   @apply outline-2 outline-offset-2 outline-[#b8860b];
 }
 
+/* Rich guide description (server-sanitized HTML, DOMPurify on render) */
+.rich-text {
+  @apply text-[#45423d] leading-relaxed text-[15px];
+}
+.rich-text h2 { @apply text-xl font-semibold text-[#1a1a1a] mt-5 mb-2; }
+.rich-text h3 { @apply text-lg font-semibold text-[#1a1a1a] mt-4 mb-2; }
+.rich-text p { @apply my-2.5; }
+.rich-text ul { @apply list-disc pl-6 my-2.5 space-y-1; }
+.rich-text ol { @apply list-decimal pl-6 my-2.5 space-y-1; }
+.rich-text blockquote {
+  @apply border-l-4 border-[#e5c261] bg-[#f9edd1]/50 rounded-r-xl px-4 py-2 my-3 italic text-[#5c5852];
+}
+.rich-text a { @apply text-[#996f09] underline underline-offset-2 hover:text-[#b8860b]; }
+.rich-text img { @apply rounded-2xl my-4 w-full h-auto object-cover; }
+.rich-text strong { @apply font-semibold text-[#1a1a1a]; }
+.rich-text hr { @apply my-5 border-[#e8e4dd]; }
+
 /* Refined scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

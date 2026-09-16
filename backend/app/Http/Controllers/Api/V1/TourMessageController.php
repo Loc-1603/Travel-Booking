@@ -14,12 +14,17 @@ class TourMessageController extends BaseApiController
 {
     /**
      * List messages of a tour booking (customer or provider's vendor only).
+     * Chỉ mở sau khi đã thanh toán (confirmed/ongoing/completed).
      * Also marks messages from the other party as read.
      */
     public function index(Request $request, string $uuid): JsonResponse
     {
         $booking = TourBooking::where('uuid', $uuid)->firstOrFail();
         $this->authorize('view', $booking);
+
+        if (! in_array($booking->status, ['confirmed', 'ongoing', 'completed'], true)) {
+            return $this->error('Chat is available only after payment is completed.', 403, 'PAYMENT_REQUIRED');
+        }
 
         TourMessage::where('tour_booking_id', $booking->id)
             ->where('sender_id', '!=', $request->user()->id)
@@ -36,11 +41,16 @@ class TourMessageController extends BaseApiController
 
     /**
      * Send a message in a tour booking thread. Broadcasts over socket + REST fallback.
+     * Chỉ mở sau khi đã thanh toán (confirmed/ongoing/completed).
      */
     public function store(StoreTourMessageRequest $request, string $uuid): JsonResponse
     {
         $booking = TourBooking::where('uuid', $uuid)->firstOrFail();
         $this->authorize('view', $booking);
+
+        if (! in_array($booking->status, ['confirmed', 'ongoing', 'completed'], true)) {
+            return $this->error('Chat is available only after payment is completed.', 403, 'PAYMENT_REQUIRED');
+        }
 
         $message = TourMessage::create([
             'tour_booking_id' => $booking->id,

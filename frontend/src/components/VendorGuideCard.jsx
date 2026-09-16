@@ -9,12 +9,17 @@ import { getGuideScore } from '../lib/guideSearch';
  * 1vs1 guide card: avatar, rating + review count + ranking score,
  * starting price, and link to the guide profile.
  */
-export function VendorGuideCard({ guide, provinceSlug, currency = 'VND' }) {
+export function VendorGuideCard({ guide, provinceSlug, travelDate, sort, currency = 'VND' }) {
   const { t } = useTranslation();
   const rating = guide.average_rating != null ? Number(guide.average_rating) : null;
   const reviewCount = guide.review_count != null ? Number(guide.review_count) : 0;
   const score = getGuideScore(guide);
-  const href = `/guides/${guide.uuid}${provinceSlug ? `?province=${encodeURIComponent(provinceSlug)}` : ''}`;
+  const params = new URLSearchParams();
+  if (provinceSlug) params.set('province', provinceSlug);
+  if (travelDate) params.set('date', travelDate);
+  if (sort) params.set('sort', sort);
+  const qs = params.toString();
+  const href = `/guides/${guide.uuid}${qs ? `?${qs}` : ''}`;
 
   return (
     <Link

@@ -79,6 +79,66 @@ class TourBookingController extends BaseApiController
     }
 
     /**
+     * Preview giá 1 ngày theo Guide (không tạo booking, không lock slot).
+     */
+    public function previewGuide(\App\Http\Requests\Api\StoreGuideBookingRequest $request): JsonResponse
+    {
+        try {
+            $slotId = $request->filled('slot_id') ? (int) $request->input('slot_id') : null;
+            $breakdown = $this->bookings->previewGuide(
+                $request->input('provider_uuid'),
+                $slotId,
+                $request->filled('coupon_code') ? trim($request->coupon_code) : null,
+                (int) $request->user()->id,
+                $request->input('travel_date'),
+            );
+        } catch (\RuntimeException $e) {
+            return $this->error($e->getMessage(), 422, 'UNAVAILABLE');
+        }
+
+        return $this->success([
+            'subtotal' => $breakdown->subtotal,
+            'discount' => $breakdown->discount,
+            'tax' => $breakdown->tax,
+            'tax_name' => $breakdown->taxName,
+            'tax_inclusive' => $breakdown->taxInclusive,
+            'add_on_amount' => $breakdown->addOnAmount,
+            'total' => $breakdown->total,
+            'currency' => $breakdown->currency,
+            'coupon_code' => $breakdown->couponCode,
+            'coupon_applied' => $breakdown->couponId !== null,
+            'pricing_mode' => 'day',
+            'duration_value' => 1,
+        ]);
+    }
+
+    /**
+     * Tạo booking 1 ngày theo Guide (auth required): lock slot -> create.
+     */
+    public function storeGuide(\App\Http\Requests\Api\StoreGuideBookingRequest $request): JsonResponse
+    {
+        try {
+            $slotId = $request->filled('slot_id') ? (int) $request->input('slot_id') : null;
+            $booking = $this->bookings->createGuideBooking(
+                (int) $request->user()->id,
+                $request->input('provider_uuid'),
+                $slotId,
+                $request->input('travel_date'),
+                $request->filled('coupon_code') ? trim($request->coupon_code) : null,
+                $request->input('meeting_point'),
+                $request->input('customer_notes'),
+                $request->input('currency', config('tour.currency', 'VND')),
+            );
+        } catch (\RuntimeException $e) {
+            return $this->error($e->getMessage(), 422, 'UNAVAILABLE');
+        }
+
+        return $this->success([
+            'booking' => new TourBookingResource($booking->load(['tour.provider', 'tour.province', 'slot'])),
+        ], 201);
+    }
+
+    /**
      * Customer tour booking history (paginated).
      */
     public function index(Request $request): JsonResponse
@@ -86,6 +146,8 @@ class TourBookingController extends BaseApiController
         $perPage = (int) $request->input('per_page', 15);
         $paginator = TourBooking::where('customer_id', $request->user()->id)
             ->with(['tour.provider', 'tour.province', 'slot'])
+            ->withCount('review')
+            ->orderByDesc('start_at')
             ->latest()
             ->paginate($perPage);
 
@@ -104,6 +166,7 @@ class TourBookingController extends BaseApiController
     {
         $booking = TourBooking::where('uuid', $uuid)
             ->with(['tour.provider', 'tour.province', 'slot', 'tour.images'])
+            ->withCount('review')
             ->firstOrFail();
         $this->authorize('view', $booking);
 

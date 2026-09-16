@@ -27,6 +27,7 @@ import TourDetail from './pages/TourDetail';
 import TourBookingWizard from './pages/TourBookingWizard';
 import TourCheckout from './pages/TourCheckout';
 import MyTourBookings from './pages/MyTourBookings';
+import TourBookingReview from './pages/TourBookingReview';
 import SavedTours from './pages/SavedTours';
 
 const queryClient = new QueryClient({
@@ -64,6 +65,7 @@ export default function App() {
               <Route path="tours/book/:uuid" element={<TourBookingWizard />} />
               <Route path="tour-checkout/:uuid" element={<TourCheckout />} />
               <Route path="tour-bookings" element={<MyTourBookings />} />
+              <Route path="tour-bookings/:uuid/review" element={<TourBookingReview />} />
               <Route path="saved-tours" element={<SavedTours />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />

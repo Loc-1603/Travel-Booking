@@ -141,5 +141,6 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::get('/guide-profile/{provider}/edit', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'edit'])->name('guide-profile.edit');
             Route::put('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update'])->name('guide-profile.update');
             Route::patch('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update']);
+            Route::post('/guide-profile/{provider}/content-image', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'storeContentImage'])->name('guide-profile.content-image');
         });
     });

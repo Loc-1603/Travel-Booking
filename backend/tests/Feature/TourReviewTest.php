@@ -74,6 +74,52 @@ test('review requires confirmed state and is one per booking', function (): void
     ])->assertNotFound();
 });
 
+test('review accepts up to 5 images and exposes them in the list', function (): void {
+    \Illuminate\Support\Facades\Storage::fake('public');
+
+    $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
+        'tour_id' => $this->tour->id, 'slot_id' => $this->slot->id,
+        'pricing_mode' => 'day', 'duration_value' => 1,
+    ])->assertCreated();
+    $booking = TourBooking::where('uuid', $store->json('data.booking.uuid'))->first();
+    $booking->update(['status' => TourBookingStatus::COMPLETED->value]);
+
+    $res = $this->actingAs($this->customer)->post('/api/v1/tour-reviews', [
+        'tour_booking_id' => $booking->id, 'rating' => 5, 'comment' => 'Tuyệt vời!',
+        'images' => [
+            \Illuminate\Http\UploadedFile::fake()->image('a.jpg'),
+            \Illuminate\Http\UploadedFile::fake()->image('b.jpg'),
+        ],
+    ])->assertCreated();
+
+    expect($res->json('data.images'))->toHaveCount(2)
+        ->and($res->json('data.images.0.url'))->toContain('review-images');
+
+    // Quá 5 ảnh -> 422.
+    $tooMany = ['tour_booking_id' => $booking->id, 'rating' => 5, 'images' => []];
+    for ($i = 0; $i < 6; $i++) {
+        $tooMany['images'][] = \Illuminate\Http\UploadedFile::fake()->image("x{$i}.jpg");
+    }
+    // Booking khác để tránh REVIEW_EXISTS.
+    $slot2 = TourAvailabilitySlot::create([
+        'tour_id' => $this->tour->id, 'date' => Carbon::tomorrow()->addDay()->toDateString(),
+        'start_time' => '09:00:00', 'end_time' => '12:00:00', 'status' => 'available',
+    ]);
+    $store2 = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
+        'tour_id' => $this->tour->id, 'slot_id' => $slot2->id,
+        'pricing_mode' => 'day', 'duration_value' => 1,
+    ])->assertCreated();
+    $booking2 = TourBooking::where('uuid', $store2->json('data.booking.uuid'))->first();
+    $booking2->update(['status' => TourBookingStatus::COMPLETED->value]);
+    $tooMany['tour_booking_id'] = $booking2->id;
+    $this->actingAs($this->customer)->post('/api/v1/tour-reviews', $tooMany)->assertStatus(422);
+
+    // List công khai kèm images sau khi duyệt.
+    TourReview::where('tour_booking_id', $booking->id)->update(['approved' => true]);
+    $list = $this->getJson('/api/v1/tour-reviews?tour_uuid='.$this->tour->uuid)->assertOk();
+    expect($list->json('data.data.0.images'))->toHaveCount(2);
+});
+
 test('public review list only shows approved and visible', function (): void {
     $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
         'tour_id' => $this->tour->id, 'slot_id' => $this->slot->id,

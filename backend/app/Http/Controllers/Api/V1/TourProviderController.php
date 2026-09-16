@@ -19,7 +19,8 @@ class TourProviderController extends BaseApiController
      * List approved 1vs1 vendors (guides), ranked by score.
      *
      * score = AVG(rating 1..5) * COUNT(approved, visible reviews).
-     * Optional multi-day filter: only vendors free for EVERY day in [from, to].
+     * Luồng mới: lọc theo 1 ngày đi (travel_date).
+     * Giữ tương thích ngược: filter khoảng [from, to] cũ (free EVERY day).
      */
     public function index(TourProviderSearchRequest $request): JsonResponse
     {
@@ -37,7 +38,16 @@ class TourProviderController extends BaseApiController
             $query->whereIn('tour_providers.id', $this->tours->providerIdsInProvince($provinceId));
         }
 
-        if ($request->filled('from') || $request->filled('to')) {
+        if ($request->filled('travel_date')) {
+            if ($provinceId === null) {
+                return $this->error('province_slug or province_id is required when filtering by date.', 422, 'PROVINCE_REQUIRED');
+            }
+            $freeIds = $this->tours->providerIdsFreeOnDate($provinceId, $request->input('travel_date'));
+            if ($freeIds === []) {
+                return $this->success($this->emptyPage((int) $request->input('per_page', 15)));
+            }
+            $query->whereIn('tour_providers.id', $freeIds);
+        } elseif ($request->filled('from') || $request->filled('to')) {
             if ($provinceId === null) {
                 return $this->error('province_slug or province_id is required when filtering by date.', 422, 'PROVINCE_REQUIRED');
             }
@@ -97,6 +107,53 @@ class TourProviderController extends BaseApiController
         }
 
         return $this->success(new TourProviderResource($provider));
+    }
+
+    /**
+     * Slot trống của 1 guide trong 1 ngày (public).
+     * Dùng cho trang chi tiết guide ở luồng đặt 1 ngày.
+     */
+    public function availability(Request $request, string $uuid): JsonResponse
+    {
+        $request->validate([
+            'date' => 'required|date|after_or_equal:today',
+            'province_slug' => 'nullable|string|max:150',
+        ]);
+
+        $provinceId = null;
+        if ($request->filled('province_slug')) {
+            $province = TourProvince::where('slug', $request->input('province_slug'))->first();
+            if (! $province) {
+                return $this->error('Province not found.', 404, 'NOT_FOUND');
+            }
+            $provinceId = $province->id;
+        }
+
+        $provider = $this->tours->providerBaseQuery()->where('uuid', $uuid)->first();
+        if (! $provider) {
+            return $this->error('Guide not found.', 404, 'NOT_FOUND');
+        }
+
+        $slots = $this->tours->providerSlotsOnDate($uuid, $request->input('date'), $provinceId);
+
+        return $this->success($slots->map(fn ($slot) => [
+            'id' => $slot->id,
+            'date' => $slot->date?->format('Y-m-d'),
+            'start_time' => is_string($slot->start_time) ? substr($slot->start_time, 0, 5) : $slot->start_time?->format('H:i'),
+            'end_time' => is_string($slot->end_time) ? substr($slot->end_time, 0, 5) : $slot->end_time?->format('H:i'),
+            'status' => $slot->status,
+            // Giá 1 ngày do guide đặt: override của slot, fallback giá ngày của tour.
+            'price' => $slot->price_override !== null
+                ? (float) $slot->price_override
+                : ($slot->tour ? (float) $slot->tour->base_price_daily : null),
+            'transport_fee' => $slot->tour?->transport_fee !== null ? (float) $slot->tour->transport_fee : null,
+            'tour' => $slot->tour ? [
+                'id' => $slot->tour->id,
+                'uuid' => $slot->tour->uuid,
+                'title' => $slot->tour->title,
+                'meeting_point' => $slot->tour->meeting_point,
+            ] : null,
+        ])->values());
     }
 
     /**

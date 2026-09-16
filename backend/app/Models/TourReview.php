@@ -33,6 +33,11 @@ class TourReview extends Model
         return $this->belongsTo(TourBooking::class, 'tour_booking_id');
     }
 
+    public function images()
+    {
+        return $this->hasMany(TourReviewImage::class, 'tour_review_id')->orderBy('sort_order');
+    }
+
     public function moderatedBy()
     {
         return $this->belongsTo(User::class, 'moderated_by');

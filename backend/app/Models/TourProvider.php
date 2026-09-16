@@ -18,6 +18,8 @@ class TourProvider extends Model
         'vendor_id',
         'business_name',
         'bio',
+        'bio_json',
+        'bio_html',
         'avatar',
         'languages',
         'status',
@@ -27,6 +29,7 @@ class TourProvider extends Model
     {
         return [
             'languages' => 'array',
+            'bio_json' => 'array',
         ];
     }
 

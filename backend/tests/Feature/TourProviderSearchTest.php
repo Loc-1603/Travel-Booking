@@ -104,7 +104,8 @@ test('guide list ranks by score and exposes rating fields', function (): void {
         ->and((int) $data[0]['review_count'])->toBe(2)
         ->and((float) $data[0]['score'])->toBe(9.0)
         ->and((int) $data[0]['tours_count'])->toBe(1)
-        ->and((float) $data[0]['price_from'])->toBe(450000.0)
+        // Giá 1 ngày do guide đặt: price_from = MIN(base_price_daily).
+        ->and((float) $data[0]['price_from'])->toBe(1200000.0)
         ->and($data[0]['primary_tour']['uuid'])->toBe($this->tourA->uuid)
         ->and($data[1]['business_name'])->toBe('Local Expert B');
 });
@@ -130,6 +131,23 @@ test('guide list filters vendors free for every selected day', function (): void
 
 test('guide list date filter requires province', function (): void {
     $this->getJson("/api/v1/tour-providers?from={$this->day1}&to={$this->day2}")
+        ->assertStatus(422);
+});
+
+test('guide list filters by single travel_date (1-day flow)', function (): void {
+    // Ngày day1: cả 2 guide đều trống.
+    $one = $this->getJson("/api/v1/tour-providers?province_slug=ha-giang-guides&travel_date={$this->day1}")
+        ->assertOk();
+    expect($one->json('data.meta.total'))->toBe(2);
+
+    // Ngày day2: chỉ Guide A trống.
+    $two = $this->getJson("/api/v1/tour-providers?province_slug=ha-giang-guides&travel_date={$this->day2}")
+        ->assertOk();
+    expect($two->json('data.meta.total'))->toBe(1)
+        ->and($two->json('data.data.0.business_name'))->toBe('Local Expert A');
+
+    // travel_date cũng yêu cầu tỉnh.
+    $this->getJson("/api/v1/tour-providers?travel_date={$this->day1}")
         ->assertStatus(422);
 });
 

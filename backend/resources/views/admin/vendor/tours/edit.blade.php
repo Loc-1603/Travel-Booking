@@ -36,17 +36,14 @@
                     <textarea name="description" class="form-control" rows="3">{{ old('description', $tour->description) }}</textarea>
                 </div>
                 <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">{{ __('admin.vendor.tours.form.base_fixed') }} *</label>
-                        <input type="number" name="base_fixed" class="form-control" value="{{ old('base_fixed', $tour->base_fixed) }}" min="0" step="1000" required>
+                    <div class="col-md-3 mb-3" style="display:none">
+                        <input type="hidden" name="base_fixed" value="{{ old('base_fixed', $tour->base_fixed) }}">
+                        <input type="hidden" name="base_price_hourly" value="{{ old('base_price_hourly', $tour->base_price_hourly) }}">
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">{{ __('admin.vendor.tours.form.per_hour') }} *</label>
-                        <input type="number" name="base_price_hourly" class="form-control" value="{{ old('base_price_hourly', $tour->base_price_hourly) }}" min="0" step="1000" required>
-                    </div>
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">{{ __('admin.vendor.tours.form.per_day') }} *</label>
                         <input type="number" name="base_price_daily" class="form-control" value="{{ old('base_price_daily', $tour->base_price_daily) }}" min="0" step="1000" required>
+                        <div class="form-text">{{ __('admin.vendor.tours.form.per_day_hint') }}</div>
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">{{ __('admin.vendor.tours.form.transport_fee') }}</label>

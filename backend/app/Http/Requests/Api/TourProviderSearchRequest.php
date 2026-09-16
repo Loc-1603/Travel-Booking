@@ -17,6 +17,8 @@ class TourProviderSearchRequest extends BaseApiRequest
         return [
             'province_id' => 'nullable|integer|exists:tour_provinces,id',
             'province_slug' => 'nullable|string|max:150',
+            // Luồng mới 1 ngày: travel_date là trường chính. Giữ from/to để tương thích ngược.
+            'travel_date' => 'nullable|date|after_or_equal:today',
             'from' => 'nullable|date|after_or_equal:today',
             'to' => 'nullable|date|after_or_equal:from',
             'min_rating' => 'nullable|numeric|min:0|max:5',

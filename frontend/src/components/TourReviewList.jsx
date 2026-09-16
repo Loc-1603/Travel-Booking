@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Star } from 'lucide-react';
+import { Loader2, Star, X } from 'lucide-react';
 import { api } from '../lib/api';
 
 export function TourReviewList({ tourUuid, providerUuid }) {
   const { t } = useTranslation();
+  const [lightbox, setLightbox] = useState(null);
   const { data, isLoading, isError } = useQuery({
     queryKey: ['tour-reviews', tourUuid ?? providerUuid],
     queryFn: async () => {
@@ -42,9 +44,46 @@ export function TourReviewList({ tourUuid, providerUuid }) {
               </p>
             )}
           </div>
-          {r.comment && <p className="text-sm text-[#45423d] mt-2">{r.comment}</p>}
+          {r.comment && <p className="text-sm text-[#45423d] mt-2 whitespace-pre-wrap">{r.comment}</p>}
+          {Array.isArray(r.images) && r.images.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {r.images.map((img) => (
+                <button
+                  key={img.id}
+                  type="button"
+                  onClick={() => setLightbox(img.url)}
+                  className="w-20 h-20 rounded-xl overflow-hidden border border-[#e8e4dd] hover:border-[#b8860b] transition-colors p-0 min-h-0 min-w-0"
+                >
+                  <img src={img.url} alt="" loading="lazy" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ))}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20"
+            aria-label={t('tours.reviews.closePhoto')}
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <img
+            src={lightbox}
+            alt=""
+            className="max-w-full max-h-[85vh] rounded-2xl object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }

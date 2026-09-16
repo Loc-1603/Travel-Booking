@@ -88,6 +88,105 @@ class TourBookingService
         });
     }
 
+    /**
+     * Luồng đặt 1 ngày theo Guide: resolve tour từ slot (slot phải thuộc
+     * tour published của đúng provider đã duyệt), giá luôn = 1 ngày.
+     * Khi $slotId = null (UI đặt theo ngày, không chọn giờ), tự lấy slot
+     * trống sớm nhất của provider trong đúng $travelDate.
+     *
+     * @return array{tour: TourProduct, slot: TourAvailabilitySlot}
+     *
+     * @throws \RuntimeException
+     */
+    public function resolveGuideTourSlot(string $providerUuid, ?int $slotId, ?string $travelDate = null): array
+    {
+        if ($slotId === null) {
+            if ($travelDate === null) {
+                throw new \RuntimeException('Travel date is required.');
+            }
+            $day = Carbon::parse($travelDate)->toDateString();
+            $slot = TourAvailabilitySlot::query()
+                ->with('tour.provider')
+                ->join('tour_products', 'tour_products.id', '=', 'tour_availability_slots.tour_id')
+                ->join('tour_providers', 'tour_providers.id', '=', 'tour_products.provider_id')
+                ->where('tour_providers.uuid', $providerUuid)
+                ->where('tour_providers.status', 'approved')
+                ->where('tour_products.status', 'published')
+                ->where('tour_availability_slots.status', 'available')
+                ->whereDate('tour_availability_slots.date', '=', $day)
+                ->orderBy('tour_availability_slots.start_time')
+                ->select('tour_availability_slots.*')
+                ->first();
+            if (! $slot || ! $slot->tour) {
+                throw new \RuntimeException('Guide is not free on the travel date.');
+            }
+
+            return ['tour' => $slot->tour, 'slot' => $slot];
+        }
+
+        $slot = TourAvailabilitySlot::with('tour.provider')->find($slotId);
+        if (! $slot || ! $slot->tour) {
+            throw new \RuntimeException('Tour slot not found.');
+        }
+
+        $tour = $slot->tour;
+        if ($tour->status !== 'published'
+            || ! $tour->provider
+            || $tour->provider->uuid !== $providerUuid
+            || $tour->provider->status !== 'approved') {
+            throw new \RuntimeException('Tour slot does not belong to this guide.');
+        }
+
+        if ($travelDate !== null && $slot->date && $slot->date->format('Y-m-d') !== $travelDate) {
+            throw new \RuntimeException('Tour slot is not on the travel date.');
+        }
+
+        return ['tour' => $tour, 'slot' => $slot];
+    }
+
+    /**
+     * Tạo booking 1 ngày theo Guide (pricing_mode=day, duration=1).
+     */
+    public function createGuideBooking(
+        int $customerId,
+        string $providerUuid,
+        ?int $slotId,
+        ?string $travelDate = null,
+        ?string $couponCode = null,
+        ?string $meetingPoint = null,
+        ?string $customerNotes = null,
+        string $currency = 'VND',
+    ): TourBooking {
+        $resolved = $this->resolveGuideTourSlot($providerUuid, $slotId, $travelDate);
+
+        return $this->createBooking(
+            $customerId,
+            $resolved['tour']->id,
+            $resolved['slot']->id,
+            'day',
+            1,
+            $couponCode,
+            $meetingPoint,
+            $customerNotes,
+            $currency,
+        );
+    }
+
+    /**
+     * Xem trước giá 1 ngày theo Guide (không lock slot).
+     */
+    public function previewGuide(
+        string $providerUuid,
+        ?int $slotId,
+        ?string $couponCode,
+        ?int $userId,
+        ?string $travelDate = null,
+    ): \App\DTOs\PriceBreakdown {
+        $resolved = $this->resolveGuideTourSlot($providerUuid, $slotId, $travelDate);
+
+        return $this->preview($resolved['tour']->id, $resolved['slot']->id, 'day', 1, $couponCode, $userId);
+    }
+
     public function cancelBooking(TourBooking $booking): void
     {
         if ($booking->status === TourBookingStatus::CANCELLED->value) {
