@@ -88,54 +88,35 @@
 
                 @if(auth()->user()->role === \App\Enums\Role::SUPER_ADMIN)
                 {{-- Platform content & configuration --}}
-                <li>
-                    <a href="{{ route('admin.countries.index') }}">
-                        <i data-feather="globe"></i>
-                        <span>{{ __('admin.sidebar.countries') }}</span>
+                @php
+                    $hotelActive = request()->routeIs('admin.countries.*','admin.cities.*','admin.amenities.*','admin.disputes.*','admin.reviews.*');
+                    $tourActive = request()->routeIs('admin.tour-provinces.*','admin.tour-attractions.*','admin.tour-providers.*','admin.tour-disputes.*','admin.tour-reviews.*');
+                @endphp
+                <li class="{{ $hotelActive ? 'mm-active' : '' }}">
+                    <a href="javascript: void(0);" class="has-arrow {{ $hotelActive ? 'mm-active' : '' }}">
+                        <i data-feather="layers"></i>
+                        <span>{{ __('admin.sidebar.hotel_management') }}</span>
                     </a>
+                    <ul class="sub-menu" aria-expanded="{{ $hotelActive ? 'true' : 'false' }}">
+                        <li><a href="{{ route('admin.countries.index') }}" class="{{ request()->routeIs('admin.countries.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.countries') }}</span></a></li>
+                        <li><a href="{{ route('admin.cities.index') }}" class="{{ request()->routeIs('admin.cities.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.cities') }}</span></a></li>
+                        <li><a href="{{ route('admin.amenities.index') }}" class="{{ request()->routeIs('admin.amenities.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.amenities') }}</span></a></li>
+                        <li><a href="{{ route('admin.disputes.index') }}" class="{{ request()->routeIs('admin.disputes.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.disputes') }}</span></a></li>
+                        <li><a href="{{ route('admin.reviews.index') }}" class="{{ request()->routeIs('admin.reviews.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.reviews') }}</span></a></li>
+                    </ul>
                 </li>
-                <li>
-                    <a href="{{ route('admin.cities.index') }}">
-                        <i data-feather="map-pin"></i>
-                        <span>{{ __('admin.sidebar.cities') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.amenities.index') }}">
-                        <i data-feather="check-square"></i>
-                        <span>{{ __('admin.sidebar.amenities') }}</span>
-                    </a>
-                </li>
-                {{-- Tours catalog & moderation (admin + super admin) --}}
-                <li>
-                    <a href="{{ route('admin.tour-provinces.index') }}">
+                <li class="{{ $tourActive ? 'mm-active' : '' }}">
+                    <a href="javascript: void(0);" class="has-arrow {{ $tourActive ? 'mm-active' : '' }}">
                         <i data-feather="map"></i>
-                        <span>{{ __('admin.sidebar.tour_provinces') }}</span>
+                        <span>{{ __('admin.sidebar.tour_management') }}</span>
                     </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tour-attractions.index') }}">
-                        <i data-feather="camera"></i>
-                        <span>{{ __('admin.sidebar.tour_attractions') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tour-providers.index') }}">
-                        <i data-feather="user"></i>
-                        <span>{{ __('admin.sidebar.tour_providers') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tour-disputes.index') }}">
-                        <i data-feather="alert-circle"></i>
-                        <span>{{ __('admin.sidebar.tour_disputes') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tour-reviews.index') }}">
-                        <i data-feather="star"></i>
-                        <span>{{ __('admin.sidebar.tour_reviews') }}</span>
-                    </a>
+                    <ul class="sub-menu" aria-expanded="{{ $tourActive ? 'true' : 'false' }}">
+                        <li><a href="{{ route('admin.tour-provinces.index') }}" class="{{ request()->routeIs('admin.tour-provinces.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_provinces') }}</span></a></li>
+                        <li><a href="{{ route('admin.tour-attractions.index') }}" class="{{ request()->routeIs('admin.tour-attractions.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_attractions') }}</span></a></li>
+                        <li><a href="{{ route('admin.tour-providers.index') }}" class="{{ request()->routeIs('admin.tour-providers.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_providers') }}</span></a></li>
+                        <li><a href="{{ route('admin.tour-disputes.index') }}" class="{{ request()->routeIs('admin.tour-disputes.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_disputes') }}</span></a></li>
+                        <li><a href="{{ route('admin.tour-reviews.index') }}" class="{{ request()->routeIs('admin.tour-reviews.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_reviews') }}</span></a></li>
+                    </ul>
                 </li>
                 {{-- Partners & revenue --}}
                 <li>
@@ -157,18 +138,6 @@
                     </a>
                 </li>
                 {{-- Moderation & support --}}
-                <li>
-                    <a href="{{ route('admin.disputes.index') }}">
-                        <i data-feather="alert-circle"></i>
-                        <span>{{ __('admin.sidebar.disputes') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.reviews.index') }}">
-                        <i data-feather="star"></i>
-                        <span>{{ __('admin.sidebar.reviews') }}</span>
-                    </a>
-                </li>
                 <li>
                     <a href="{{ route('admin.support-tickets.index') }}">
                         <i data-feather="message-circle"></i>
@@ -200,47 +169,32 @@
                 </li>
                 @else
                 {{-- Admin (non-super): Moderation only (gồm cả tour) --}}
-                <li>
-                    <a href="{{ route('admin.tour-provinces.index') }}">
+                @php
+                    $hotelActive = request()->routeIs('admin.disputes.*','admin.reviews.*');
+                    $tourActive = request()->routeIs('admin.tour-provinces.*','admin.tour-attractions.*','admin.tour-providers.*','admin.tour-disputes.*','admin.tour-reviews.*');
+                @endphp
+                <li class="{{ $hotelActive ? 'mm-active' : '' }}">
+                    <a href="javascript: void(0);" class="has-arrow {{ $hotelActive ? 'mm-active' : '' }}">
+                        <i data-feather="layers"></i>
+                        <span>{{ __('admin.sidebar.hotel_management') }}</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="{{ $hotelActive ? 'true' : 'false' }}">
+                        <li><a href="{{ route('admin.disputes.index') }}" class="{{ request()->routeIs('admin.disputes.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.disputes') }}</span></a></li>
+                        <li><a href="{{ route('admin.reviews.index') }}" class="{{ request()->routeIs('admin.reviews.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.reviews') }}</span></a></li>
+                    </ul>
+                </li>
+                <li class="{{ $tourActive ? 'mm-active' : '' }}">
+                    <a href="javascript: void(0);" class="has-arrow {{ $tourActive ? 'mm-active' : '' }}">
                         <i data-feather="map"></i>
-                        <span>{{ __('admin.sidebar.tour_provinces') }}</span>
+                        <span>{{ __('admin.sidebar.tour_management') }}</span>
                     </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tour-attractions.index') }}">
-                        <i data-feather="camera"></i>
-                        <span>{{ __('admin.sidebar.tour_attractions') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tour-providers.index') }}">
-                        <i data-feather="user"></i>
-                        <span>{{ __('admin.sidebar.tour_providers') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tour-disputes.index') }}">
-                        <i data-feather="alert-circle"></i>
-                        <span>{{ __('admin.sidebar.tour_disputes') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.tour-reviews.index') }}">
-                        <i data-feather="star"></i>
-                        <span>{{ __('admin.sidebar.tour_reviews') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.disputes.index') }}">
-                        <i data-feather="alert-circle"></i>
-                        <span>{{ __('admin.sidebar.disputes') }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.reviews.index') }}">
-                        <i data-feather="star"></i>
-                        <span>{{ __('admin.sidebar.reviews') }}</span>
-                    </a>
+                    <ul class="sub-menu" aria-expanded="{{ $tourActive ? 'true' : 'false' }}">
+                        <li><a href="{{ route('admin.tour-provinces.index') }}" class="{{ request()->routeIs('admin.tour-provinces.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_provinces') }}</span></a></li>
+                        <li><a href="{{ route('admin.tour-attractions.index') }}" class="{{ request()->routeIs('admin.tour-attractions.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_attractions') }}</span></a></li>
+                        <li><a href="{{ route('admin.tour-providers.index') }}" class="{{ request()->routeIs('admin.tour-providers.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_providers') }}</span></a></li>
+                        <li><a href="{{ route('admin.tour-disputes.index') }}" class="{{ request()->routeIs('admin.tour-disputes.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_disputes') }}</span></a></li>
+                        <li><a href="{{ route('admin.tour-reviews.index') }}" class="{{ request()->routeIs('admin.tour-reviews.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_reviews') }}</span></a></li>
+                    </ul>
                 </li>
                 <li>
                     <a href="{{ route('admin.support-tickets.index') }}">
