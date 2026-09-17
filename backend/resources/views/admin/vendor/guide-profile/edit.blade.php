@@ -14,6 +14,9 @@
                     <input type="text" name="business_name" class="form-control" value="{{ old('business_name', $provider->business_name) }}" required>
                 </div>
                 <div class="mb-3">
+                    <a href="{{ route('admin.vendor.guide-profile.settings.index', $provider) }}" class="btn btn-outline-primary btn-sm">Cài đặt hoạt động & ngày nghỉ</a>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">{{ __('admin.vendor.guide_profiles.form.bio_rich') }}</label>
                     <div class="btn-toolbar mb-2" role="toolbar" aria-label="Rich text" id="bio-toolbar">
                         <div class="btn-group btn-group-sm me-2" role="group">

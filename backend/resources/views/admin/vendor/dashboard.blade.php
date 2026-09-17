@@ -162,9 +162,6 @@
                         <i class="mdi mdi-domain me-2"></i>{{ __('admin.sidebar.business_details') }}
                     </a>
                     @if($segment === 'tour')
-                    <a href="{{ route('admin.vendor.tours.index') }}" class="btn btn-outline-primary btn-sm text-start">
-                        <i class="mdi mdi-map-marker-path me-2"></i>{{ __('admin.sidebar.tours') }}
-                    </a>
                     <a href="{{ route('admin.vendor.tour-bookings.index') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-calendar-multiple me-2"></i>{{ __('admin.sidebar.tour_bookings') }}
                     </a>

@@ -16,6 +16,7 @@ class TourProvider extends Model
     protected $fillable = [
         'uuid',
         'vendor_id',
+        'province_id',
         'business_name',
         'bio',
         'bio_json',
@@ -23,6 +24,7 @@ class TourProvider extends Model
         'avatar',
         'languages',
         'status',
+        'price_daily',
     ];
 
     protected function casts(): array
@@ -30,6 +32,7 @@ class TourProvider extends Model
         return [
             'languages' => 'array',
             'bio_json' => 'array',
+            'price_daily' => 'decimal:2',
         ];
     }
 
@@ -65,6 +68,16 @@ class TourProvider extends Model
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(TourProvince::class, 'province_id');
+    }
+
+    public function blackouts()
+    {
+        return $this->hasMany(TourProviderBlackout::class, 'provider_id');
     }
 
     public function tours()

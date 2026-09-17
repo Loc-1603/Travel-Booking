@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\TourProvider;
+use App\Models\TourProduct;
+use App\Models\TourProvince;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 class GuideProfileController extends Controller
 {

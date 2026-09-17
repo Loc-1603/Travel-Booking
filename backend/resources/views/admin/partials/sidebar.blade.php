@@ -53,7 +53,6 @@
                         @endif
                     </a>
                     <ul class="sub-menu" aria-expanded="{{ $tourActive ? 'true' : 'false' }}">
-                        <li><a href="{{ route('admin.vendor.tours.index') }}" class="{{ request()->routeIs('admin.vendor.tours.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tours') }}</span></a></li>
                         <li><a href="{{ route('admin.vendor.guide-profile.index') }}" class="{{ request()->routeIs('admin.vendor.guide-profile.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.guide_profiles') }}</span></a></li>
                         <li><a href="{{ route('admin.vendor.tour-bookings.index') }}" class="{{ request()->routeIs('admin.vendor.tour-bookings.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_bookings') }}</span></a></li>
                         <li><a href="{{ route('admin.vendor.tour-messages.index') }}" class="{{ request()->routeIs('admin.vendor.tour-messages.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_messages') }}</span></a></li>

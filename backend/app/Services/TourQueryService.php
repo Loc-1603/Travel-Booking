@@ -102,7 +102,7 @@ class TourQueryService
     {
         return TourProduct::where('province_id', $provinceId)
             ->where('status', 'published')
-            ->whereHas('provider', fn ($q) => $q->where('status', 'approved'))
+            ->whereHas('provider', fn ($q) => $q->where('status', 'approved')->where('province_id', $provinceId))
             ->distinct()
             ->pluck('provider_id')
             ->all();
@@ -119,7 +119,7 @@ class TourQueryService
     {
         $day = Carbon::parse($date)->toDateString();
 
-        $rows = TourAvailabilitySlot::query()
+        $query = TourAvailabilitySlot::query()
             ->join('tour_products', 'tour_products.id', '=', 'tour_availability_slots.tour_id')
             ->join('tour_providers', 'tour_providers.id', '=', 'tour_products.provider_id')
             ->where('tour_availability_slots.status', 'available')
@@ -127,9 +127,22 @@ class TourQueryService
             ->where('tour_products.status', 'published')
             ->where('tour_products.province_id', $provinceId)
             ->where('tour_providers.status', 'approved')
-            ->distinct()
-            ->pluck('tour_products.provider_id')
-            ->all();
+            ->where('tour_providers.province_id', $provinceId)
+            ->whereNotExists(function ($q) use ($day) {
+                $q->selectRaw(1)
+                  ->from('tour_provider_blackouts')
+                  ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
+                  ->whereRaw("? BETWEEN tour_provider_blackouts.start_date AND tour_provider_blackouts.end_date", [$day]);
+            })
+            ->whereNotExists(function ($q) use ($day) {
+                $q->selectRaw(1)
+                  ->from('tour_bookings')
+                  ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
+                  ->whereDate('tour_bookings.start_at', '=', $day)
+                  ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
+            });
+
+        $rows = $query->distinct()->pluck('tour_products.provider_id')->all();
 
         return array_map('intval', $rows);
     }
@@ -160,18 +173,32 @@ class TourQueryService
             $totalDays = 31;
         }
 
-        $rows = TourAvailabilitySlot::query()
+        $query = TourAvailabilitySlot::query()
             ->join('tour_products', 'tour_products.id', '=', 'tour_availability_slots.tour_id')
             ->join('tour_providers', 'tour_providers.id', '=', 'tour_products.provider_id')
             ->where('tour_availability_slots.status', 'available')
-            // whereDate (not whereBetween): SQLite stores DATE columns as
-            // 'Y-m-d H:i:s' strings, so a BETWEEN 'Y-m-d' upper bound misses.
             ->whereDate('tour_availability_slots.date', '>=', $start->toDateString())
             ->whereDate('tour_availability_slots.date', '<=', $end->toDateString())
             ->where('tour_products.status', 'published')
             ->where('tour_products.province_id', $provinceId)
             ->where('tour_providers.status', 'approved')
-            ->groupBy('tour_products.provider_id')
+            ->where('tour_providers.province_id', $provinceId)
+            ->whereNotExists(function ($q) use ($start, $end) {
+                $q->selectRaw(1)
+                  ->from('tour_provider_blackouts')
+                  ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
+                  ->whereRaw("tour_provider_blackouts.start_date <= ? AND tour_provider_blackouts.end_date >= ?", [$end->toDateString(), $start->toDateString()]);
+            })
+            ->whereNotExists(function ($q) use ($start, $end) {
+                $q->selectRaw(1)
+                  ->from('tour_bookings')
+                  ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
+                  ->whereDate('tour_bookings.start_at', '>=', $start->toDateString())
+                  ->whereDate('tour_bookings.start_at', '<=', $end->toDateString())
+                  ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
+            });
+
+        $rows = $query->groupBy('tour_products.provider_id')
             ->havingRaw('COUNT(DISTINCT tour_availability_slots.date) >= ?', [$totalDays])
             ->pluck('tour_products.provider_id')
             ->all();
@@ -195,10 +222,23 @@ class TourQueryService
             ->join('tour_providers', 'tour_providers.id', '=', 'tour_products.provider_id')
             ->where('tour_providers.uuid', $providerUuid)
             ->where('tour_providers.status', 'approved')
+            ->when($provinceId !== null, fn ($q) => $q->where('tour_products.province_id', $provinceId)->where('tour_providers.province_id', $provinceId))
             ->where('tour_products.status', 'published')
-            ->when($provinceId !== null, fn ($q) => $q->where('tour_products.province_id', $provinceId))
             ->where('tour_availability_slots.status', 'available')
             ->whereDate('tour_availability_slots.date', '=', $day)
+            ->whereNotExists(function ($q) use ($day) {
+                $q->selectRaw(1)
+                  ->from('tour_provider_blackouts')
+                  ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
+                  ->whereRaw("? BETWEEN tour_provider_blackouts.start_date AND tour_provider_blackouts.end_date", [$day]);
+            })
+            ->whereNotExists(function ($q) use ($day) {
+                $q->selectRaw(1)
+                  ->from('tour_bookings')
+                  ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
+                  ->whereDate('tour_bookings.start_at', '=', $day)
+                  ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
+            })
             ->orderBy('tour_availability_slots.start_time')
             ->select('tour_availability_slots.*')
             ->get();

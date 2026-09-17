@@ -31,7 +31,10 @@
                         <td>{{ implode(', ', $p->languages ?? []) }}</td>
                         <td>{{ $p->tours_count }}</td>
                         <td><span class="badge bg-secondary">{{ $p->status }}</span></td>
-                        <td><a href="{{ route('admin.vendor.guide-profile.edit', $p) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.edit') }}</a></td>
+                        <td>
+                            <a href="{{ route('admin.vendor.guide-profile.edit', $p) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.edit') }}</a>
+                            <a href="{{ route('admin.vendor.guide-profile.settings.index', $p) }}" class="btn btn-sm btn-outline-primary">Cài đặt hoạt động</a>
+                        </td>
                     </tr>
                     @empty
                     <tr><td colspan="6" class="text-muted">{{ __('admin.vendor.guide_profiles.empty') }}</td></tr>
