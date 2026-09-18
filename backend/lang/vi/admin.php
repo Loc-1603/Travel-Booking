@@ -991,7 +991,7 @@ return [
         ],
 
         // Payouts (Admin)
-        'payouts' => [
+        'payouts_admin' => [
             'title' => 'Thanh toán',
             'generate' => 'Tạo thanh toán',
             'export_csv' => 'Xuất CSV',

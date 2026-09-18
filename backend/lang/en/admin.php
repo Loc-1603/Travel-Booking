@@ -987,7 +987,7 @@ return [
         ],
 
         // Payouts (Admin)
-        'payouts' => [
+        'payouts_admin' => [
             'title' => 'Payouts',
             'generate' => 'Generate payouts',
             'export_csv' => 'Export CSV',

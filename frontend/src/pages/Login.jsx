@@ -14,16 +14,19 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [requiresVerification, setRequiresVerification] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setRequiresVerification(false);
     setLoading(true);
     try {
       await login(email, password);
       navigate(redirect.startsWith('/') ? redirect : '/');
     } catch (err) {
+      setRequiresVerification(!!err.response?.data?.requires_verification);
       setError(err.response?.data?.message || err.message || t('auth.errors.loginFailed'));
     } finally {
       setLoading(false);
@@ -70,6 +73,14 @@ export default function Login() {
               </div>
             </div>
             {error && <ErrorMessage message={error} />}
+            {requiresVerification && (
+              <Link
+                to={`/verify-email?email=${encodeURIComponent(email)}`}
+                className="block text-center text-sm text-[#b8860b] font-semibold hover:text-[#996f09]"
+              >
+                {t('auth.verifyEmail.resend')}
+              </Link>
+            )}
             <button
               type="submit"
               disabled={loading}

@@ -42,6 +42,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role'     => $isVendor ? RoleEnum::VENDOR : RoleEnum::CUSTOMER,
         ]);
+        $user->markEmailAsVerified();
 
         if ($request->hasFile('avatar')) {
             $user->avatar = $request->file('avatar')->store('avatars', 'public');

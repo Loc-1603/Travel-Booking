@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import ErrorMessage from '../components/ErrorMessage';
@@ -8,8 +8,6 @@ import { useTranslation } from 'react-i18next';
 export default function Register() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/';
   const { register: registerUser } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,7 +26,7 @@ export default function Register() {
     setLoading(true);
     try {
       await registerUser(name, email, password, passwordConfirmation);
-      navigate(redirect.startsWith('/') ? redirect : '/');
+      navigate(`/verify-email?email=${encodeURIComponent(email)}`);
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.errors ? JSON.stringify(err.response.data.errors) : err.message || t('auth.errors.registerFailed'));
     } finally {

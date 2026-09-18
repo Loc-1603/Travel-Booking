@@ -432,6 +432,25 @@
       "loginFailed": "Đăng nhập thất bại",
       "registerFailed": "Đăng ký thất bại",
       "passwordMismatch": "Mật khẩu không khớp"
+    },
+    "verifyEmail": {
+      "title": "Xác thực email",
+      "subtitle": "Một bước cuối cùng trước khi bạn có thể đăng nhập.",
+      "checkInbox": "Chúng tôi đã gửi liên kết xác thực đến {{email}}.",
+      "openInbox": "Nhấp vào liên kết trong email để xác nhận địa chỉ của bạn, sau đó đăng nhập.",
+      "noEmail": "Chưa nhận được email?",
+      "resend": "Gửi lại email xác thực",
+      "resending": "Đang gửi lại…",
+      "resendSent": "Một liên kết xác thực mới đã được gửi.",
+      "verifiedTitle": "Email đã được xác thực",
+      "verifiedMessage": "Địa chỉ email của bạn đã được xác thực. Bạn có thể đăng nhập ngay bây giờ.",
+      "goToLogin": "Đăng nhập",
+      "goHome": "Về trang chủ",
+      "errors": {
+        "resendFailed": "Không thể gửi lại email xác thực. Vui lòng thử lại.",
+        "emailTaken": "Email này đã được đăng ký. Vui lòng đăng nhập.",
+        "invalidLink": "Liên kết xác thực không hợp lệ hoặc đã hết hạn. Vui lòng gửi lại liên kết bên dưới."
+      }
     }
   },
   "profile": {

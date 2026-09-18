@@ -10,19 +10,19 @@ use Carbon\Carbon;
 beforeEach(function (): void {
     \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'vendor', 'guard_name' => 'web']);
 
-    $this->vendor = User::create([
+    $this->vendor = User::factory()->create([
         'name' => 'Vendor', 'email' => 'vendor-complete@test.local',
         'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
     ]);
     $this->vendor->assignRole('vendor');
 
-    $this->otherVendor = User::create([
+    $this->otherVendor = User::factory()->create([
         'name' => 'Other Vendor', 'email' => 'other-vendor-complete@test.local',
         'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
     ]);
     $this->otherVendor->assignRole('vendor');
 
-    $this->customer = User::create([
+    $this->customer = User::factory()->create([
         'name' => 'Customer', 'email' => 'customer-complete@test.local',
         'password' => bcrypt('password'), 'role' => 'customer', 'status' => 'active',
     ]);

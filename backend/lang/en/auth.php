@@ -74,6 +74,16 @@ return [
         'verification_link_sent' => 'A new verification link has been sent to the email address you provided during registration.',
         'resend_verification_email' => 'Resend Verification Email',
         'log_out' => 'Log Out',
+        'blocked' => 'Please verify your email address before logging in. Check your inbox or resend the verification link.',
+        'resend_sent' => 'If that email address exists, a new verification link has been sent.',
+        'verified' => 'Your email has been verified. You can now log in.',
+        'mail_subject' => 'Verify your email — :site_name',
+        'greeting' => 'Hello!',
+        'mail_body' => 'Thanks for signing up! Please confirm your email address by clicking the button below.',
+        'verify_button' => 'Verify Email Address',
+        'expires_in' => 'This verification link expires in :minutes minutes.',
+        'ignore_hint' => 'If you did not create an account, no further action is required.',
+        'support_hint' => 'Need help? Contact us at:',
     ],
     'confirm_password' => [
         'title' => 'Confirm Password',
@@ -88,5 +98,6 @@ return [
     ],
     'registration' => [
         'pending_approval' => 'Registration successful. Your account is pending approval. You will be able to add hotels once approved by our team.',
+        'check_email' => 'Registration successful. Please check your email to verify your account before logging in.',
     ],
 ];

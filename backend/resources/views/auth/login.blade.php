@@ -21,6 +21,18 @@
                                         <h5 class="mb-0">{{ __('auth.login.welcome_back') }}</h5>
                                         <p class="text-muted mt-2">{{ __('auth.login.sign_in_continue') }}</p>
                                     </div>
+                                    @if (session('status') == 'verification-sent' || session('info'))
+                                        <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                                            {{ session('info') ?? __('auth.registration.check_email') }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    @if (session('status') == 'verified')
+                                        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                                            {{ __('auth.verify_email.verified') }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
                                     <form class="mt-4 pt-2" method="POST" action="{{ route('login') }}">
                                         @csrf
 

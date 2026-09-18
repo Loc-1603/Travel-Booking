@@ -32,3 +32,20 @@
 
 </head>
 <body>
+<script>
+(function(){
+  try{
+    var mode = localStorage.getItem('admin_theme_mode');
+    if(!mode){
+      var m = document.cookie.match(/(?:^|; )admin_theme=([^;]+)/);
+      if(m) mode = decodeURIComponent(m[1]);
+    }
+    if(mode === 'dark' || mode === 'light'){
+      document.body.setAttribute('data-bs-theme', mode);
+      document.body.setAttribute('data-topbar', mode);
+      document.body.setAttribute('data-sidebar', mode);
+    }
+  }catch(e){}
+})();
+</script>
+

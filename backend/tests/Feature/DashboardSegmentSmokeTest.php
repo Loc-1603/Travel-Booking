@@ -12,17 +12,17 @@ beforeEach(function (): void {
     foreach (['super-admin', 'admin', 'vendor', 'customer'] as $role) {
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
     }
-    $this->superAdmin = User::create([
+    $this->superAdmin = User::factory()->create([
         'name' => 'SA', 'email' => 'dash-sa@test.local',
         'password' => bcrypt('password'), 'role' => 'super_admin', 'status' => 'active',
     ]);
     $this->superAdmin->assignRole('super-admin');
-    $this->vendor = User::create([
+    $this->vendor = User::factory()->create([
         'name' => 'Tour Only Vendor', 'email' => 'dash-tour-vendor@test.local',
         'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
     ]);
     $this->vendor->assignRole('vendor');
-    $this->customer = User::create([
+    $this->customer = User::factory()->create([
         'name' => 'Cust', 'email' => 'dash-cust@test.local',
         'password' => bcrypt('password'), 'role' => 'customer', 'status' => 'active',
     ]);

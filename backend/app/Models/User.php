@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Role;
+use App\Notifications\VerifyEmailNotification;
 use App\Traits\HasUuid;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, HasUuid, Notifiable;
@@ -103,5 +104,14 @@ class User extends Authenticatable
         }
 
         return mb_strtoupper(mb_substr($name, 0, 1));
+    }
+
+    /**
+     * Send the email verification notification (branded). Used when an existing
+     * user re-verifies (e.g. after changing their email address).
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmailNotification('user:'.$this->uuid, $this->email));
     }
 }

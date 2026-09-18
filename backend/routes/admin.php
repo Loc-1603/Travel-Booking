@@ -84,8 +84,8 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::resource('amenities', \App\Http\Controllers\Admin\AmenityController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
         });
 
-        // Vendor dashboard (vendor role only)
-        Route::middleware('vendor')->prefix('vendor')->name('vendor.')->group(function () {
+        // Vendor dashboard (vendor role only, email must be verified)
+        Route::middleware(['vendor', 'verified'])->prefix('vendor')->name('vendor.')->group(function () {
             Route::get('/dashboard', [\App\Http\Controllers\Admin\Vendor\DashboardController::class, 'index'])->name('dashboard');
             Route::get('/profile', [\App\Http\Controllers\Admin\Vendor\ProfileController::class, 'edit'])->name('profile.edit');
             Route::put('/profile', [\App\Http\Controllers\Admin\Vendor\ProfileController::class, 'update'])->name('profile.update');

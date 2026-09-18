@@ -432,6 +432,25 @@
       "loginFailed": "Login failed",
       "registerFailed": "Registration failed",
       "passwordMismatch": "Passwords do not match"
+    },
+    "verifyEmail": {
+      "title": "Verify your email",
+      "subtitle": "One last step before you can log in.",
+      "checkInbox": "We've sent a verification link to {{email}}.",
+      "openInbox": "Click the link in the email to confirm your address, then log in.",
+      "noEmail": "Didn't get the email?",
+      "resend": "Resend verification email",
+      "resending": "Resending…",
+      "resendSent": "A new verification link has been sent.",
+      "verifiedTitle": "Email verified",
+      "verifiedMessage": "Your email address has been verified. You can now log in.",
+      "goToLogin": "Go to login",
+      "goHome": "Back to home",
+      "errors": {
+        "resendFailed": "Could not resend the verification email. Please try again.",
+        "emailTaken": "This email is already registered. Please log in instead.",
+        "invalidLink": "This verification link is invalid or has expired. Request a new one below."
+      }
     }
   },
   "profile": {

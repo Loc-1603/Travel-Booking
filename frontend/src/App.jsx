@@ -20,6 +20,7 @@ import SupportTicketNew from './pages/SupportTicketNew';
 import SupportTicketDetail from './pages/SupportTicketDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import VerifyEmail from './pages/VerifyEmail';
 import Tours from './pages/Tours';
 import TourProvinceDetail from './pages/TourProvinceDetail';
 import GuideDetail from './pages/GuideDetail';
@@ -69,6 +70,7 @@ export default function App() {
               <Route path="saved-tours" element={<SavedTours />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
+              <Route path="verify-email" element={<VerifyEmail />} />
             </Route>
           </Routes>
             </BrowserRouter>

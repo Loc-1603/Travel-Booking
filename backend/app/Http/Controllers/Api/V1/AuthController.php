@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
+use App\Models\PendingRegistration;
 use App\Models\User;
+use App\Models\VendorProfile;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -33,6 +38,15 @@ class AuthController extends Controller
             throw ValidationException::withMessages(['email' => ['Account is not active.']]);
         }
 
+        if (! $user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('auth.verify_email.blocked'),
+                'requires_verification' => true,
+                'email' => $user->email,
+            ], 403);
+        }
+
         if ($user->role !== Role::CUSTOMER) {
             throw ValidationException::withMessages(['email' => ['Only customer accounts can sign in here.']]);
         }
@@ -51,77 +65,61 @@ class AuthController extends Controller
     }
 
     /**
-     * Register as vendor: name, email, password, optional business info. Creates VENDOR + VendorProfile (pending).
-     * Returns token + user. Vendor cannot add hotels until approved.
+     * Register as vendor: name, email, password, optional business info.
+     * Creates a PENDING registration — the vendor account is only created once
+     * the emailed link is verified. Vendor cannot add hotels until approved.
      */
     public function registerVendor(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'confirmed', Password::defaults()],
             'business_name' => 'nullable|string|max:255',
             'business_details' => 'nullable|string|max:2000',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => Role::VENDOR,
-            'status' => 'active',
-        ]);
-
-        $user->assignRole('vendor');
-
-        \App\Models\VendorProfile::create([
-            'user_id' => $user->id,
-            'status' => \App\Models\VendorProfile::STATUS_PENDING,
-            'business_name' => $validated['business_name'] ?? null,
-            'business_details' => $validated['business_details'] ?? null,
-        ]);
-
-        $token = $user->createToken('spa')->plainTextToken;
+        $pending = $this->createPendingRegistration(
+            $validated['name'],
+            $validated['email'],
+            $validated['password'],
+            Role::VENDOR->value,
+            $validated['business_name'] ?? null,
+            $validated['business_details'] ?? null,
+        );
 
         return response()->json([
             'success' => true,
             'data' => [
-                'token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $this->userApiPayload($user),
+                'email' => $pending->email,
             ],
         ], 201);
     }
 
     /**
-     * Register: name, email, password. Creates CUSTOMER + active, returns token + user.
+     * Register: name, email, password.
+     * Creates a PENDING registration — the customer account is only created once
+     * the emailed link is verified.
      */
     public function register(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => Role::CUSTOMER,
-            'status' => 'active',
-        ]);
-
-        $user->assignRole('customer');
-
-        $token = $user->createToken('spa')->plainTextToken;
+        $pending = $this->createPendingRegistration(
+            $validated['name'],
+            $validated['email'],
+            $validated['password'],
+            Role::CUSTOMER->value,
+        );
 
         return response()->json([
             'success' => true,
             'data' => [
-                'token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $this->userApiPayload($user),
+                'email' => $pending->email,
             ],
         ], 201);
     }
@@ -133,6 +131,41 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Resend the email verification link for a pending registration.
+     * Always returns success to avoid leaking which emails exist.
+     */
+    public function resendVerification(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => 'required|string|email|max:255',
+        ]);
+
+        $pending = PendingRegistration::query()
+            ->where('email', $validated['email'])
+            ->active()
+            ->latest()
+            ->first();
+
+        if ($pending) {
+            $this->sendVerificationEmail($pending);
+        } else {
+            // Existing user waiting to verify a changed email address.
+            $user = User::where('email', $validated['email'])
+                ->whereNull('email_verified_at')
+                ->first();
+
+            if ($user) {
+                $user->sendEmailVerificationNotification();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => __('auth.verify_email.resend_sent'),
+        ]);
     }
 
     /**
@@ -179,13 +212,61 @@ class AuthController extends Controller
         }
 
         $user->name = $validated['name'] ?? $user->name;
-        $user->email = $validated['email'] ?? $user->email;
+        $emailChanged = false;
+        if (array_key_exists('email', $validated)) {
+            $emailChanged = $validated['email'] !== $user->email;
+            $user->email = $validated['email'];
+            if ($emailChanged) {
+                $user->email_verified_at = null;
+            }
+        }
         if (! empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
         $user->save();
 
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+        }
+
         return response()->json(['success' => true, 'data' => $this->userApiPayload($user->fresh())]);
+    }
+
+    /**
+     * Create a pending registration (no users row yet) and email the verification link.
+     *
+     * @return PendingRegistration
+     */
+    protected function createPendingRegistration(
+        string $name,
+        string $email,
+        string $password,
+        string $role,
+        ?string $businessName = null,
+        ?string $businessDetails = null,
+    ): PendingRegistration {
+        // Clear stale pendings for this address so a re-registration works.
+        PendingRegistration::where('email', $email)->delete();
+
+        $pending = PendingRegistration::create([
+            'name' => $name,
+            'email' => $email,
+            'password' => Hash::make($password),
+            'role' => $role,
+            'business_name' => $businessName,
+            'business_details' => $businessDetails,
+            'expires_at' => now()->addHours(24),
+        ]);
+
+        $this->sendVerificationEmail($pending);
+
+        return $pending;
+    }
+
+    protected function sendVerificationEmail(PendingRegistration $pending): void
+    {
+        Notification::route('mail', $pending->email)
+            ->notify(new VerifyEmailNotification('pending:'.$pending->uuid, $pending->email));
     }
 
     /**
@@ -200,6 +281,8 @@ class AuthController extends Controller
             'email' => $user->email,
             'role' => $user->role->value,
             'avatar_url' => $user->avatarUrl(),
+            'email_verified_at' => $user->email_verified_at?->toISOString(),
+            'email_verified' => $user->hasVerifiedEmail(),
         ];
         if ($user->role === Role::VENDOR) {
             $data['vendor_approved'] = $user->isVendorApproved();

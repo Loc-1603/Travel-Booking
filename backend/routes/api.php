@@ -49,6 +49,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register/vendor', [AuthController::class, 'registerVendor'])->name('register.vendor');
+    Route::post('/email/verify-resend', [AuthController::class, 'resendVerification'])
+        ->middleware('throttle:6,1')
+        ->name('email.verify-resend');
 
     // Hotel search & single hotel (no auth)
     Route::get('/hotels', [HotelSearchController::class, 'index'])->name('hotels.index');

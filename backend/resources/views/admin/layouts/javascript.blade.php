@@ -22,5 +22,33 @@
 
 <script src="{{asset('admin/dist/assets/js/app.js')}}"></script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function saveTheme(mode){
+    try{
+      localStorage.setItem('admin_theme_mode', mode);
+      document.cookie = 'admin_theme=' + encodeURIComponent(mode) + '; path=/; max-age=' + (60*60*24*365) + '; SameSite=Lax';
+    }catch(e){}
+  }
+  function getCurrentMode(){
+    return document.body.getAttribute('data-bs-theme') || 'light';
+  }
+  var btn = document.getElementById('mode-setting-btn');
+  if(btn){
+    btn.addEventListener('click', function(){
+      setTimeout(function(){ saveTheme(getCurrentMode()); }, 0);
+    });
+  }
+  document.addEventListener('change', function(e){
+    if(e.target && e.target.name === 'layout-mode'){
+      var mode = e.target.value;
+      if(mode === 'dark' || mode === 'light'){
+        setTimeout(function(){ saveTheme(mode); }, 0);
+      }
+    }
+  });
+});
+</script>
 </body>
 </html>
+

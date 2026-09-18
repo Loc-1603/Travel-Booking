@@ -74,6 +74,16 @@ return [
         'verification_link_sent' => 'Một liên kết xác thực mới đã được gửi đến địa chỉ email bạn cung cấp khi đăng ký.',
         'resend_verification_email' => 'Gửi lại email xác thực',
         'log_out' => 'Đăng xuất',
+        'blocked' => 'Vui lòng xác thực địa chỉ email trước khi đăng nhập. Kiểm tra hộp thư của bạn hoặc gửi lại liên kết xác thực.',
+        'resend_sent' => 'Nếu địa chỉ email đó tồn tại, một liên kết xác thực mới đã được gửi.',
+        'verified' => 'Email của bạn đã được xác thực. Bạn có thể đăng nhập ngay bây giờ.',
+        'mail_subject' => 'Xác thực email của bạn — :site_name',
+        'greeting' => 'Xin chào!',
+        'mail_body' => 'Cảm ơn bạn đã đăng ký! Vui lòng xác nhận địa chỉ email của bạn bằng cách nhấp vào nút bên dưới.',
+        'verify_button' => 'Xác thực địa chỉ email',
+        'expires_in' => 'Liên kết xác thực này hết hạn sau :minutes phút.',
+        'ignore_hint' => 'Nếu bạn không tạo tài khoản, không cần thực hiện thêm hành động nào.',
+        'support_hint' => 'Cần hỗ trợ? Liên hệ với chúng tôi tại:',
     ],
     'confirm_password' => [
         'title' => 'Xác Nhận Mật Khẩu',
@@ -88,5 +98,6 @@ return [
     ],
     'registration' => [
         'pending_approval' => 'Đăng ký thành công. Tài khoản của bạn đang chờ phê duyệt. Bạn sẽ có thể thêm khách sạn sau khi được đội ngũ của chúng tôi phê duyệt.',
+        'check_email' => 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.',
     ],
 ];
