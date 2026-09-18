@@ -1546,6 +1546,7 @@ return [
                 'tour' => 'Tour',
                 'customer' => 'Khách hàng',
                 'messages' => 'Tin nhắn',
+                'unread' => 'chưa đọc',
                 'actions' => 'Hành động',
             ],
             'empty' => 'Chưa có hội thoại nào.',
@@ -1556,6 +1557,8 @@ return [
                 'no_messages' => 'Chưa có tin nhắn nào.',
                 'reply_placeholder' => 'Nhập trả lời...',
                 'send' => 'Gửi',
+                'read' => 'Đã xem',
+                'unread' => 'Chưa xem',
             ],
             'flash' => [
                 'reply_sent' => 'Đã gửi trả lời.',

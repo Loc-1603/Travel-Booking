@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\TourBooking;
+use App\Models\TourMessage;
 use App\Models\TourProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,10 +32,14 @@ class TourMessageController extends Controller
 
     public function show(string $uuid): View
     {
-        $booking = $this->myBookingsQuery()
-            ->where('uuid', $uuid)
-            ->with(['tour', 'customer', 'messages.sender'])
-            ->firstOrFail();
+        $booking = $this->myBookingsQuery()->where('uuid', $uuid)->firstOrFail();
+
+        TourMessage::where('tour_booking_id', $booking->id)
+            ->where('sender_id', '!=', auth()->id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $booking->load(['tour', 'customer', 'messages.sender']);
 
         return view('admin.vendor.tour-messages.show', compact('booking'));
     }

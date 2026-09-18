@@ -13,9 +13,17 @@
     <div class="card mb-3">
         <div class="card-body" style="max-height:420px;overflow-y:auto">
             @forelse($booking->messages as $m)
-            <div class="mb-2 p-2 rounded {{ (int) $m->sender_id === (int) auth()->id() ? 'bg-primary text-white ms-5' : 'bg-light me-5' }}">
+            @php $isMine = (int) $m->sender_id === (int) auth()->id(); @endphp
+            <div class="mb-2 p-2 rounded {{ $isMine ? 'bg-primary text-white ms-5' : 'bg-light me-5' }}">
                 <div class="small opacity-75">{{ $m->sender->name ?? 'User' }} · {{ $m->created_at?->format('Y-m-d H:i') }}</div>
                 <div>{{ $m->body }}</div>
+                @if(! $isMine)
+                <div class="small mt-1 {{ $m->read_at ? 'opacity-75' : 'text-danger fw-semibold' }}">
+                    {{ $m->read_at
+                        ? __('admin.vendor.tour_messages.detail.read')
+                        : __('admin.vendor.tour_messages.detail.unread') }}
+                </div>
+                @endif
             </div>
             @empty
             <p class="text-muted">{{ __('admin.vendor.tour_messages.detail.no_messages') }}</p>

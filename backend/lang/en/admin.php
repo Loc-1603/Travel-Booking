@@ -1542,6 +1542,7 @@ return [
                 'tour' => 'Tour',
                 'customer' => 'Customer',
                 'messages' => 'Messages',
+                'unread' => 'unread',
                 'actions' => 'Actions',
             ],
             'empty' => 'No conversations yet.',
@@ -1552,6 +1553,8 @@ return [
                 'no_messages' => 'No messages yet.',
                 'reply_placeholder' => 'Type a reply...',
                 'send' => 'Send',
+                'read' => 'Read',
+                'unread' => 'Unread',
             ],
             'flash' => [
                 'reply_sent' => 'Reply sent.',

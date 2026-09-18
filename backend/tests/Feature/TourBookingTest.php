@@ -5,6 +5,7 @@ use App\Enums\TourBookingStatus;
 use App\Models\Country;
 use App\Models\TourAvailabilitySlot;
 use App\Models\TourBooking;
+use App\Models\TourMessage;
 use App\Models\TourPayment;
 use App\Models\TourProduct;
 use App\Models\TourProvince;
@@ -217,6 +218,50 @@ test('customer and vendor can chat in booking thread, stranger cannot', function
         'password' => bcrypt('password'), 'role' => 'customer', 'status' => 'active',
     ]);
     $this->actingAs($stranger)->getJson("/api/v1/tour-bookings/{$uuid}/messages")->assertForbidden();
+});
+
+test('messages track read/unread status on both sides', function (): void {
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'vendor', 'guard_name' => 'web']);
+    $this->vendor->forceFill(['email_verified_at' => now()])->save();
+    $this->vendor->assignRole('vendor');
+
+    $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
+        'tour_id' => $this->tour->id, 'slot_id' => $this->slot->id,
+        'pricing_mode' => 'hour', 'duration_value' => 2,
+    ])->assertCreated();
+    $uuid = $store->json('data.booking.uuid');
+    TourBooking::where('uuid', $uuid)->update(['status' => TourBookingStatus::CONFIRMED->value]);
+    $booking = TourBooking::where('uuid', $uuid)->firstOrFail();
+
+    // Customer messages the vendor -> vendor side unread.
+    $this->actingAs($this->customer)->postJson("/api/v1/tour-bookings/{$uuid}/messages", [
+        'body' => 'Hello from customer',
+    ])->assertCreated();
+    $customerMessage = TourMessage::where('tour_booking_id', $booking->id)->first();
+    expect($customerMessage->read_at)->toBeNull();
+
+    // Vendor inbox shows 1 unread badge.
+    $this->actingAs($this->vendor)->get('/admin/vendor/tour-messages')
+        ->assertOk()
+        ->assertSee('chưa đọc', false);
+
+    // Vendor opens the thread via blade -> customer messages marked read.
+    $this->actingAs($this->vendor)->get("/admin/vendor/tour-messages/{$uuid}")->assertOk();
+    expect($customerMessage->fresh()->read_at)->not->toBeNull();
+
+    // Vendor replies -> customer side unread until customer reads.
+    $this->actingAs($this->vendor)->post("/admin/vendor/tour-messages/{$uuid}/reply", [
+        'body' => 'Hi customer',
+    ])->assertRedirect();
+    $vendorMessage = TourMessage::where('tour_booking_id', $booking->id)
+        ->where('sender_id', $this->vendor->id)
+        ->firstOrFail();
+    expect($vendorMessage->read_at)->toBeNull();
+
+    // Customer reads the thread -> vendor messages marked read.
+    $list = $this->actingAs($this->customer)->getJson("/api/v1/tour-bookings/{$uuid}/messages")->assertOk();
+    expect(collect($list->json('data'))->where('sender_id', $this->vendor->id)->first()['read_at'])->not->toBeNull();
+    expect($vendorMessage->fresh()->read_at)->not->toBeNull();
 });
 
 test('broadcast auth allows booking parties, rejects stranger', function (): void {

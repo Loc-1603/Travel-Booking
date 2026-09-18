@@ -963,6 +963,7 @@
       "empty": "Chưa có tin nhắn. Hãy chào hướng dẫn viên!",
       "placeholder": "Nhập tin nhắn...",
       "send": "Gửi",
+      "read": "Đã xem",
       "couldNotLoad": "Không tải được tin nhắn.",
       "payRequired": "Bạn chỉ có thể nhắn tin với guide sau khi đã thanh toán tour."
     },

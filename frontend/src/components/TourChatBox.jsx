@@ -63,11 +63,10 @@ export function TourChatBox({ bookingUuid }) {
                 <p className="text-xs font-semibold text-[#b8860b] mb-0.5">{m.sender_name}</p>
               )}
               <p className="whitespace-pre-wrap break-words">{m.body}</p>
-              {m.created_at && (
-                <p className={cn('text-[11px] mt-1', m.is_mine ? 'text-white/60' : 'text-[#a39e94]')}>
-                  {new Date(m.created_at).toLocaleString()}
-                </p>
-              )}
+              <div className={cn('text-[11px] mt-1 flex gap-2', m.is_mine ? 'text-white/60' : 'text-[#a39e94]')}>
+                {m.created_at && <span>{new Date(m.created_at).toLocaleString()}</span>}
+                {m.is_mine && m.read_at && <span className="text-emerald-300">{t('tours.chat.read')}</span>}
+              </div>
             </div>
           </div>
         ))}

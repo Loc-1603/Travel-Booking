@@ -963,6 +963,7 @@
       "empty": "No messages yet. Say hello!",
       "placeholder": "Type a message...",
       "send": "Send",
+      "read": "Read",
       "couldNotLoad": "Could not load messages.",
       "payRequired": "You can message the guide only after payment is completed."
     },
