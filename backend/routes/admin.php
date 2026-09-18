@@ -97,35 +97,40 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::delete('/profile/bank-accounts/{bankAccount}', [\App\Http\Controllers\Admin\Vendor\ProfileController::class, 'destroyBankAccount'])->name('profile.bank-accounts.destroy');
             Route::get('/reports', [\App\Http\Controllers\Admin\Vendor\ReportController::class, 'index'])->name('reports.index');
             Route::get('/reports/export', [\App\Http\Controllers\Admin\Vendor\ReportController::class, 'export'])->name('reports.export');
-            Route::resource('hotels', \App\Http\Controllers\Admin\Vendor\HotelController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-            Route::resource('rooms', \App\Http\Controllers\Admin\Vendor\RoomController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-            Route::get('rooms/{room}/availability', [\App\Http\Controllers\Admin\Vendor\RoomController::class, 'availability'])->name('rooms.availability');
-            Route::post('rooms/{room}/availability', [\App\Http\Controllers\Admin\Vendor\RoomController::class, 'storeAvailability'])->name('rooms.availability.store');
-            Route::get('/bookings', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'index'])->name('bookings.index');
-            Route::get('/bookings/old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'oldBookings'])->name('bookings.old');
-            Route::post('/bookings/{uuid}/mark-old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'markAsOld'])->name('bookings.mark-old');
-            Route::post('/bookings/{uuid}/complete', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'markCompleted'])->name('bookings.complete');
-            Route::post('/bookings/{uuid}/unmark-old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'unmarkAsOld'])->name('bookings.unmark-old');
-            Route::get('/bookings/{uuid}/invoice', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'invoice'])->name('bookings.invoice');
+
+            // Hotel cluster: locked until the vendor is approved by an admin.
+            Route::middleware('vendor.approved')->group(function () {
+                Route::resource('hotels', \App\Http\Controllers\Admin\Vendor\HotelController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+                Route::resource('rooms', \App\Http\Controllers\Admin\Vendor\RoomController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+                Route::get('rooms/{room}/availability', [\App\Http\Controllers\Admin\Vendor\RoomController::class, 'availability'])->name('rooms.availability');
+                Route::post('rooms/{room}/availability', [\App\Http\Controllers\Admin\Vendor\RoomController::class, 'storeAvailability'])->name('rooms.availability.store');
+                Route::get('/bookings', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'index'])->name('bookings.index');
+                Route::get('/bookings/old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'oldBookings'])->name('bookings.old');
+                Route::post('/bookings/{uuid}/mark-old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'markAsOld'])->name('bookings.mark-old');
+                Route::post('/bookings/{uuid}/complete', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'markCompleted'])->name('bookings.complete');
+                Route::post('/bookings/{uuid}/unmark-old', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'unmarkAsOld'])->name('bookings.unmark-old');
+                Route::get('/bookings/{uuid}/invoice', [\App\Http\Controllers\Admin\Vendor\BookingController::class, 'invoice'])->name('bookings.invoice');
+
+                // Room Images
+                Route::get('rooms/{room}/images', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'index'])->name('rooms.images.index');
+                Route::post('rooms/{room}/images', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'store'])->name('rooms.images.store');
+                Route::put('rooms/{room}/images/{image}', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'update'])->name('rooms.images.update');
+                Route::delete('rooms/{room}/images/{image}', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'destroy'])->name('rooms.images.destroy');
+                Route::post('rooms/{room}/images/reorder', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'reorder'])->name('rooms.images.reorder');
+
+                // Hotel Images
+                Route::get('hotels/{hotel}/images', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'index'])->name('hotels.images.index');
+                Route::post('hotels/{hotel}/images', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'store'])->name('hotels.images.store');
+                Route::put('hotels/{hotel}/images/{image}', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'update'])->name('hotels.images.update');
+                Route::delete('hotels/{hotel}/images/{image}', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'destroy'])->name('hotels.images.destroy');
+                Route::post('hotels/{hotel}/images/reorder', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'reorder'])->name('hotels.images.reorder');
+            });
+
             Route::get('/payouts', [\App\Http\Controllers\Admin\Vendor\PayoutController::class, 'index'])->name('payouts.index');
             Route::get('/support-tickets', [\App\Http\Controllers\Admin\Vendor\SupportTicketController::class, 'index'])->name('support-tickets.index');
             Route::get('/support-tickets/create', [\App\Http\Controllers\Admin\Vendor\SupportTicketController::class, 'create'])->name('support-tickets.create');
             Route::post('/support-tickets', [\App\Http\Controllers\Admin\Vendor\SupportTicketController::class, 'store'])->name('support-tickets.store');
             Route::get('/support-tickets/{supportTicket}', [\App\Http\Controllers\Admin\Vendor\SupportTicketController::class, 'show'])->name('support-tickets.show');
-
-            // Room Images
-            Route::get('rooms/{room}/images', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'index'])->name('rooms.images.index');
-            Route::post('rooms/{room}/images', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'store'])->name('rooms.images.store');
-            Route::put('rooms/{room}/images/{image}', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'update'])->name('rooms.images.update');
-            Route::delete('rooms/{room}/images/{image}', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'destroy'])->name('rooms.images.destroy');
-            Route::post('rooms/{room}/images/reorder', [\App\Http\Controllers\Admin\Vendor\RoomImageController::class, 'reorder'])->name('rooms.images.reorder');
-
-            // Hotel Images
-            Route::get('hotels/{hotel}/images', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'index'])->name('hotels.images.index');
-            Route::post('hotels/{hotel}/images', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'store'])->name('hotels.images.store');
-            Route::put('hotels/{hotel}/images/{image}', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'update'])->name('hotels.images.update');
-            Route::delete('hotels/{hotel}/images/{image}', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'destroy'])->name('hotels.images.destroy');
-            Route::post('hotels/{hotel}/images/reorder', [\App\Http\Controllers\Admin\Vendor\HotelImageController::class, 'reorder'])->name('hotels.images.reorder');
 
             // Tours (vendor owns via TourProvider) - removed per guide-only flow
             Route::get('/tour-bookings', [\App\Http\Controllers\Admin\Vendor\TourBookingController::class, 'index'])->name('tour-bookings.index');
@@ -134,9 +139,12 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::get('/tour-messages/{uuid}', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'show'])->name('tour-messages.show');
             Route::post('/tour-messages/{uuid}/reply', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'reply'])->name('tour-messages.reply');
             Route::get('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'index'])->name('guide-profile.index');
+            Route::get('/guide-profile/create', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'create'])->name('guide-profile.create');
+            Route::post('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'store'])->name('guide-profile.store');
             Route::get('/guide-profile/{provider}/edit', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'edit'])->name('guide-profile.edit');
             Route::put('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update'])->name('guide-profile.update');
             Route::patch('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update']);
+            Route::delete('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'destroy'])->name('guide-profile.destroy');
             Route::post('/guide-profile/{provider}/content-image', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'storeContentImage'])->name('guide-profile.content-image');
             Route::get('/guide-profile/{provider}/settings', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'index'])->name('guide-profile.settings.index');
             Route::put('/guide-profile/{provider}/settings', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'updateProvider'])->name('guide-profile.settings.update');

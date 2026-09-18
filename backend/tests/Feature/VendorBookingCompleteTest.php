@@ -15,12 +15,20 @@ beforeEach(function (): void {
         'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
     ]);
     $this->vendor->assignRole('vendor');
+    \App\Models\VendorProfile::create([
+        'user_id' => $this->vendor->id,
+        'status' => \App\Models\VendorProfile::STATUS_APPROVED,
+    ]);
 
     $this->otherVendor = User::factory()->create([
         'name' => 'Other Vendor', 'email' => 'other-vendor-complete@test.local',
         'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
     ]);
     $this->otherVendor->assignRole('vendor');
+    \App\Models\VendorProfile::create([
+        'user_id' => $this->otherVendor->id,
+        'status' => \App\Models\VendorProfile::STATUS_APPROVED,
+    ]);
 
     $this->customer = User::factory()->create([
         'name' => 'Customer', 'email' => 'customer-complete@test.local',

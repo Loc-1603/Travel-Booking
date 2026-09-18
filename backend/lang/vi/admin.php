@@ -281,6 +281,8 @@ return [
         'rooms_availability' => 'Phòng & sẵn có',
         'pending_approval' => 'Chờ phê duyệt',
         'pending_approval_message' => 'Tài khoản của bạn đang được xem xét. Bạn sẽ có thể thêm khách sạn và nhận đặt phòng sau khi được phê duyệt bởi đội ngũ của chúng tôi.',
+        'pending_approval_feature' => 'Vui lòng đợi Admin phê duyệt để sử dụng tính năng này.',
+        'pending_approval_go_dashboard' => 'Về bảng điều khiển',
 
         // Bookings
         'bookings' => [
@@ -1565,6 +1567,7 @@ return [
             'title' => 'Hồ sơ hướng dẫn viên',
             'my_title' => 'Hồ sơ hướng dẫn viên của tôi',
             'edit' => 'Sửa hồ sơ hướng dẫn viên',
+            'create' => 'Tạo hồ sơ hướng dẫn viên',
             'table' => [
                 'business' => 'Doanh nghiệp',
                 'languages' => 'Ngôn ngữ',
@@ -1572,7 +1575,8 @@ return [
                 'status' => 'Trạng thái',
                 'actions' => 'Hành động',
             ],
-            'empty' => 'Chưa có hồ sơ hướng dẫn viên nào. Liên hệ hỗ trợ để tạo.',
+            'empty' => 'Chưa có hồ sơ hướng dẫn viên nào. Bấm "Tạo hồ sơ hướng dẫn viên" để tạo.',
+            'delete_confirm' => 'Xóa hồ sơ hướng dẫn viên này?',
             'form' => [
                 'business_name' => 'Tên doanh nghiệp',
                 'bio' => 'Giới thiệu ngắn',
@@ -1583,10 +1587,13 @@ return [
                 'avatar' => 'Ảnh đại diện',
                 'remove_avatar' => 'Gỡ ảnh',
                 'no_avatar' => 'Chưa có ảnh — khách hàng sẽ thấy ảnh đại diện tài khoản, sau đó là chữ cái đầu.',
-                'languages' => 'Ngôn ngữ (cách nhau bằng dấu phẩy)',
+                'languages' => 'Ngoại ngữ',
+                'languages_options' => ['English', 'Russian', 'Chinese', 'Korean', 'Japanese'],
             ],
             'flash' => [
                 'updated' => 'Đã cập nhật hồ sơ hướng dẫn viên.',
+                'created' => 'Đã tạo hồ sơ hướng dẫn viên. Hồ sơ đang chờ admin phê duyệt.',
+                'deleted' => 'Đã xóa hồ sơ hướng dẫn viên.',
             ],
         ],
     ],

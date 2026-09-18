@@ -9,6 +9,12 @@
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
         "@tailwindcss/vite": "^4.0.0",
+        "@tiptap/core": "^2.11.5",
+        "@tiptap/extension-image": "^2.11.5",
+        "@tiptap/extension-link": "^2.11.5",
+        "@tiptap/extension-text-align": "^2.11.5",
+        "@tiptap/extension-underline": "^2.11.5",
+        "@tiptap/starter-kit": "^2.11.5",
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.2",
         "axios": "^1.11.0",

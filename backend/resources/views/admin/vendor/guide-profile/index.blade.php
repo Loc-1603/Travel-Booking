@@ -4,6 +4,9 @@
 <div class="container-fluid">
     <x-page-title title="{{ __('admin.vendor.guide_profiles.my_title') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.guide_profiles.title')]]" />
     <x-alert />
+    @if($providers->isEmpty())
+        <a href="{{ route('admin.vendor.guide-profile.create') }}" class="btn btn-primary mb-3">{{ __('admin.vendor.guide_profiles.create') }}</a>
+    @endif
     <div class="card">
         <div class="card-body">
             <table class="table table-hover">
@@ -33,7 +36,12 @@
                         <td><span class="badge bg-secondary">{{ $p->status }}</span></td>
                         <td>
                             <a href="{{ route('admin.vendor.guide-profile.edit', $p) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.edit') }}</a>
-                            <a href="{{ route('admin.vendor.guide-profile.settings.index', $p) }}" class="btn btn-sm btn-outline-primary">Cài đặt hoạt động</a>
+                            <a href="{{ route('admin.vendor.guide-profile.settings.index', $p) }}" class="btn btn-sm btn-success">Cài đặt hoạt động</a>
+                            <form action="{{ route('admin.vendor.guide-profile.destroy', $p) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.guide_profiles.delete_confirm') }}')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">{{ __('admin.vendor.common.delete') }}</button>
+                            </form>
                         </td>
                     </tr>
                     @empty

@@ -277,6 +277,8 @@ return [
         'rooms_availability' => 'Rooms & availability',
         'pending_approval' => 'Pending approval',
         'pending_approval_message' => 'Your account is under review. You will be able to add hotels and receive bookings once approved by our team.',
+        'pending_approval_feature' => 'Please wait for Admin approval to use this feature.',
+        'pending_approval_go_dashboard' => 'Back to dashboard',
 
         // Bookings
         'bookings' => [
@@ -1561,6 +1563,7 @@ return [
             'title' => 'Guide Profiles',
             'my_title' => 'My Guide Profiles',
             'edit' => 'Edit guide profile',
+            'create' => 'Create guide profile',
             'table' => [
                 'business' => 'Business',
                 'languages' => 'Languages',
@@ -1568,7 +1571,8 @@ return [
                 'status' => 'Status',
                 'actions' => 'Actions',
             ],
-            'empty' => 'No guide profiles yet. Contact support to create one.',
+            'empty' => 'No guide profiles yet. Click "Create guide profile" to get started.',
+            'delete_confirm' => 'Delete this guide profile?',
             'form' => [
                 'business_name' => 'Business name',
                 'bio' => 'Short bio',
@@ -1579,10 +1583,13 @@ return [
                 'avatar' => 'Avatar',
                 'remove_avatar' => 'Remove photo',
                 'no_avatar' => 'No photo yet — shoppers see your account avatar, then an initial.',
-                'languages' => 'Languages (comma separated)',
+                'languages' => 'Foreign languages',
+                'languages_options' => ['English', 'Russian', 'Chinese', 'Korean', 'Japanese'],
             ],
             'flash' => [
                 'updated' => 'Guide profile updated.',
+                'created' => 'Guide profile created. It is pending admin approval.',
+                'deleted' => 'Guide profile deleted.',
             ],
         ],
     ],

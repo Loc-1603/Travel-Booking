@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin_only' => \App\Http\Middleware\AdminOnlyMiddleware::class,
             'super_admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
             'vendor' => \App\Http\Middleware\VendorMiddleware::class,
+            'vendor.approved' => \App\Http\Middleware\EnsureVendorApproved::class,
             'customer' => \App\Http\Middleware\CustomerMiddleware::class,
             'auth.optional' => \App\Http\Middleware\OptionalSanctumAuth::class,
             'locale' => \App\Http\Middleware\SetLocale::class,
