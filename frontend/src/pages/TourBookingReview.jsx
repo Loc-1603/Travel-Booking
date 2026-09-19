@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Calendar, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
 import { TourReviewForm } from '../components/TourReviewForm';
 import { formatPrice } from '../lib/utils';

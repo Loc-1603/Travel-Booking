@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
 import { MapPin, Calendar, Users, X, ChevronLeft, ChevronRight, Star, Sparkles } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { useWishlist } from '../hooks/useWishlist';
 import { HotelDetailSkeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
@@ -38,7 +38,7 @@ function WishlistHeart({ hotelId, checkIn, checkOut }) {
     try {
       if (inList) await removeFromWishlist(hotelId);
       else await addToWishlist({ hotelId: Number(hotelId), checkIn, checkOut });
-    } catch (_) {}
+    } catch { /* ignore */ }
   };
   return (
     <button type="button" onClick={handleClick} disabled={pending} className="p-2 rounded-full border border-[#e8e4dd] hover:bg-[#faf8f5] disabled:opacity-60 inline-flex" aria-label={inList ? t('hotels.wishlist.remove') : t('hotels.wishlist.add')}>
@@ -170,7 +170,7 @@ export default function HotelDetail() {
     : null;
 
   const images = hotel?.images ?? [];
-  const rooms = hotel?.rooms ?? [];
+  const rooms = useMemo(() => hotel?.rooms ?? [], [hotel]);
   const roomsForGuests = useMemo(() => {
     const fit = rooms.filter((r) => r.capacity >= guests);
     return fit.length > 0 ? fit : rooms;

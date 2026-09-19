@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useWebsiteSettings } from '../contexts/WebsiteSettingsContext';
+import { useWebsiteSettings } from '../contexts/useWebsiteSettings';
 
 /**
  * Updates document title and favicon based on website settings.

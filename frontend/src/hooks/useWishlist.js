@@ -15,7 +15,7 @@ export function useWishlist(enabled = true) {
     enabled,
   });
 
-  const items = data?.data?.data ?? data?.data ?? [];
+  const items = useMemo(() => data?.data?.data ?? data?.data ?? [], [data]);
   const wishlistHotelIds = useMemo(() => new Set(items.map((i) => i.hotel_id)), [items]);
 
   const addMutation = useMutation({

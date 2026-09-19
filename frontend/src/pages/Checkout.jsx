@@ -3,7 +3,7 @@ import { useParams, Link, useLocation, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query';
 import { Lock, CheckCircle2, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
 import { formatPrice, formatDate } from '../lib/utils';
 import { useTranslation } from 'react-i18next';

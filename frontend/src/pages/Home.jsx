@@ -19,7 +19,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { DatePicker } from '../components/DatePicker';
-import { useWebsiteSettings } from '../contexts/WebsiteSettingsContext';
+import { useWebsiteSettings } from '../contexts/useWebsiteSettings';
 import { HotelCard } from '../components/HotelCard';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useTranslation } from 'react-i18next';
@@ -185,8 +185,8 @@ export default function Home() {
     },
   });
 
-  const cities = Array.isArray(citiesData) ? citiesData : [];
-  const countries = Array.isArray(countriesData) ? countriesData : [];
+  const cities = useMemo(() => (Array.isArray(citiesData) ? citiesData : []), [citiesData]);
+  const countries = useMemo(() => (Array.isArray(countriesData) ? countriesData : []), [countriesData]);
   const hotels = Array.isArray(hotelsData) ? hotelsData : [];
   const recItems = Array.isArray(recPayload?.data) ? recPayload.data : [];
   const recTagline = recPayload?.tagline;

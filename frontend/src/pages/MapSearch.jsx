@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaf
 import L from 'leaflet';
 import { MapPin, Search, SlidersHorizontal, X, ChevronRight } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { useWishlist } from '../hooks/useWishlist';
 import { HotelCard } from '../components/HotelCard';
 import { HotelListSkeleton } from '../components/Skeleton';
@@ -81,7 +81,7 @@ function WishlistHeart({ hotelId, checkIn, checkOut }) {
     try {
       if (inList) await removeFromWishlist(hotelId);
       else await addToWishlist({ hotelId, checkIn, checkOut });
-    } catch {}
+    } catch { /* ignore */ }
   };
   return (
     <button

@@ -14,7 +14,7 @@ import {
   Star,
 } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
 import { TourChatBox } from '../components/TourChatBox';
 import { formatPrice, cn } from '../lib/utils';

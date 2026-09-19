@@ -3,7 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { MapPin, Calendar, Users, Search, SlidersHorizontal, X } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { useWishlist } from '../hooks/useWishlist';
 import { HotelCard } from '../components/HotelCard';
 import { HotelListSkeleton } from '../components/Skeleton';

@@ -1,9 +1,8 @@
-import { createContext, useContext, useEffect, useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useWebsiteSettings } from './WebsiteSettingsContext';
+import { useWebsiteSettings } from './useWebsiteSettings';
+import { LanguageContext } from './useLanguage';
 import { isAdminRoute } from '../i18n';
-
-const LanguageContext = createContext(null);
 
 export function LanguageProvider({ children }) {
   const { settings, isLoading } = useWebsiteSettings();
@@ -12,19 +11,16 @@ export function LanguageProvider({ children }) {
 
   // Sync language with backend settings once on mount (skip for admin routes - they use Vietnamese)
   useEffect(() => {
-    if (!isLoading && settings?.locale && !syncedRef.current && !isAdminRoute()) {
-      const backendLocale = settings.locale;
-      const currentLocale = i18n.language;
-
-      if (backendLocale && backendLocale !== currentLocale) {
-        i18n.changeLanguage(backendLocale);
-      }
-      syncedRef.current = true;
+    if (isLoading || !settings?.locale || syncedRef.current || isAdminRoute()) return;
+    syncedRef.current = true;
+    const backendLocale = settings.locale;
+    if (backendLocale !== i18n.language) {
+      i18n.changeLanguage(backendLocale);
     }
   }, [settings, isLoading, i18n]);
 
   // isReady is true when not loading and sync is complete
-  const isReady = !isLoading && syncedRef.current;
+  const isReady = !isLoading && !isAdminRoute() && !!settings?.locale;
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -38,12 +34,4 @@ export function LanguageProvider({ children }) {
       {children}
     </LanguageContext.Provider>
   );
-}
-
-export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
 }

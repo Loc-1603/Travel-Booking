@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, User, Headphones, LogOut, CalendarCheck, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../contexts/AuthContext';
-import { useWebsiteSettings } from '../contexts/WebsiteSettingsContext';
+import { useAuth } from '../contexts/useAuth';
+import { useWebsiteSettings } from '../contexts/useWebsiteSettings';
 import UserAvatar from './UserAvatar';
 import { LanguageSwitcher } from './ui/LanguageSwitcher';
 

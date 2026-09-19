@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate, useLocation, Link } from 'react-router-do
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
 import { HotelDetailSkeleton } from '../components/Skeleton';
 import { AmenityIcon } from '../components/AmenityIcon';

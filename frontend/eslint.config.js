@@ -24,6 +24,8 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // React Compiler rules are not applicable: this project does not use the React Compiler.
+      'react-hooks/preserve-manual-memoization': 'off',
     },
   },
 ])

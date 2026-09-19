@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Heart, Loader2, Search } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { HotelCard } from '../components/HotelCard';
 import ErrorMessage from '../components/ErrorMessage';
 import { useTranslation } from 'react-i18next';

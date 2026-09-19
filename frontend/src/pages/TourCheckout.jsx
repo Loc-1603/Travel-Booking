@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Lock, CheckCircle2, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
 import { formatPrice } from '../lib/utils';
 

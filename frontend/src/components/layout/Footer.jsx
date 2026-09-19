@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Shield, CreditCard, Headphones, Mail, Phone } from 'lucide-react';
-import { useWebsiteSettings } from '../../contexts/WebsiteSettingsContext';
+import { useWebsiteSettings } from '../../contexts/useWebsiteSettings';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();

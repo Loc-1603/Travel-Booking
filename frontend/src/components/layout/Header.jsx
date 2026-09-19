@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, Heart, User, LogOut, Home, MapPin, ChevronDown } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useWebsiteSettings } from '../../contexts/WebsiteSettingsContext';
+import { useAuth } from '../../contexts/useAuth';
+import { useWebsiteSettings } from '../../contexts/useWebsiteSettings';
 import { Button } from '../ui/Button';
 import { cn } from '../../lib/utils';
 import UserAvatar from '../UserAvatar';
