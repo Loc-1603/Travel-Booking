@@ -138,6 +138,7 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::get('/tour-messages', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'index'])->name('tour-messages.index');
             Route::get('/tour-messages/{uuid}', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'show'])->name('tour-messages.show');
             Route::post('/tour-messages/{uuid}/reply', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'reply'])->name('tour-messages.reply');
+            Route::post('/tour-messages/{uuid}/read', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'read'])->name('tour-messages.read');
             Route::get('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'index'])->name('guide-profile.index');
             Route::get('/guide-profile/create', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'create'])->name('guide-profile.create');
             Route::post('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'store'])->name('guide-profile.store');

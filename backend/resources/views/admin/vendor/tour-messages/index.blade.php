@@ -16,7 +16,7 @@
                         <th>{{ __('admin.vendor.tour_messages.table.actions') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody data-tour-messages-index>
                     @forelse($bookings as $b)
                     @php
                         $unread = $b->messages
@@ -24,14 +24,14 @@
                             ->whereNull('read_at')
                             ->count();
                     @endphp
-                    <tr class="{{ $unread > 0 ? 'table-warning' : '' }}">
+                    <tr data-booking-uuid="{{ $b->uuid }}" class="{{ $unread > 0 ? 'table-warning' : '' }}">
                         <td><code>{{ Str::limit($b->uuid, 8) }}</code></td>
                         <td>{{ $b->tour->title ?? '-' }}</td>
                         <td>{{ $b->customer->name ?? $b->customer->email ?? '-' }}</td>
                         <td>
-                            {{ $b->messages->count() }}
+                            <span data-row-messages>{{ $b->messages->count() }}</span>
                             @if($unread > 0)
-                                <span class="badge bg-danger rounded-pill">{{ $unread }} {{ __('admin.vendor.tour_messages.table.unread') }}</span>
+                                <span data-row-unread data-count="{{ $unread }}" class="badge bg-danger rounded-pill">{{ $unread }} {{ __('admin.vendor.tour_messages.table.unread') }}</span>
                             @endif
                         </td>
                         <td><a href="{{ route('admin.vendor.tour-messages.show', $b->uuid) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.tour_messages.open') }}</a></td>

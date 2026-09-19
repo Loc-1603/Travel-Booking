@@ -9,13 +9,7 @@
                 @if(auth()->user()->role === \App\Enums\Role::VENDOR)
                 {{-- Vendor menu: Overview → Profile → Inventory → Operations → Finance → Support --}}
                 @php
-                    $unreadTourMessages = 0;
-                    $providerIds = \App\Models\TourProvider::where('vendor_id', auth()->id())->pluck('id');
-                    if($providerIds->isNotEmpty()){
-                        $unreadTourMessages = \App\Models\TourMessage::whereHas('booking', function($q) use ($providerIds){
-                            $q->whereIn('provider_id', $providerIds);
-                        })->where('sender_id','!=', auth()->id())->whereNull('read_at')->count();
-                    }
+                    $unreadTourMessages = \App\Models\TourMessage::unreadForVendor(auth()->id());
                 @endphp
                 <li>
                     <a href="{{ route('admin.vendor.dashboard') }}">
@@ -48,9 +42,7 @@
                     <a href="javascript: void(0);" class="has-arrow {{ $tourActive ? 'mm-active' : '' }}">
                         <i data-feather="map"></i>
                         <span>{{ __('admin.sidebar.tour_management') }}</span>
-                        @if($unreadTourMessages > 0)
-                            <span class="badge bg-danger rounded-pill ms-2">{{ $unreadTourMessages }}</span>
-                        @endif
+                        <span id="tour-messages-unread-badge" data-vendor-id="{{ auth()->id() }}" class="badge bg-danger rounded-pill ms-2" style="{{ $unreadTourMessages > 0 ? '' : 'display:none' }}">{{ $unreadTourMessages }}</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="{{ $tourActive ? 'true' : 'false' }}">
                         <li><a href="{{ route('admin.vendor.guide-profile.index') }}" class="{{ request()->routeIs('admin.vendor.guide-profile.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.guide_profiles') }}</span></a></li>

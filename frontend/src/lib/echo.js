@@ -36,6 +36,15 @@ export function getEcho() {
   return echo;
 }
 
+/** Current socket id for X-Socket-ID (lets backend `toOthers()` skip echo-back). */
+export function getEchoSocketId() {
+  try {
+    return echo?.socketId() || null;
+  } catch {
+    return null;
+  }
+}
+
 /** Refresh the auth header after login/logout. */
 export function resetEcho() {
   try {

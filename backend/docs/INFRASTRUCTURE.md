@@ -34,6 +34,38 @@ Replace `/path/to/backend` with the actual project path.
 
 ---
 
+## Realtime (Reverb)
+
+Tour chat uses Laravel Reverb for realtime messages. Events implementing `ShouldBroadcast`
+(TourMessageSent, TourMessageInboxUpdated, TourMessageRead) go through the queue in
+production, so the queue worker must be running; in dev `QUEUE_CONNECTION=sync` runs them
+immediately.
+
+**Run the socket server (development):**
+
+```bash
+php artisan reverb:start
+```
+
+**Broadcast auth endpoints:**
+- Admin (session cookie): `POST /broadcasting/auth` (registered via `channels` in `bootstrap/app.php`).
+- API (Bearer token, React SPA): `POST /api/v1/broadcasting/auth` (registered in `AppServiceProvider`).
+
+**Production (Supervisor example):**
+
+```ini
+[program:hotel-booking-reverb]
+command=php /path/to/backend/artisan reverb:start --host=0.0.0.0 --port=8080
+autostart=true
+autorestart=true
+numprocs=1
+user=www-data
+redirect_stderr=true
+stdout_logfile=/path/to/backend/storage/logs/reverb.log
+```
+
+---
+
 ## Scheduler
 
 The Laravel scheduler runs scheduled tasks (daily reports, cleanup, availability batch jobs).

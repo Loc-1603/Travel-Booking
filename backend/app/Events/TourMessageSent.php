@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Http\Resources\TourMessageResource;
 use App\Models\TourMessage;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -34,8 +33,19 @@ class TourMessageSent implements ShouldBroadcast
     {
         $this->message->loadMissing('sender');
 
+        // Neutral payload: every client computes `is_mine` locally by
+        // comparing `sender_id` with its own user id. Never use request()
+        // here — it reflects the SENDER, so receivers would see a flipped side.
         return [
-            'message' => (new TourMessageResource($this->message))->toArray(request()),
+            'message' => [
+                'id' => $this->message->id,
+                'tour_booking_id' => $this->message->tour_booking_id,
+                'sender_id' => $this->message->sender_id,
+                'sender_name' => $this->message->sender?->name,
+                'body' => $this->message->body,
+                'read_at' => $this->message->read_at?->toIso8601String(),
+                'created_at' => $this->message->created_at?->toIso8601String(),
+            ],
         ];
     }
 }

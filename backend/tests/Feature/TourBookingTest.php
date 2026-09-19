@@ -2,14 +2,17 @@
 
 use App\Enums\PaymentStatus;
 use App\Enums\TourBookingStatus;
+use App\Events\TourMessageInboxUpdated;
+use App\Events\TourMessageRead;
+use App\Events\TourMessageSent;
 use App\Models\Country;
 use App\Models\TourAvailabilitySlot;
 use App\Models\TourBooking;
 use App\Models\TourMessage;
 use App\Models\TourPayment;
 use App\Models\TourProduct;
-use App\Models\TourProvince;
 use App\Models\TourProvider;
+use App\Models\TourProvince;
 use App\Models\User;
 use App\Services\TourVnpayAdapter;
 use Carbon\Carbon;
@@ -245,20 +248,37 @@ test('messages track read/unread status on both sides', function (): void {
         ->assertOk()
         ->assertSee('chưa đọc', false);
 
-    // Vendor opens the thread via blade -> customer messages marked read.
+    // Reading the thread is read-only: nothing is marked without interaction.
     $this->actingAs($this->vendor)->get("/admin/vendor/tour-messages/{$uuid}")->assertOk();
+    expect($customerMessage->fresh()->read_at)->toBeNull();
+    $this->actingAs($this->vendor)->getJson("/api/v1/tour-bookings/{$uuid}/messages")->assertOk();
+    expect($customerMessage->fresh()->read_at)->toBeNull();
+
+    // Vendor interacts with the thread -> customer message marked read.
+    $this->actingAs($this->vendor)->postJson("/admin/vendor/tour-messages/{$uuid}/read")->assertOk();
     expect($customerMessage->fresh()->read_at)->not->toBeNull();
 
-    // Vendor replies -> customer side unread until customer reads.
+    // Vendor replies (classic form post keeps redirect) -> customer side unread.
     $this->actingAs($this->vendor)->post("/admin/vendor/tour-messages/{$uuid}/reply", [
         'body' => 'Hi customer',
     ])->assertRedirect();
+    // Same endpoint via AJAX returns JSON for the live thread page.
+    $this->actingAs($this->vendor)->postJson("/admin/vendor/tour-messages/{$uuid}/reply", [
+        'body' => 'Hi customer (ajax)',
+    ])->assertCreated();
     $vendorMessage = TourMessage::where('tour_booking_id', $booking->id)
         ->where('sender_id', $this->vendor->id)
         ->firstOrFail();
     expect($vendorMessage->read_at)->toBeNull();
 
-    // Customer reads the thread -> vendor messages marked read.
+    // Customer opens the thread (read-only) -> still unread until interaction.
+    $list = $this->actingAs($this->customer)->getJson("/api/v1/tour-bookings/{$uuid}/messages")->assertOk();
+    expect(collect($list->json('data'))->where('sender_id', $this->vendor->id)->first()['read_at'])->toBeNull();
+    expect($vendorMessage->fresh()->read_at)->toBeNull();
+
+    // Customer interacts -> vendor messages marked read.
+    $this->actingAs($this->customer)->postJson("/api/v1/tour-bookings/{$uuid}/messages/read")->assertOk()
+        ->assertJsonPath('data.marked', 2);
     $list = $this->actingAs($this->customer)->getJson("/api/v1/tour-bookings/{$uuid}/messages")->assertOk();
     expect(collect($list->json('data'))->where('sender_id', $this->vendor->id)->first()['read_at'])->not->toBeNull();
     expect($vendorMessage->fresh()->read_at)->not->toBeNull();
@@ -299,6 +319,106 @@ test('broadcast auth allows booking parties, rejects stranger', function (): voi
 
     // Guest (no token) is rejected (401 from sanctum or 403 from channel gate)
     $this->postJson('/api/v1/broadcasting/auth', $payload)->assertStatus(403);
+});
+
+test('vendor tour-messages channel authorizes only the owning vendor', function (): void {
+    config([
+        'broadcasting.default' => 'reverb',
+        'broadcasting.connections.reverb.key' => 'test-key',
+        'broadcasting.connections.reverb.secret' => 'test-secret',
+        'broadcasting.connections.reverb.app_id' => '1',
+    ]);
+    // Re-register channels on the reverb driver (same pattern as the tour.booking auth test).
+    require base_path('routes/channels.php');
+
+    $payload = ['socket_id' => '123.456', 'channel_name' => "private-vendor.{$this->vendor->id}.tour-messages"];
+
+    // Owning vendor can join.
+    $this->actingAs($this->vendor, 'sanctum')->postJson('/api/v1/broadcasting/auth', $payload)
+        ->assertOk()
+        ->assertJsonStructure(['auth']);
+
+    // Customer cannot join a vendor inbox channel.
+    $this->actingAs($this->customer, 'sanctum')->postJson('/api/v1/broadcasting/auth', $payload)->assertForbidden();
+
+    // Another vendor cannot join either.
+    $otherVendor = User::create([
+        'name' => 'Other Vendor', 'email' => 'other-vendor-2@test.local',
+        'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
+    ]);
+    $this->actingAs($otherVendor, 'sanctum')->postJson('/api/v1/broadcasting/auth', $payload)->assertForbidden();
+});
+
+test('tour message realtime events are dispatched on store, read and reply', function (): void {
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'vendor', 'guard_name' => 'web']);
+    $this->vendor->forceFill(['email_verified_at' => now()])->save();
+    $this->vendor->assignRole('vendor');
+
+    $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
+        'tour_id' => $this->tour->id, 'slot_id' => $this->slot->id,
+        'pricing_mode' => 'hour', 'duration_value' => 2,
+    ])->assertCreated();
+    $uuid = $store->json('data.booking.uuid');
+    TourBooking::where('uuid', $uuid)->update(['status' => TourBookingStatus::CONFIRMED->value]);
+
+    // broadcast() dispatches through the container event dispatcher (Laravel 12 has no
+    // Broadcast::fake, and Event::fake only intercepts the Event facade) — so capture the
+    // real dispatches with listeners instead.
+    $inboxUpdates = [];
+    $readEvents = [];
+    $sentEvents = [];
+    Event::listen(TourMessageInboxUpdated::class, function ($e) use (&$inboxUpdates) {
+        $inboxUpdates[] = $e;
+    });
+    Event::listen(TourMessageRead::class, function ($e) use (&$readEvents) {
+        $readEvents[] = $e;
+    });
+    Event::listen(TourMessageSent::class, function ($e) use (&$sentEvents) {
+        $sentEvents[] = $e;
+    });
+
+    // Customer sends -> TourMessageSent + vendor inbox update.
+    $this->actingAs($this->customer)->postJson("/api/v1/tour-bookings/{$uuid}/messages", [
+        'body' => 'Hello realtime',
+    ])->assertCreated();
+    expect($sentEvents)->toHaveCount(1);
+    $inbox = $inboxUpdates[0] ?? null;
+    expect($inbox)->not->toBeNull()
+        ->and($inbox->bookingUuid)->toBe($uuid)
+        ->and($inbox->vendorId)->toBe((int) $this->vendor->id)
+        ->and($inbox->unreadCount)->toBe(1)
+        ->and($inbox->lastMessage['body'] ?? null)->toBe('Hello realtime')
+        ->and($inbox->broadcastOn()->name)->toBe('private-vendor.'.$this->vendor->id.'.tour-messages');
+
+    // Vendor replies -> TourMessageSent broadcast so the customer sees it live.
+    $this->actingAs($this->vendor)->post("/admin/vendor/tour-messages/{$uuid}/reply", [
+        'body' => 'Hi there',
+    ])->assertRedirect();
+    expect($sentEvents)->toHaveCount(2);
+
+    // Customer opens the thread (read-only): no read receipt yet.
+    $this->actingAs($this->customer)->getJson("/api/v1/tour-bookings/{$uuid}/messages")->assertOk();
+    expect($readEvents)->toHaveCount(0);
+
+    // Customer interacts -> TourMessageRead marks the vendor message.
+    $this->actingAs($this->customer)->postJson("/api/v1/tour-bookings/{$uuid}/messages/read")->assertOk();
+    expect($readEvents)->toHaveCount(1)
+        ->and($readEvents[0]->readerId)->toBe((int) $this->customer->id)
+        ->and($readEvents[0]->bookingUuid)->toBe($uuid)
+        ->and($readEvents[0]->broadcastOn()->name)->toBe('private-tour.booking.'.$uuid);
+
+    // Vendor opens the thread (read-only): no new receipt yet.
+    $this->actingAs($this->vendor)->get("/admin/vendor/tour-messages/{$uuid}")->assertOk();
+    expect($readEvents)->toHaveCount(1);
+
+    // Vendor interacts -> TourMessageRead + inbox badge sync.
+    $this->actingAs($this->vendor)->postJson("/admin/vendor/tour-messages/{$uuid}/read")->assertOk();
+    expect($readEvents)->toHaveCount(2)
+        ->and($readEvents[1]->readerId)->toBe((int) $this->vendor->id);
+    $synced = collect($inboxUpdates)->first(fn ($e) => $e->unreadCount === 0);
+    expect($synced)->not->toBeNull()
+        ->and($synced->bookingUuid)->toBe($uuid)
+        ->and($synced->vendorId)->toBe((int) $this->vendor->id);
 });
 
 test('saved tours crud', function (): void {

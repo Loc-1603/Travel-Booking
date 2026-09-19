@@ -9,6 +9,7 @@ use App\Listeners\SendBookingConfirmationNotification;
 use App\Listeners\SendBookingDisputeAdminNotification;
 use App\Listeners\SendSupportTicketReplyNotification;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrap();
+
+        // API (React SPA) broadcast auth under /api/v1/broadcasting/auth (Bearer token).
+        Broadcast::routes(['prefix' => 'api/v1', 'middleware' => ['auth:sanctum']]);
 
         Event::listen(SupportTicketReplyCreated::class, SendSupportTicketReplyNotification::class);
         Event::listen(PaymentConfirmed::class, SendBookingConfirmationNotification::class);

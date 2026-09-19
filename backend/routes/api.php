@@ -120,6 +120,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('/tour-bookings/{uuid}/dispute', [TourBookingController::class, 'storeDispute'])->name('tour-bookings.dispute.store');
         Route::get('/tour-bookings/{uuid}/messages', [TourMessageController::class, 'index'])->name('tour-bookings.messages.index');
         Route::post('/tour-bookings/{uuid}/messages', [TourMessageController::class, 'store'])->name('tour-bookings.messages.store');
+        Route::post('/tour-bookings/{uuid}/messages/read', [TourMessageController::class, 'read'])->name('tour-bookings.messages.read');
         Route::get('/saved-tours', [SavedTourController::class, 'index'])->name('saved-tours.index');
         Route::post('/saved-tours', [SavedTourController::class, 'store'])->name('saved-tours.store');
         Route::delete('/saved-tours/{tourId}', [SavedTourController::class, 'destroy'])->name('saved-tours.destroy');

@@ -1,9 +1,20 @@
 <?php
 
+use App\Enums\Role;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
+});
+
+/*
+|--------------------------------------------------------------------------
+| Vendor inbox channel (tour messages)
+|--------------------------------------------------------------------------
+| Only the vendor who owns the given id may join to receive inbox updates.
+*/
+Broadcast::channel('vendor.{id}.tour-messages', function ($user, $id) {
+    return $user->role === Role::VENDOR && (int) $user->id === (int) $id;
 });
 
 /*

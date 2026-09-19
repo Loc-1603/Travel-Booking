@@ -49,6 +49,37 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 });
 </script>
+
+@auth
+@if(auth()->user()->role === \App\Enums\Role::VENDOR)
+@php
+    $liveBookingUuid = request()->routeIs('admin.vendor.tour-messages.show') ? request()->route('uuid') : null;
+    $liveConfig = [
+        'reverb' => [
+            'key' => config('broadcasting.connections.reverb.key'),
+            'host' => config('broadcasting.connections.reverb.options.host'),
+            'port' => config('broadcasting.connections.reverb.options.port'),
+            'scheme' => config('broadcasting.connections.reverb.options.scheme'),
+        ],
+        'vendorId' => auth()->id(),
+        'authEndpoint' => '/broadcasting/auth',
+        'bookingUuid' => $liveBookingUuid,
+        'indexUrl' => route('admin.vendor.tour-messages.show', ['uuid' => '__UUID__']),
+        'readUrl' => $liveBookingUuid ? route('admin.vendor.tour-messages.read', ['uuid' => $liveBookingUuid]) : null,
+        'replyUrl' => $liveBookingUuid ? route('admin.vendor.tour-messages.reply', ['uuid' => $liveBookingUuid]) : null,
+        'readUrlTemplate' => route('admin.vendor.tour-messages.read', ['uuid' => '__UUID__']),
+        'replyUrlTemplate' => route('admin.vendor.tour-messages.reply', ['uuid' => '__UUID__']),
+        'labels' => [
+            'read' => __('admin.vendor.tour_messages.detail.read'),
+            'unread' => __('admin.vendor.tour_messages.detail.unread'),
+            'open' => __('admin.vendor.tour_messages.open'),
+        ],
+    ];
+@endphp
+<script>window.TourMessagesLive = {{ \Illuminate\Support\Js::from($liveConfig) }};</script>
+@vite(['resources/js/admin-live.js'])
+@endif
+@endauth
 </body>
 </html>
 
