@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
+import { DatePicker } from '../components/DatePicker';
 import { useWebsiteSettings } from '../contexts/WebsiteSettingsContext';
 import { HotelCard } from '../components/HotelCard';
 import { Skeleton } from '../components/ui/Skeleton';
@@ -250,10 +251,9 @@ export default function Home() {
                 </div>
                 <div className="relative">
                   <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a756d] pointer-events-none" />
-                  <input
-                    type="date"
+                  <DatePicker
                     value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
+                    onChange={setCheckIn}
                     min={today}
                     className="w-full h-12 pl-11 pr-3 rounded-xl border border-[#e8e4dd] text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
                     aria-label={t('common.date.checkIn')}
@@ -261,10 +261,9 @@ export default function Home() {
                 </div>
                 <div className="relative">
                   <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a756d] pointer-events-none" />
-                  <input
-                    type="date"
+                  <DatePicker
                     value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
+                    onChange={setCheckOut}
                     min={checkIn || tomorrow}
                     className="w-full h-12 pl-11 pr-3 rounded-xl border border-[#e8e4dd] text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
                     aria-label={t('common.date.checkOut')}

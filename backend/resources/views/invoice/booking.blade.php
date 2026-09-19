@@ -66,7 +66,7 @@
     </header>
 
     <h1>Invoice / Receipt</h1>
-    <p class="meta">Booking reference: <strong>{{ $booking->uuid }}</strong> · Issued: {{ $booking->created_at->format('F j, Y') }}</p>
+    <p class="meta">Booking reference: <strong>{{ $booking->uuid }}</strong> · Issued: {{ $booking->created_at->format('d/m/Y') }}</p>
 
     @php
         $h = $booking->hotel;
@@ -120,8 +120,8 @@
         @endif
     </div>
 
-    <p><strong>Check-in:</strong> {{ $booking->check_in->format('F j, Y') }}@if($h && $h->check_in) at {{ date('g:i A', strtotime($h->check_in)) }}@endif
-        &nbsp; <strong>Check-out:</strong> {{ $booking->check_out->format('F j, Y') }}@if($h && $h->check_out) at {{ date('g:i A', strtotime($h->check_out)) }}@endif
+    <p><strong>Check-in:</strong> {{ $booking->check_in->format('d/m/Y') }}@if($h && $h->check_in) at {{ date('H:i', strtotime($h->check_in)) }}@endif
+        &nbsp; <strong>Check-out:</strong> {{ $booking->check_out->format('d/m/Y') }}@if($h && $h->check_out) at {{ date('H:i', strtotime($h->check_out)) }}@endif
         &nbsp; <strong>Nights:</strong> {{ $nights }}</p>
 
     <table>

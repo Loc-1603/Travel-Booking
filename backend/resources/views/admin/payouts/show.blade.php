@@ -21,7 +21,7 @@
                 <div class="card-body">
                     <table class="table table-bordered">
                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.vendor') }}</th><td><a href="{{ route('admin.vendors.show', $payout->vendor_id) }}">{{ $payout->vendor->name ?? $payout->vendor_id }}</a> ({{ $payout->vendor->email ?? '' }})</td></tr>
-                        <tr><th>{{ __('admin.vendor.payouts_admin.detail.period') }}</th><td>{{ $payout->period_start->format('M d, Y') }} – {{ $payout->period_end->format('M d, Y') }}</td></tr>
+                        <tr><th>{{ __('admin.vendor.payouts_admin.detail.period') }}</th><td>{{ $payout->period_start->format('d/m/Y') }} – {{ $payout->period_end->format('d/m/Y') }}</td></tr>
                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.gross') }}</th><td>{{ format_vnd($payout->amount) }}</td></tr>
                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.commission') }}</th><td>{{ format_vnd($payout->commission) }}</td></tr>
                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.net') }}</th><td><strong>{{ format_vnd($payout->net) }}</strong></td></tr>
@@ -38,7 +38,7 @@
                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.reference') }}</th><td>{{ $payout->reference }}</td></tr>
                         @endif
                         @if($payout->paid_at)
-                        <tr><th>{{ __('admin.vendor.payouts_admin.detail.paid_at') }}</th><td>{{ $payout->paid_at->format('M d, Y H:i') }}</td></tr>
+                        <tr><th>{{ __('admin.vendor.payouts_admin.detail.paid_at') }}</th><td>{{ $payout->paid_at->format('d/m/Y H:i') }}</td></tr>
                         @endif
                     </table>
                     @if(!$payout->isPaid())

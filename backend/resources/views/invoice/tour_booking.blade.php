@@ -25,7 +25,7 @@
 </head>
 <body>
     <h1>Invoice / Receipt — Tour 1vs1</h1>
-    <p class="meta">Booking reference: <strong>{{ $booking->uuid }}</strong> · Issued: {{ $booking->created_at->format('F j, Y') }} · Status: {{ $booking->status }}</p>
+    <p class="meta">Booking reference: <strong>{{ $booking->uuid }}</strong> · Issued: {{ $booking->created_at->format('d/m/Y') }} · Status: {{ $booking->status }}</p>
 
     <div class="two-col">
         <div>
@@ -41,8 +41,8 @@
         </div>
     </div>
 
-    <p><strong>Start:</strong> {{ $booking->start_at->format('F j, Y g:i A') }}
-        &nbsp; <strong>End:</strong> {{ $booking->end_at->format('F j, Y g:i A') }}
+    <p><strong>Start:</strong> {{ $booking->start_at->format('d/m/Y H:i') }}
+        &nbsp; <strong>End:</strong> {{ $booking->end_at->format('d/m/Y H:i') }}
         &nbsp; <strong>Mode:</strong> {{ $booking->pricing_mode }} × {{ $booking->duration_value }}</p>
     @if($booking->meeting_point)<p><strong>Meeting point:</strong> {{ $booking->meeting_point }}</p>@endif
 

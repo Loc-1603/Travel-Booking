@@ -22,16 +22,16 @@ export function getRatingLabel(score) {
   return 'Pleasant';
 }
 
-export function formatDate(dateString) {
-  return new Intl.DateTimeFormat('en-US', {
+export function formatDate(dateString, locale = 'en-US') {
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   }).format(new Date(dateString));
 }
 
-export function formatDateRange(checkIn, checkOut) {
-  return `${formatDate(checkIn)} - ${formatDate(checkOut)}`;
+export function formatDateRange(checkIn, checkOut, locale = 'en-US') {
+  return `${formatDate(checkIn, locale)} - ${formatDate(checkOut, locale)}`;
 }
 
 export function calculateNights(checkIn, checkOut) {

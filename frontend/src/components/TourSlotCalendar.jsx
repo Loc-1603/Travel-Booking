@@ -20,8 +20,9 @@ function addDays(d, n) {
  * available (selectable) or not shown/disabled.
  */
 export function TourSlotCalendar({ tourUuid, selectedSlotId, onSelect }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [weekOffset, setWeekOffset] = useState(0);
+  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
 
   const today = useMemo(() => {
     const d = new Date();
@@ -96,7 +97,7 @@ export function TourSlotCalendar({ tourUuid, selectedSlotId, onSelect }) {
             return (
               <div key={key} className="border-b border-[#f0ede8] last:border-0 pb-3 last:pb-0">
                 <p className="text-sm font-medium text-[#45423d] mb-2">
-                  {d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })}
+                  {d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}
                 </p>
                 {daySlots.length === 0 ? (
                   <p className="text-sm text-[#a39e94]">{t('tours.slots.none')}</p>

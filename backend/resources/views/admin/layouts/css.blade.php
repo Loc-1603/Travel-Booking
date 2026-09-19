@@ -5,7 +5,7 @@
     $adminFaviconHref = $adminFavicon ?: asset('admin/dist/assets/images/favicon.ico');
 @endphp
 <!doctype html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8">
     <title>@hasSection('title')@yield('title')@else{{ $authPageTitle ?? 'Dashboard' }}@endif | {{ $adminSiteName }}</title>
@@ -16,6 +16,7 @@
 
     <!-- plugin css -->
     <link href="{{ asset('admin/dist/assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('admin/dist/assets/libs/flatpickr/flatpickr.min.css') }}" rel="stylesheet" type="text/css">
 
     <!-- preloader css -->
     <link rel="stylesheet" href="{{asset('admin/dist/assets/css/preloader.min.css')}}" type="text/css">

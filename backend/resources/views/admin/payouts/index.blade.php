@@ -70,7 +70,7 @@
                             <a href="{{ route('admin.vendors.show', $p->vendor_id) }}">{{ $p->vendor->name ?? $p->vendor_id }}</a>
                             <br><small class="text-muted">{{ $p->vendor->email ?? '' }}</small>
                         </td>
-                        <td>{{ $p->period_start->format('M d, Y') }} – {{ $p->period_end->format('M d, Y') }}</td>
+                        <td>{{ $p->period_start->format('d/m/Y') }} – {{ $p->period_end->format('d/m/Y') }}</td>
                         <td>{{ format_vnd($p->amount) }}</td>
                         <td>{{ format_vnd($p->commission) }}</td>
                         <td><strong>{{ format_vnd($p->net) }}</strong></td>

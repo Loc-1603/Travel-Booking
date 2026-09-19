@@ -22,6 +22,10 @@
 
 <script src="{{asset('admin/dist/assets/js/app.js')}}"></script>
 
+<!-- flatpickr (date picker with Vietnamese locale) -->
+<script src="{{asset('admin/dist/assets/libs/flatpickr/flatpickr.min.js')}}"></script>
+<script src="{{asset('admin/dist/assets/libs/flatpickr/l10n/vn.js')}}"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function(){
   function saveTheme(mode){
@@ -47,6 +51,30 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     }
   });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  if (typeof flatpickr !== 'undefined') {
+    // Initialize flatpickr on all date inputs for Vietnamese locale
+    try {
+      // flatpickr uses 'vn' code for Vietnamese
+      if (flatpickr.l10ns && flatpickr.l10ns.vn) {
+        flatpickr.localize(flatpickr.l10ns.vn);
+      }
+    } catch(e) {}
+    document.querySelectorAll('input[type="date"]').forEach(function(el){
+      // Avoid double init
+      if (el.dataset.flatpickr) return;
+      el.dataset.flatpickr = '1';
+      flatpickr(el, {
+        dateFormat: 'Y-m-d',
+        locale: 'vn',
+        allowInput: true
+      });
+    });
+  }
 });
 </script>
 

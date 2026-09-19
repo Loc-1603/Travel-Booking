@@ -9,7 +9,8 @@ import { formatPrice, formatDate } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
 
 export default function Checkout() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
   const { uuid } = useParams();
   const { user } = useAuth();
   const location = useLocation();
@@ -145,7 +146,7 @@ export default function Checkout() {
               <p className="text-[#5c5852] mb-1">{t('checkout.summary.guest')}: {booking.guest_name}</p>
             )}
             {booking?.check_in && booking?.check_out && (
-              <p className="text-[#5c5852] mb-4">{formatDate(booking.check_in)} – {formatDate(booking.check_out)}</p>
+              <p className="text-[#5c5852] mb-4">{formatDate(booking.check_in, dateLocale)} – {formatDate(booking.check_out, dateLocale)}</p>
             )}
             {booking?.booking_rooms?.length > 0 && (
               <ul className="text-sm text-[#5c5852] mb-4">

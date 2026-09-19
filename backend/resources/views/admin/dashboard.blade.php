@@ -144,7 +144,7 @@
                                     </td>
                                     <td class="text-muted small text-truncate" style="max-width: 220px;">{{ $row['file_name'] }}</td>
                                     <td class="text-muted small">
-                                        {{ $row['uploaded_at'] ? $row['uploaded_at']->format('M j, Y g:i a') : '—' }}
+                                        {{ $row['uploaded_at'] ? $row['uploaded_at']->format('d/m/Y H:i') : '—' }}
                                     </td>
                                     <td>
                                         <a href="{{ route('admin.vendors.documents.download', ['vendor' => $row['vendor_id'], 'documentId' => $row['document_id']]) }}" class="btn btn-sm btn-soft-primary">

@@ -90,7 +90,7 @@
                             </td>
                             <td class="text-muted small">
                                 @if(!empty($doc['uploaded_at']))
-                                    {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('M j, Y g:i a') }}
+                                    {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('d/m/Y H:i') }}
                                 @else
                                     —
                                 @endif

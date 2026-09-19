@@ -10,6 +10,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import { formatPrice, getRatingLabel, calculateNights, cn } from '../lib/utils';
 import { getAmenityLabel } from '../lib/amenities';
 import { AmenityIcon } from '../components/AmenityIcon';
+import { DatePicker } from '../components/DatePicker';
 import { useTranslation } from 'react-i18next';
 
 const TABS = [
@@ -540,20 +541,18 @@ export default function HotelDetail() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkIn')}</label>
-                  <input
-                    type="date"
+                  <DatePicker
                     value={localCheckIn}
-                    onChange={(e) => setLocalCheckIn(e.target.value)}
+                    onChange={setLocalCheckIn}
                     min={today}
                     className="w-full rounded-xl border border-[#e8e4dd] px-4 py-2.5 text-sm text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkOut')}</label>
-                  <input
-                    type="date"
+                  <DatePicker
                     value={localCheckOut}
-                    onChange={(e) => setLocalCheckOut(e.target.value)}
+                    onChange={setLocalCheckOut}
                     min={localCheckIn || tomorrow}
                     className="w-full rounded-xl border border-[#e8e4dd] px-4 py-2.5 text-sm text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
                   />

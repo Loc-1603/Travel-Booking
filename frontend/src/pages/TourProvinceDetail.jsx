@@ -7,6 +7,7 @@ import { api } from '../lib/api';
 import { HotelDetailSkeleton, Skeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
 import { VendorGuideCard } from '../components/VendorGuideCard';
+import { DatePicker } from '../components/DatePicker';
 import { parseGuideSearchResponse } from '../lib/guideSearch';
 import { todayISO } from '../lib/guideSearch';
 
@@ -172,11 +173,10 @@ export default function TourProvinceDetail() {
         <div className="rounded-2xl border border-[#e8e4dd] bg-white p-4 mb-6 flex flex-col sm:flex-row gap-3 sm:items-end">
           <div>
             <label className="block text-sm font-medium text-[#45423d] mb-1">{t('tours.provinceDetail.travelDate')}</label>
-            <input
-              type="date"
+            <DatePicker
               value={travelDateInput}
+              onChange={setTravelDateInput}
               min={today}
-              onChange={(e) => setTravelDateInput(e.target.value)}
               className="rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
             />
           </div>

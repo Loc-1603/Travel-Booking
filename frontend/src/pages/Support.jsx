@@ -15,7 +15,8 @@ const CATEGORY_LABELS = {
 };
 
 function SupportContent() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['support-tickets'],
     queryFn: async () => {
@@ -100,7 +101,7 @@ function SupportContent() {
                 <p className="text-sm text-stone-600 line-clamp-1">{t.body}</p>
                 <p className="text-xs text-stone-500 mt-3 flex items-center gap-1">
                   <MessageSquare className="w-3.5 h-3.5" />
-                  #{t.id} · {t.replies_count != null ? `${t.replies_count} ${t.replies_count === 1 ? t('support.replies.one') : t('support.replies.other')}` : ''} · {t.created_at ? new Date(t.created_at).toLocaleDateString() : ''}
+                  #{t.id} · {t.replies_count != null ? `${t.replies_count} ${t.replies_count === 1 ? t('support.replies.one') : t('support.replies.other')}` : ''} · {t.created_at ? new Date(t.created_at).toLocaleDateString(locale) : ''}
                 </p>
               </Link>
             </li>

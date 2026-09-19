@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import ErrorMessage from '../components/ErrorMessage';
@@ -10,6 +11,8 @@ import { Skeleton } from '../components/ui/Skeleton';
 const CATEGORY_LABELS = { billing: 'Billing', booking: 'Booking', technical: 'Technical', other: 'Other' };
 
 export default function SupportTicketDetail() {
+  const { i18n } = useTranslation();
+  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
   const { user } = useAuth();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -108,7 +111,7 @@ export default function SupportTicketDetail() {
             </span>
             <span className="px-2.5 py-0.5 rounded-lg bg-stone-100 text-stone-700 text-xs font-medium">{ticket.status}</span>
           </div>
-          <p className="text-sm text-stone-500">#{ticket.id} · Created {ticket.created_at ? new Date(ticket.created_at).toLocaleString() : ''}</p>
+          <p className="text-sm text-stone-500">#{ticket.id} · Created {ticket.created_at ? new Date(ticket.created_at).toLocaleString(locale) : ''}</p>
         </div>
         <div className="p-5 sm:p-6">
           <h2 className="font-semibold text-stone-900 mb-4">Messages</h2>
@@ -117,7 +120,7 @@ export default function SupportTicketDetail() {
               <p className="text-sm text-stone-600 mb-1">
                 <span className="font-medium text-stone-800">{user?.name ?? 'You'}</span>
                 {' · '}
-                {ticket.created_at ? new Date(ticket.created_at).toLocaleString() : ''}
+                {ticket.created_at ? new Date(ticket.created_at).toLocaleString(locale) : ''}
               </p>
               <div className="text-stone-800 whitespace-pre-wrap">{ticket.body}</div>
             </li>
@@ -126,7 +129,7 @@ export default function SupportTicketDetail() {
                 <p className="text-sm text-stone-600 mb-1">
                   <span className="font-medium text-stone-800">{r.user?.name ?? 'Support'}</span>
                   {' · '}
-                  {r.created_at ? new Date(r.created_at).toLocaleString() : ''}
+                  {r.created_at ? new Date(r.created_at).toLocaleString(locale) : ''}
                 </p>
                 <div className="text-stone-800 whitespace-pre-wrap">{r.body}</div>
               </li>

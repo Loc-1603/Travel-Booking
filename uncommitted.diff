@@ -1,0 +1,682 @@
+diff --git a/backend/app/Http/Middleware/SetAdminLocale.php b/backend/app/Http/Middleware/SetAdminLocale.php
+index aeea8c6..946b2f1 100644
+--- a/backend/app/Http/Middleware/SetAdminLocale.php
++++ b/backend/app/Http/Middleware/SetAdminLocale.php
+@@ -14,6 +14,9 @@ class SetAdminLocale
+         // Always set Vietnamese for admin routes
+         app()->setLocale('vi');
+         
++        // Also set Carbon locale for date formatting
++        \Carbon\Carbon::setLocale('vi');
++        
+         // Also set in session to persist across requests
+         Session::put('locale', 'vi');
+         
+diff --git a/backend/app/Http/Middleware/SetLocale.php b/backend/app/Http/Middleware/SetLocale.php
+index 5abd8d4..8fbccc4 100644
+--- a/backend/app/Http/Middleware/SetLocale.php
++++ b/backend/app/Http/Middleware/SetLocale.php
+@@ -18,6 +18,7 @@ class SetLocale
+ 
+         $locale = PlatformSetting::get('locale', config('app.fallback_locale', 'en'));
+         app()->setLocale($locale);
++        \Carbon\Carbon::setLocale($locale);
+ 
+         return $next($request);
+     }
+diff --git a/backend/composer.json b/backend/composer.json
+index 7c939da..1c53520 100644
+--- a/backend/composer.json
++++ b/backend/composer.json
+@@ -51,7 +51,7 @@
+         ],
+         "dev": [
+             "Composer\\Config::disableProcessTimeout",
+-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
++            "@php dev.php"
+         ],
+         "test": [
+             "@php artisan config:clear --ansi",
+diff --git a/backend/resources/views/admin/dashboard.blade.php b/backend/resources/views/admin/dashboard.blade.php
+index 524872e..59fd350 100644
+--- a/backend/resources/views/admin/dashboard.blade.php
++++ b/backend/resources/views/admin/dashboard.blade.php
+@@ -144,7 +144,7 @@
+                                     </td>
+                                     <td class="text-muted small text-truncate" style="max-width: 220px;">{{ $row['file_name'] }}</td>
+                                     <td class="text-muted small">
+-                                        {{ $row['uploaded_at'] ? $row['uploaded_at']->format('M j, Y g:i a') : '—' }}
++                                        {{ $row['uploaded_at'] ? $row['uploaded_at']->format('d/m/Y H:i') : '—' }}
+                                     </td>
+                                     <td>
+                                         <a href="{{ route('admin.vendors.documents.download', ['vendor' => $row['vendor_id'], 'documentId' => $row['document_id']]) }}" class="btn btn-sm btn-soft-primary">
+diff --git a/backend/resources/views/admin/layouts/css.blade.php b/backend/resources/views/admin/layouts/css.blade.php
+index 8e636ea..84112c6 100644
+--- a/backend/resources/views/admin/layouts/css.blade.php
++++ b/backend/resources/views/admin/layouts/css.blade.php
+@@ -5,7 +5,7 @@
+     $adminFaviconHref = $adminFavicon ?: asset('admin/dist/assets/images/favicon.ico');
+ @endphp
+ <!doctype html>
+-<html lang="en">
++<html lang="vi">
+ <head>
+     <meta charset="utf-8">
+     <title>@hasSection('title')@yield('title')@else{{ $authPageTitle ?? 'Dashboard' }}@endif | {{ $adminSiteName }}</title>
+@@ -16,6 +16,7 @@
+ 
+     <!-- plugin css -->
+     <link href="{{ asset('admin/dist/assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet" type="text/css">
++    <link href="{{ asset('admin/dist/assets/libs/flatpickr/flatpickr.min.css') }}" rel="stylesheet" type="text/css">
+ 
+     <!-- preloader css -->
+     <link rel="stylesheet" href="{{asset('admin/dist/assets/css/preloader.min.css')}}" type="text/css">
+diff --git a/backend/resources/views/admin/layouts/javascript.blade.php b/backend/resources/views/admin/layouts/javascript.blade.php
+index a93ea44..7c50704 100644
+--- a/backend/resources/views/admin/layouts/javascript.blade.php
++++ b/backend/resources/views/admin/layouts/javascript.blade.php
+@@ -22,6 +22,10 @@
+ 
+ <script src="{{asset('admin/dist/assets/js/app.js')}}"></script>
+ 
++<!-- flatpickr (date picker with Vietnamese locale) -->
++<script src="{{asset('admin/dist/assets/libs/flatpickr/flatpickr.min.js')}}"></script>
++<script src="{{asset('admin/dist/assets/libs/flatpickr/l10n/vn.js')}}"></script>
++
+ <script>
+ document.addEventListener('DOMContentLoaded', function(){
+   function saveTheme(mode){
+@@ -50,6 +54,30 @@ document.addEventListener('DOMContentLoaded', function(){
+ });
+ </script>
+ 
++<script>
++document.addEventListener('DOMContentLoaded', function(){
++  if (typeof flatpickr !== 'undefined') {
++    // Initialize flatpickr on all date inputs for Vietnamese locale
++    try {
++      // flatpickr uses 'vn' code for Vietnamese
++      if (flatpickr.l10ns && flatpickr.l10ns.vn) {
++        flatpickr.localize(flatpickr.l10ns.vn);
++      }
++    } catch(e) {}
++    document.querySelectorAll('input[type="date"]').forEach(function(el){
++      // Avoid double init
++      if (el.dataset.flatpickr) return;
++      el.dataset.flatpickr = '1';
++      flatpickr(el, {
++        dateFormat: 'Y-m-d',
++        locale: 'vn',
++        allowInput: true
++      });
++    });
++  }
++});
++</script>
++
+ @auth
+ @if(auth()->user()->role === \App\Enums\Role::VENDOR)
+ @php
+diff --git a/backend/resources/views/admin/payouts/index.blade.php b/backend/resources/views/admin/payouts/index.blade.php
+index 8d6c407..618e44e 100644
+--- a/backend/resources/views/admin/payouts/index.blade.php
++++ b/backend/resources/views/admin/payouts/index.blade.php
+@@ -70,7 +70,7 @@
+                             <a href="{{ route('admin.vendors.show', $p->vendor_id) }}">{{ $p->vendor->name ?? $p->vendor_id }}</a>
+                             <br><small class="text-muted">{{ $p->vendor->email ?? '' }}</small>
+                         </td>
+-                        <td>{{ $p->period_start->format('M d, Y') }} – {{ $p->period_end->format('M d, Y') }}</td>
++                        <td>{{ $p->period_start->format('d/m/Y') }} – {{ $p->period_end->format('d/m/Y') }}</td>
+                         <td>{{ format_vnd($p->amount) }}</td>
+                         <td>{{ format_vnd($p->commission) }}</td>
+                         <td><strong>{{ format_vnd($p->net) }}</strong></td>
+diff --git a/backend/resources/views/admin/payouts/show.blade.php b/backend/resources/views/admin/payouts/show.blade.php
+index f54b138..968e019 100644
+--- a/backend/resources/views/admin/payouts/show.blade.php
++++ b/backend/resources/views/admin/payouts/show.blade.php
+@@ -21,7 +21,7 @@
+                 <div class="card-body">
+                     <table class="table table-bordered">
+                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.vendor') }}</th><td><a href="{{ route('admin.vendors.show', $payout->vendor_id) }}">{{ $payout->vendor->name ?? $payout->vendor_id }}</a> ({{ $payout->vendor->email ?? '' }})</td></tr>
+-                        <tr><th>{{ __('admin.vendor.payouts_admin.detail.period') }}</th><td>{{ $payout->period_start->format('M d, Y') }} – {{ $payout->period_end->format('M d, Y') }}</td></tr>
++                        <tr><th>{{ __('admin.vendor.payouts_admin.detail.period') }}</th><td>{{ $payout->period_start->format('d/m/Y') }} – {{ $payout->period_end->format('d/m/Y') }}</td></tr>
+                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.gross') }}</th><td>{{ format_vnd($payout->amount) }}</td></tr>
+                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.commission') }}</th><td>{{ format_vnd($payout->commission) }}</td></tr>
+                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.net') }}</th><td><strong>{{ format_vnd($payout->net) }}</strong></td></tr>
+@@ -38,7 +38,7 @@
+                         <tr><th>{{ __('admin.vendor.payouts_admin.detail.reference') }}</th><td>{{ $payout->reference }}</td></tr>
+                         @endif
+                         @if($payout->paid_at)
+-                        <tr><th>{{ __('admin.vendor.payouts_admin.detail.paid_at') }}</th><td>{{ $payout->paid_at->format('M d, Y H:i') }}</td></tr>
++                        <tr><th>{{ __('admin.vendor.payouts_admin.detail.paid_at') }}</th><td>{{ $payout->paid_at->format('d/m/Y H:i') }}</td></tr>
+                         @endif
+                     </table>
+                     @if(!$payout->isPaid())
+diff --git a/backend/resources/views/admin/vendor/payouts/index.blade.php b/backend/resources/views/admin/vendor/payouts/index.blade.php
+index b7af68c..e3623d4 100644
+--- a/backend/resources/views/admin/vendor/payouts/index.blade.php
++++ b/backend/resources/views/admin/vendor/payouts/index.blade.php
+@@ -36,7 +36,7 @@
+                 <tbody>
+                     @forelse($payouts as $p)
+                     <tr>
+-                        <td>{{ $p->period_start->format('M d, Y') }} – {{ $p->period_end->format('M d, Y') }}</td>
++                        <td>{{ $p->period_start->format('d/m/Y') }} – {{ $p->period_end->format('d/m/Y') }}</td>
+                         <td>{{ format_vnd($p->amount) }}</td>
+                         <td>{{ format_vnd($p->commission) }}</td>
+                         <td><strong>{{ format_vnd($p->net) }}</strong></td>
+@@ -49,7 +49,7 @@
+                                 <span class="badge bg-success">{{ __('admin.vendor.payouts.history.status.paid') }}</span>
+                             @endif
+                         </td>
+-                        <td>{{ $p->paid_at?->format('M d, Y') ?? '-' }}</td>
++                        <td>{{ $p->paid_at?->format('d/m/Y') ?? '-' }}</td>
+                     </tr>
+                     @empty
+                     <tr><td colspan="6" class="text-muted">{{ __('admin.vendor.payouts.history.empty') }}</td></tr>
+diff --git a/backend/resources/views/admin/vendor/profile/edit.blade.php b/backend/resources/views/admin/vendor/profile/edit.blade.php
+index 1514d94..42cb882 100644
+--- a/backend/resources/views/admin/vendor/profile/edit.blade.php
++++ b/backend/resources/views/admin/vendor/profile/edit.blade.php
+@@ -90,7 +90,7 @@
+                             </td>
+                             <td class="text-muted small">
+                                 @if(!empty($doc['uploaded_at']))
+-                                    {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('M j, Y g:i a') }}
++                                    {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('d/m/Y H:i') }}
+                                 @else
+                                     —
+                                 @endif
+diff --git a/backend/resources/views/admin/vendors/show.blade.php b/backend/resources/views/admin/vendors/show.blade.php
+index 11d909e..9361bd9 100644
+--- a/backend/resources/views/admin/vendors/show.blade.php
++++ b/backend/resources/views/admin/vendors/show.blade.php
+@@ -36,7 +36,7 @@
+                                 @if($profile?->status === 'approved')
+                                     <span class="badge bg-success">{{ __('admin.vendor.vendors.approval_status.approved') }}</span>
+                                     @if($profile->approved_at)
+-                                        <small class="text-muted">{{ __('admin.vendor.vendors.detail.approved_at', ['date' => $profile->approved_at->format('M j, Y')]) }}</small>
++                                        <small class="text-muted">{{ __('admin.vendor.vendors.detail.approved_at', ['date' => $profile->approved_at->format('d/m/Y')]) }}</small>
+                                     @endif
+                                 @elseif($profile?->status === 'rejected')
+                                     <span class="badge bg-danger">{{ __('admin.vendor.vendors.approval_status.rejected') }}</span>
+@@ -155,7 +155,7 @@
+                                     </td>
+                                     <td class="text-muted small">
+                                         @if(!empty($doc['uploaded_at']))
+-                                            {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('M j, Y') }}
++                                            {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('d/m/Y') }}
+                                         @else
+                                             —
+                                         @endif
+diff --git a/backend/resources/views/invoice/booking.blade.php b/backend/resources/views/invoice/booking.blade.php
+index 54e38dc..9c0a1af 100644
+--- a/backend/resources/views/invoice/booking.blade.php
++++ b/backend/resources/views/invoice/booking.blade.php
+@@ -66,7 +66,7 @@
+     </header>
+ 
+     <h1>Invoice / Receipt</h1>
+-    <p class="meta">Booking reference: <strong>{{ $booking->uuid }}</strong> · Issued: {{ $booking->created_at->format('F j, Y') }}</p>
++    <p class="meta">Booking reference: <strong>{{ $booking->uuid }}</strong> · Issued: {{ $booking->created_at->format('d/m/Y') }}</p>
+ 
+     @php
+         $h = $booking->hotel;
+@@ -120,8 +120,8 @@
+         @endif
+     </div>
+ 
+-    <p><strong>Check-in:</strong> {{ $booking->check_in->format('F j, Y') }}@if($h && $h->check_in) at {{ date('g:i A', strtotime($h->check_in)) }}@endif
+-        &nbsp; <strong>Check-out:</strong> {{ $booking->check_out->format('F j, Y') }}@if($h && $h->check_out) at {{ date('g:i A', strtotime($h->check_out)) }}@endif
++    <p><strong>Check-in:</strong> {{ $booking->check_in->format('d/m/Y') }}@if($h && $h->check_in) at {{ date('H:i', strtotime($h->check_in)) }}@endif
++        &nbsp; <strong>Check-out:</strong> {{ $booking->check_out->format('d/m/Y') }}@if($h && $h->check_out) at {{ date('H:i', strtotime($h->check_out)) }}@endif
+         &nbsp; <strong>Nights:</strong> {{ $nights }}</p>
+ 
+     <table>
+diff --git a/backend/resources/views/invoice/tour_booking.blade.php b/backend/resources/views/invoice/tour_booking.blade.php
+index 5cc0fcc..7036ebe 100644
+--- a/backend/resources/views/invoice/tour_booking.blade.php
++++ b/backend/resources/views/invoice/tour_booking.blade.php
+@@ -25,7 +25,7 @@
+ </head>
+ <body>
+     <h1>Invoice / Receipt — Tour 1vs1</h1>
+-    <p class="meta">Booking reference: <strong>{{ $booking->uuid }}</strong> · Issued: {{ $booking->created_at->format('F j, Y') }} · Status: {{ $booking->status }}</p>
++    <p class="meta">Booking reference: <strong>{{ $booking->uuid }}</strong> · Issued: {{ $booking->created_at->format('d/m/Y') }} · Status: {{ $booking->status }}</p>
+ 
+     <div class="two-col">
+         <div>
+@@ -41,8 +41,8 @@
+         </div>
+     </div>
+ 
+-    <p><strong>Start:</strong> {{ $booking->start_at->format('F j, Y g:i A') }}
+-        &nbsp; <strong>End:</strong> {{ $booking->end_at->format('F j, Y g:i A') }}
++    <p><strong>Start:</strong> {{ $booking->start_at->format('d/m/Y H:i') }}
++        &nbsp; <strong>End:</strong> {{ $booking->end_at->format('d/m/Y H:i') }}
+         &nbsp; <strong>Mode:</strong> {{ $booking->pricing_mode }} × {{ $booking->duration_value }}</p>
+     @if($booking->meeting_point)<p><strong>Meeting point:</strong> {{ $booking->meeting_point }}</p>@endif
+ 
+diff --git a/backend/storage/framework/views/.gitignore b/backend/storage/framework/views/.gitignore
+deleted file mode 100644
+index d6b7ef3..0000000
+--- a/backend/storage/framework/views/.gitignore
++++ /dev/null
+@@ -1,2 +0,0 @@
+-*
+-!.gitignore
+diff --git a/frontend/package-lock.json b/frontend/package-lock.json
+index 4eaa5d0..2c7da5a 100644
+--- a/frontend/package-lock.json
++++ b/frontend/package-lock.json
+@@ -12,6 +12,7 @@
+         "axios": "^1.13.6",
+         "clsx": "^2.1.1",
+         "dompurify": "^3.4.15",
++        "flatpickr": "^4.6.13",
+         "i18next": "^26.4.2",
+         "i18next-browser-languagedetector": "^8.2.1",
+         "laravel-echo": "^2.5.0",
+@@ -3229,6 +3230,12 @@
+         "node": ">=16"
+       }
+     },
++    "node_modules/flatpickr": {
++      "version": "4.6.13",
++      "resolved": "https://registry.npmjs.org/flatpickr/-/flatpickr-4.6.13.tgz",
++      "integrity": "sha512-97PMG/aywoYpB4IvbvUJi0RQi8vearvU0oov1WW3k0WZPBMrTQVqekSX5CjSG/M4Q3i6A/0FKXC7RyAoAUUSPw==",
++      "license": "MIT"
++    },
+     "node_modules/flatted": {
+       "version": "3.3.3",
+       "resolved": "https://registry.npmjs.org/flatted/-/flatted-3.3.3.tgz",
+diff --git a/frontend/package.json b/frontend/package.json
+index 53d81e8..2026748 100644
+--- a/frontend/package.json
++++ b/frontend/package.json
+@@ -16,6 +16,7 @@
+     "axios": "^1.13.6",
+     "clsx": "^2.1.1",
+     "dompurify": "^3.4.15",
++    "flatpickr": "^4.6.13",
+     "i18next": "^26.4.2",
+     "i18next-browser-languagedetector": "^8.2.1",
+     "laravel-echo": "^2.5.0",
+diff --git a/frontend/src/components/TourChatBox.jsx b/frontend/src/components/TourChatBox.jsx
+index 39cc02d..0988ce8 100644
+--- a/frontend/src/components/TourChatBox.jsx
++++ b/frontend/src/components/TourChatBox.jsx
+@@ -6,7 +6,8 @@ import ErrorMessage from './ErrorMessage';
+ import { cn } from '../lib/utils';
+ 
+ export function TourChatBox({ bookingUuid }) {
+-  const { t } = useTranslation();
++  const { t, i18n } = useTranslation();
++  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+   const { messages, isLoading, isError, refetch, sendMessage, socketLive } = useTourChat(bookingUuid);
+   const [draft, setDraft] = useState('');
+   const [sending, setSending] = useState(false);
+@@ -64,7 +65,7 @@ export function TourChatBox({ bookingUuid }) {
+               )}
+               <p className="whitespace-pre-wrap break-words">{m.body}</p>
+               <div className={cn('text-[11px] mt-1 flex gap-2', m.is_mine ? 'text-white/60' : 'text-[#a39e94]')}>
+-                {m.created_at && <span>{new Date(m.created_at).toLocaleString()}</span>}
++                {m.created_at && <span>{new Date(m.created_at).toLocaleString(locale)}</span>}
+                 {m.is_mine && m.read_at && <span className="text-emerald-300">{t('tours.chat.read')}</span>}
+               </div>
+             </div>
+diff --git a/frontend/src/components/TourSlotCalendar.jsx b/frontend/src/components/TourSlotCalendar.jsx
+index 2cde75a..7b84e1d 100644
+--- a/frontend/src/components/TourSlotCalendar.jsx
++++ b/frontend/src/components/TourSlotCalendar.jsx
+@@ -20,8 +20,9 @@ function addDays(d, n) {
+  * available (selectable) or not shown/disabled.
+  */
+ export function TourSlotCalendar({ tourUuid, selectedSlotId, onSelect }) {
+-  const { t } = useTranslation();
++  const { t, i18n } = useTranslation();
+   const [weekOffset, setWeekOffset] = useState(0);
++  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+ 
+   const today = useMemo(() => {
+     const d = new Date();
+@@ -96,7 +97,7 @@ export function TourSlotCalendar({ tourUuid, selectedSlotId, onSelect }) {
+             return (
+               <div key={key} className="border-b border-[#f0ede8] last:border-0 pb-3 last:pb-0">
+                 <p className="text-sm font-medium text-[#45423d] mb-2">
+-                  {d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })}
++                  {d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}
+                 </p>
+                 {daySlots.length === 0 ? (
+                   <p className="text-sm text-[#a39e94]">{t('tours.slots.none')}</p>
+diff --git a/frontend/src/i18n/index.js b/frontend/src/i18n/index.js
+index 859491b..b36a9dc 100644
+--- a/frontend/src/i18n/index.js
++++ b/frontend/src/i18n/index.js
+@@ -37,4 +37,16 @@ i18n
+     react: { useSuspense: false },
+   });
+ 
++i18n.on('languageChanged', (lng) => {
++  const htmlLang = lng?.startsWith('vi') ? 'vi-VN' : 'en-US';
++  if (typeof document !== 'undefined') {
++    document.documentElement.lang = htmlLang;
++  }
++});
++
++if (typeof document !== 'undefined') {
++  const initialLang = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
++  document.documentElement.lang = initialLang;
++}
++
+ export default i18n;
+\ No newline at end of file
+diff --git a/frontend/src/lib/utils.js b/frontend/src/lib/utils.js
+index 826fe65..ebe2265 100644
+--- a/frontend/src/lib/utils.js
++++ b/frontend/src/lib/utils.js
+@@ -22,16 +22,16 @@ export function getRatingLabel(score) {
+   return 'Pleasant';
+ }
+ 
+-export function formatDate(dateString) {
+-  return new Intl.DateTimeFormat('en-US', {
++export function formatDate(dateString, locale = 'en-US') {
++  return new Intl.DateTimeFormat(locale, {
+     year: 'numeric',
+     month: 'short',
+     day: 'numeric',
+   }).format(new Date(dateString));
+ }
+ 
+-export function formatDateRange(checkIn, checkOut) {
+-  return `${formatDate(checkIn)} - ${formatDate(checkOut)}`;
++export function formatDateRange(checkIn, checkOut, locale = 'en-US') {
++  return `${formatDate(checkIn, locale)} - ${formatDate(checkOut, locale)}`;
+ }
+ 
+ export function calculateNights(checkIn, checkOut) {
+diff --git a/frontend/src/pages/Booking.jsx b/frontend/src/pages/Booking.jsx
+index d2f64b3..42299d2 100644
+--- a/frontend/src/pages/Booking.jsx
++++ b/frontend/src/pages/Booking.jsx
+@@ -32,7 +32,8 @@ function BookingSkeleton() {
+ }
+ 
+ export default function Booking() {
+-  const { t } = useTranslation();
++  const { t, i18n } = useTranslation();
++  const dateLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+   const [searchParams] = useSearchParams();
+   const navigate = useNavigate();
+   const location = useLocation();
+@@ -237,7 +238,7 @@ export default function Booking() {
+               <div className="flex-1">
+                 <h3 className="font-semibold text-stone-900">{room.name}</h3>
+                 <p className="text-sm text-stone-600 mt-0.5">{hotel.name} · {[hotel.city, hotel.country].filter(Boolean).join(', ')}</p>
+-                <p className="text-sm text-stone-600 mt-0.5">{formatDate(checkIn)} – {formatDate(checkOut)} · {nights} {t('common.nights', { count: nights })}</p>
++                <p className="text-sm text-stone-600 mt-0.5">{formatDate(checkIn, dateLocale)} – {formatDate(checkOut, dateLocale)} · {nights} {t('common.nights', { count: nights })}</p>
+                 {room.amenities?.length > 0 && (
+                   <div className="mt-2 flex flex-wrap gap-1.5">
+                     {room.amenities.slice(0, 4).map((a) => (
+@@ -321,7 +322,7 @@ export default function Booking() {
+               </div>
+               <div>
+                 <h3 className="font-semibold text-stone-900">{room.name}</h3>
+-                <p className="text-sm text-stone-600">{formatDate(checkIn)} – {formatDate(checkOut)} · {quantity} {t('hotelDetail.booking.rooms', { count: quantity })}</p>
++                <p className="text-sm text-stone-600">{formatDate(checkIn, dateLocale)} – {formatDate(checkOut, dateLocale)} · {quantity} {t('hotelDetail.booking.rooms', { count: quantity })}</p>
+               </div>
+             </div>
+ 
+diff --git a/frontend/src/pages/Checkout.jsx b/frontend/src/pages/Checkout.jsx
+index 6cd8895..609aec9 100644
+--- a/frontend/src/pages/Checkout.jsx
++++ b/frontend/src/pages/Checkout.jsx
+@@ -9,7 +9,8 @@ import { formatPrice, formatDate } from '../lib/utils';
+ import { useTranslation } from 'react-i18next';
+ 
+ export default function Checkout() {
+-  const { t } = useTranslation();
++  const { t, i18n } = useTranslation();
++  const dateLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+   const { uuid } = useParams();
+   const { user } = useAuth();
+   const location = useLocation();
+@@ -145,7 +146,7 @@ export default function Checkout() {
+               <p className="text-[#5c5852] mb-1">{t('checkout.summary.guest')}: {booking.guest_name}</p>
+             )}
+             {booking?.check_in && booking?.check_out && (
+-              <p className="text-[#5c5852] mb-4">{formatDate(booking.check_in)} – {formatDate(booking.check_out)}</p>
++              <p className="text-[#5c5852] mb-4">{formatDate(booking.check_in, dateLocale)} – {formatDate(booking.check_out, dateLocale)}</p>
+             )}
+             {booking?.booking_rooms?.length > 0 && (
+               <ul className="text-sm text-[#5c5852] mb-4">
+diff --git a/frontend/src/pages/Home.jsx b/frontend/src/pages/Home.jsx
+index 979f96b..8068d4c 100644
+--- a/frontend/src/pages/Home.jsx
++++ b/frontend/src/pages/Home.jsx
+@@ -18,6 +18,7 @@ import {
+ } from 'lucide-react';
+ import { useQuery } from '@tanstack/react-query';
+ import { api } from '../lib/api';
++import { DatePicker } from '../components/DatePicker';
+ import { useWebsiteSettings } from '../contexts/WebsiteSettingsContext';
+ import { HotelCard } from '../components/HotelCard';
+ import { Skeleton } from '../components/ui/Skeleton';
+@@ -250,10 +251,9 @@ export default function Home() {
+                 </div>
+                 <div className="relative">
+                   <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a756d] pointer-events-none" />
+-                  <input
+-                    type="date"
++                  <DatePicker
+                     value={checkIn}
+-                    onChange={(e) => setCheckIn(e.target.value)}
++                    onChange={setCheckIn}
+                     min={today}
+                     className="w-full h-12 pl-11 pr-3 rounded-xl border border-[#e8e4dd] text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
+                     aria-label={t('common.date.checkIn')}
+@@ -261,10 +261,9 @@ export default function Home() {
+                 </div>
+                 <div className="relative">
+                   <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a756d] pointer-events-none" />
+-                  <input
+-                    type="date"
++                  <DatePicker
+                     value={checkOut}
+-                    onChange={(e) => setCheckOut(e.target.value)}
++                    onChange={setCheckOut}
+                     min={checkIn || tomorrow}
+                     className="w-full h-12 pl-11 pr-3 rounded-xl border border-[#e8e4dd] text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
+                     aria-label={t('common.date.checkOut')}
+diff --git a/frontend/src/pages/HotelDetail.jsx b/frontend/src/pages/HotelDetail.jsx
+index 613a6ca..bbb8099 100644
+--- a/frontend/src/pages/HotelDetail.jsx
++++ b/frontend/src/pages/HotelDetail.jsx
+@@ -10,6 +10,7 @@ import ErrorMessage from '../components/ErrorMessage';
+ import { formatPrice, getRatingLabel, calculateNights, cn } from '../lib/utils';
+ import { getAmenityLabel } from '../lib/amenities';
+ import { AmenityIcon } from '../components/AmenityIcon';
++import { DatePicker } from '../components/DatePicker';
+ import { useTranslation } from 'react-i18next';
+ 
+ const TABS = [
+@@ -540,20 +541,18 @@ export default function HotelDetail() {
+               <div className="grid grid-cols-2 gap-3">
+                 <div>
+                   <label className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkIn')}</label>
+-                  <input
+-                    type="date"
++                  <DatePicker
+                     value={localCheckIn}
+-                    onChange={(e) => setLocalCheckIn(e.target.value)}
++                    onChange={setLocalCheckIn}
+                     min={today}
+                     className="w-full rounded-xl border border-[#e8e4dd] px-4 py-2.5 text-sm text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
+                   />
+                 </div>
+                 <div>
+                   <label className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkOut')}</label>
+-                  <input
+-                    type="date"
++                  <DatePicker
+                     value={localCheckOut}
+-                    onChange={(e) => setLocalCheckOut(e.target.value)}
++                    onChange={setLocalCheckOut}
+                     min={localCheckIn || tomorrow}
+                     className="w-full rounded-xl border border-[#e8e4dd] px-4 py-2.5 text-sm text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
+                   />
+diff --git a/frontend/src/pages/HotelList.jsx b/frontend/src/pages/HotelList.jsx
+index be6dbe5..5ab1b9b 100644
+--- a/frontend/src/pages/HotelList.jsx
++++ b/frontend/src/pages/HotelList.jsx
+@@ -13,6 +13,7 @@ import { calculateNights, formatPrice } from '../lib/utils';
+ import { getAmenityLabel } from '../lib/amenities';
+ import { parseHotelSearchResponse } from '../lib/hotelSearch';
+ import { useTranslation } from 'react-i18next';
++import { DatePicker } from '../components/DatePicker';
+ 
+ const REVIEW_SCORE_OPTIONS = [
+   { label: 'hotels.reviewScore.excellent', value: 5 },
+@@ -512,9 +513,8 @@ function HotelList() {
+               </div>
+               <div className="relative">
+                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a756d] pointer-events-none" />
+-                <input
++                <DatePicker
+                   name="check_in"
+-                  type="date"
+                   defaultValue={checkIn}
+                   min={today}
+                   className="w-full h-12 pl-10 pr-3 rounded-xl border border-[#e8e4dd]200 text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
+@@ -523,9 +523,8 @@ function HotelList() {
+               </div>
+               <div className="relative">
+                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a756d] pointer-events-none" />
+-                <input
++                <DatePicker
+                   name="check_out"
+-                  type="date"
+                   defaultValue={checkOut}
+                   min={checkIn || tomorrow}
+                   className="w-full h-12 pl-10 pr-3 rounded-xl border border-[#e8e4dd]200 text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
+diff --git a/frontend/src/pages/MyBookings.jsx b/frontend/src/pages/MyBookings.jsx
+index f879822..d97f7be 100644
+--- a/frontend/src/pages/MyBookings.jsx
++++ b/frontend/src/pages/MyBookings.jsx
+@@ -72,7 +72,8 @@ function BookingCardSkeleton() {
+ }
+ 
+ export default function MyBookings() {
+-  const { t } = useTranslation();
++  const { t, i18n } = useTranslation();
++  const dateLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+   const { user } = useAuth();
+   const queryClient = useQueryClient();
+   const [page, setPage] = useState(1);
+@@ -258,7 +259,7 @@ export default function MyBookings() {
+                         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-1 text-sm text-stone-600">
+                           <span className="flex items-center gap-1.5">
+                             <Calendar className="w-4 h-4 shrink-0" />
+-                            {formatDate(b.check_in)} – {formatDate(b.check_out)}
++                            {formatDate(b.check_in, dateLocale)} – {formatDate(b.check_out, dateLocale)}
+                           </span>
+                           {b.booking_rooms?.length > 0 && (
+                             <span className="flex items-center gap-1.5">
+diff --git a/frontend/src/pages/Support.jsx b/frontend/src/pages/Support.jsx
+index d2b8fad..4d09b8e 100644
+--- a/frontend/src/pages/Support.jsx
++++ b/frontend/src/pages/Support.jsx
+@@ -15,7 +15,8 @@ const CATEGORY_LABELS = {
+ };
+ 
+ function SupportContent() {
+-  const { t } = useTranslation();
++  const { t, i18n } = useTranslation();
++  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+   const { data, isLoading, isError, error, refetch } = useQuery({
+     queryKey: ['support-tickets'],
+     queryFn: async () => {
+@@ -100,7 +101,7 @@ function SupportContent() {
+                 <p className="text-sm text-stone-600 line-clamp-1">{t.body}</p>
+                 <p className="text-xs text-stone-500 mt-3 flex items-center gap-1">
+                   <MessageSquare className="w-3.5 h-3.5" />
+-                  #{t.id} · {t.replies_count != null ? `${t.replies_count} ${t.replies_count === 1 ? t('support.replies.one') : t('support.replies.other')}` : ''} · {t.created_at ? new Date(t.created_at).toLocaleDateString() : ''}
++                  #{t.id} · {t.replies_count != null ? `${t.replies_count} ${t.replies_count === 1 ? t('support.replies.one') : t('support.replies.other')}` : ''} · {t.created_at ? new Date(t.created_at).toLocaleDateString(locale) : ''}
+                 </p>
+               </Link>
+             </li>
+diff --git a/frontend/src/pages/SupportTicketDetail.jsx b/frontend/src/pages/SupportTicketDetail.jsx
+index c0f0688..203e877 100644
+--- a/frontend/src/pages/SupportTicketDetail.jsx
++++ b/frontend/src/pages/SupportTicketDetail.jsx
+@@ -2,6 +2,7 @@ import { useState } from 'react';
+ import { Link, useParams } from 'react-router-dom';
+ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+ import { ArrowLeft, Loader2 } from 'lucide-react';
++import { useTranslation } from 'react-i18next';
+ import { api } from '../lib/api';
+ import { useAuth } from '../contexts/AuthContext';
+ import ErrorMessage from '../components/ErrorMessage';
+@@ -10,6 +11,8 @@ import { Skeleton } from '../components/ui/Skeleton';
+ const CATEGORY_LABELS = { billing: 'Billing', booking: 'Booking', technical: 'Technical', other: 'Other' };
+ 
+ export default function SupportTicketDetail() {
++  const { i18n } = useTranslation();
++  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+   const { user } = useAuth();
+   const { id } = useParams();
+   const queryClient = useQueryClient();
+@@ -108,7 +111,7 @@ export default function SupportTicketDetail() {
+             </span>
+             <span className="px-2.5 py-0.5 rounded-lg bg-stone-100 text-stone-700 text-xs font-medium">{ticket.status}</span>
+           </div>
+-          <p className="text-sm text-stone-500">#{ticket.id} · Created {ticket.created_at ? new Date(ticket.created_at).toLocaleString() : ''}</p>
++          <p className="text-sm text-stone-500">#{ticket.id} · Created {ticket.created_at ? new Date(ticket.created_at).toLocaleString(locale) : ''}</p>
+         </div>
+         <div className="p-5 sm:p-6">
+           <h2 className="font-semibold text-stone-900 mb-4">Messages</h2>
+@@ -117,7 +120,7 @@ export default function SupportTicketDetail() {
+               <p className="text-sm text-stone-600 mb-1">
+                 <span className="font-medium text-stone-800">{user?.name ?? 'You'}</span>
+                 {' · '}
+-                {ticket.created_at ? new Date(ticket.created_at).toLocaleString() : ''}
++                {ticket.created_at ? new Date(ticket.created_at).toLocaleString(locale) : ''}
+               </p>
+               <div className="text-stone-800 whitespace-pre-wrap">{ticket.body}</div>
+             </li>
+@@ -126,7 +129,7 @@ export default function SupportTicketDetail() {
+                 <p className="text-sm text-stone-600 mb-1">
+                   <span className="font-medium text-stone-800">{r.user?.name ?? 'Support'}</span>
+                   {' · '}
+-                  {r.created_at ? new Date(r.created_at).toLocaleString() : ''}
++                  {r.created_at ? new Date(r.created_at).toLocaleString(locale) : ''}
+                 </p>
+                 <div className="text-stone-800 whitespace-pre-wrap">{r.body}</div>
+               </li>
+diff --git a/frontend/src/pages/TourProvinceDetail.jsx b/frontend/src/pages/TourProvinceDetail.jsx
+index 4e8facc..1b3818a 100644
+--- a/frontend/src/pages/TourProvinceDetail.jsx
++++ b/frontend/src/pages/TourProvinceDetail.jsx
+@@ -7,6 +7,7 @@ import { api } from '../lib/api';
+ import { HotelDetailSkeleton, Skeleton } from '../components/Skeleton';
+ import ErrorMessage from '../components/ErrorMessage';
+ import { VendorGuideCard } from '../components/VendorGuideCard';
++import { DatePicker } from '../components/DatePicker';
+ import { parseGuideSearchResponse } from '../lib/guideSearch';
+ import { todayISO } from '../lib/guideSearch';
+ 
+@@ -172,11 +173,10 @@ export default function TourProvinceDetail() {
+         <div className="rounded-2xl border border-[#e8e4dd] bg-white p-4 mb-6 flex flex-col sm:flex-row gap-3 sm:items-end">
+           <div>
+             <label className="block text-sm font-medium text-[#45423d] mb-1">{t('tours.provinceDetail.travelDate')}</label>
+-            <input
+-              type="date"
++            <DatePicker
+               value={travelDateInput}
++              onChange={setTravelDateInput}
+               min={today}
+-              onChange={(e) => setTravelDateInput(e.target.value)}
+               className="rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
+             />
+           </div>

@@ -6,7 +6,8 @@ import ErrorMessage from './ErrorMessage';
 import { cn } from '../lib/utils';
 
 export function TourChatBox({ bookingUuid }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
   const { messages, isLoading, isError, refetch, sendMessage, socketLive } = useTourChat(bookingUuid);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
@@ -64,7 +65,7 @@ export function TourChatBox({ bookingUuid }) {
               )}
               <p className="whitespace-pre-wrap break-words">{m.body}</p>
               <div className={cn('text-[11px] mt-1 flex gap-2', m.is_mine ? 'text-white/60' : 'text-[#a39e94]')}>
-                {m.created_at && <span>{new Date(m.created_at).toLocaleString()}</span>}
+                {m.created_at && <span>{new Date(m.created_at).toLocaleString(locale)}</span>}
                 {m.is_mine && m.read_at && <span className="text-emerald-300">{t('tours.chat.read')}</span>}
               </div>
             </div>

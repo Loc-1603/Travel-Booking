@@ -18,6 +18,7 @@ class SetLocale
 
         $locale = PlatformSetting::get('locale', config('app.fallback_locale', 'en'));
         app()->setLocale($locale);
+        \Carbon\Carbon::setLocale($locale);
 
         return $next($request);
     }

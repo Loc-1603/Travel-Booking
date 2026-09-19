@@ -36,7 +36,7 @@
                 <tbody>
                     @forelse($payouts as $p)
                     <tr>
-                        <td>{{ $p->period_start->format('M d, Y') }} – {{ $p->period_end->format('M d, Y') }}</td>
+                        <td>{{ $p->period_start->format('d/m/Y') }} – {{ $p->period_end->format('d/m/Y') }}</td>
                         <td>{{ format_vnd($p->amount) }}</td>
                         <td>{{ format_vnd($p->commission) }}</td>
                         <td><strong>{{ format_vnd($p->net) }}</strong></td>
@@ -49,7 +49,7 @@
                                 <span class="badge bg-success">{{ __('admin.vendor.payouts.history.status.paid') }}</span>
                             @endif
                         </td>
-                        <td>{{ $p->paid_at?->format('M d, Y') ?? '-' }}</td>
+                        <td>{{ $p->paid_at?->format('d/m/Y') ?? '-' }}</td>
                     </tr>
                     @empty
                     <tr><td colspan="6" class="text-muted">{{ __('admin.vendor.payouts.history.empty') }}</td></tr>

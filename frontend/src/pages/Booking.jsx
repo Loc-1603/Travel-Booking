@@ -32,7 +32,8 @@ function BookingSkeleton() {
 }
 
 export default function Booking() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -237,7 +238,7 @@ export default function Booking() {
               <div className="flex-1">
                 <h3 className="font-semibold text-stone-900">{room.name}</h3>
                 <p className="text-sm text-stone-600 mt-0.5">{hotel.name} · {[hotel.city, hotel.country].filter(Boolean).join(', ')}</p>
-                <p className="text-sm text-stone-600 mt-0.5">{formatDate(checkIn)} – {formatDate(checkOut)} · {nights} {t('common.nights', { count: nights })}</p>
+                <p className="text-sm text-stone-600 mt-0.5">{formatDate(checkIn, dateLocale)} – {formatDate(checkOut, dateLocale)} · {nights} {t('common.nights', { count: nights })}</p>
                 {room.amenities?.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {room.amenities.slice(0, 4).map((a) => (
@@ -321,7 +322,7 @@ export default function Booking() {
               </div>
               <div>
                 <h3 className="font-semibold text-stone-900">{room.name}</h3>
-                <p className="text-sm text-stone-600">{formatDate(checkIn)} – {formatDate(checkOut)} · {quantity} {t('hotelDetail.booking.rooms', { count: quantity })}</p>
+                <p className="text-sm text-stone-600">{formatDate(checkIn, dateLocale)} – {formatDate(checkOut, dateLocale)} · {quantity} {t('hotelDetail.booking.rooms', { count: quantity })}</p>
               </div>
             </div>
 

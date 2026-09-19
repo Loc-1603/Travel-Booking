@@ -72,7 +72,8 @@ function BookingCardSkeleton() {
 }
 
 export default function MyBookings() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -258,7 +259,7 @@ export default function MyBookings() {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-1 text-sm text-stone-600">
                           <span className="flex items-center gap-1.5">
                             <Calendar className="w-4 h-4 shrink-0" />
-                            {formatDate(b.check_in)} – {formatDate(b.check_out)}
+                            {formatDate(b.check_in, dateLocale)} – {formatDate(b.check_out, dateLocale)}
                           </span>
                           {b.booking_rooms?.length > 0 && (
                             <span className="flex items-center gap-1.5">

@@ -36,7 +36,7 @@
                                 @if($profile?->status === 'approved')
                                     <span class="badge bg-success">{{ __('admin.vendor.vendors.approval_status.approved') }}</span>
                                     @if($profile->approved_at)
-                                        <small class="text-muted">{{ __('admin.vendor.vendors.detail.approved_at', ['date' => $profile->approved_at->format('M j, Y')]) }}</small>
+                                        <small class="text-muted">{{ __('admin.vendor.vendors.detail.approved_at', ['date' => $profile->approved_at->format('d/m/Y')]) }}</small>
                                     @endif
                                 @elseif($profile?->status === 'rejected')
                                     <span class="badge bg-danger">{{ __('admin.vendor.vendors.approval_status.rejected') }}</span>
@@ -155,7 +155,7 @@
                                     </td>
                                     <td class="text-muted small">
                                         @if(!empty($doc['uploaded_at']))
-                                            {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('M j, Y') }}
+                                            {{ \Carbon\Carbon::parse($doc['uploaded_at'])->format('d/m/Y') }}
                                         @else
                                             —
                                         @endif

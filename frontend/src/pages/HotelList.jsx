@@ -13,6 +13,7 @@ import { calculateNights, formatPrice } from '../lib/utils';
 import { getAmenityLabel } from '../lib/amenities';
 import { parseHotelSearchResponse } from '../lib/hotelSearch';
 import { useTranslation } from 'react-i18next';
+import { DatePicker } from '../components/DatePicker';
 
 const REVIEW_SCORE_OPTIONS = [
   { label: 'hotels.reviewScore.excellent', value: 5 },
@@ -512,9 +513,8 @@ function HotelList() {
               </div>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a756d] pointer-events-none" />
-                <input
+                <DatePicker
                   name="check_in"
-                  type="date"
                   defaultValue={checkIn}
                   min={today}
                   className="w-full h-12 pl-10 pr-3 rounded-xl border border-[#e8e4dd]200 text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
@@ -523,9 +523,8 @@ function HotelList() {
               </div>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a756d] pointer-events-none" />
-                <input
+                <DatePicker
                   name="check_out"
-                  type="date"
                   defaultValue={checkOut}
                   min={checkIn || tomorrow}
                   className="w-full h-12 pl-10 pr-3 rounded-xl border border-[#e8e4dd]200 text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"

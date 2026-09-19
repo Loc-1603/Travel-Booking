@@ -37,4 +37,16 @@ i18n
     react: { useSuspense: false },
   });
 
+i18n.on('languageChanged', (lng) => {
+  const htmlLang = lng?.startsWith('vi') ? 'vi-VN' : 'en-US';
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = htmlLang;
+  }
+});
+
+if (typeof document !== 'undefined') {
+  const initialLang = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+  document.documentElement.lang = initialLang;
+}
+
 export default i18n;

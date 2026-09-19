@@ -14,6 +14,9 @@ class SetAdminLocale
         // Always set Vietnamese for admin routes
         app()->setLocale('vi');
         
+        // Also set Carbon locale for date formatting
+        \Carbon\Carbon::setLocale('vi');
+        
         // Also set in session to persist across requests
         Session::put('locale', 'vi');
         
