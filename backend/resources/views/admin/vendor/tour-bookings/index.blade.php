@@ -11,8 +11,8 @@
                     <label class="form-label mb-0">{{ __('admin.vendor.tour_bookings.filter.status') }}</label>
                     <select name="status" class="form-select form-select-sm">
                         <option value="">{{ __('admin.vendor.tour_bookings.filter.all') }}</option>
-                        @foreach(['pending_payment','confirmed','ongoing','completed','cancelled','disputed','refunded'] as $s)
-                        <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ $s }}</option>
+                        @foreach(['pending_payment','confirmed','cancelled','completed'] as $s)
+                        <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ __('admin.status.' . $s) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -49,7 +49,21 @@
                         <td>{{ $b->tour->title ?? '-' }}</td>
                         <td>{{ $b->customer->name ?? $b->customer->email ?? '-' }}</td>
                         <td>{{ $b->start_at?->format('Y-m-d H:i') }}</td>
-                        <td><span class="badge bg-secondary">{{ $b->status }}</span></td>
+                        <td>
+                            @php
+                                $statusColors = [
+                                    'completed' => 'bg-primary',
+                                    'confirmed' => 'bg-success',
+                                    'pending_payment' => 'bg-warning',
+                                    'cancelled' => 'bg-danger',
+                                    'ongoing' => 'bg-info',
+                                    'disputed' => 'bg-warning',
+                                    'refunded' => 'bg-secondary',
+                                ];
+                                $badgeClass = $statusColors[$b->status] ?? 'bg-secondary';
+                            @endphp
+                            <span class="badge {{ $badgeClass }}">{{ __('admin.status.' . $b->status) }}</span>
+                        </td>
                         <td>{{ format_vnd($b->total_price ?? 0) }}</td>
                         <td>
                             <a href="{{ route('admin.vendor.tour-bookings.invoice', $b->uuid) }}" class="btn btn-sm btn-outline-primary" target="_blank">{{ __('admin.vendor.tour_bookings.invoice') }}</a>
