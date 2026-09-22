@@ -40,7 +40,18 @@
                         <td>{{ $d->id }}</td>
                         <td><a href="{{ route('admin.disputes.show', $d) }}">{{ $d->booking->uuid ?? $d->booking_id }}</a></td>
                         <td>{{ $d->booking->hotel->name ?? '-' }}</td>
-                        <td><span class="badge bg-secondary">{{ $d->status }}</span></td>
+                        <td>
+                            @php
+                                $statusColors = [
+                                    'open' => 'bg-warning',
+                                    'in_review' => 'bg-info',
+                                    'resolved' => 'bg-success',
+                                    'closed' => 'bg-secondary',
+                                ];
+                                $badgeClass = $statusColors[$d->status] ?? 'bg-secondary';
+                            @endphp
+                            <span class="badge {{ $badgeClass }}">{{ __('admin.vendor.disputes.filter.' . $d->status) }}</span>
+                        </td>
                         <td>{{ $d->created_at->format('Y-m-d') }}</td>
                         <td><a href="{{ route('admin.disputes.show', $d) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
                     </tr>

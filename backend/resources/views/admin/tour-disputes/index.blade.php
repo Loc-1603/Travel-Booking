@@ -12,7 +12,7 @@
                     <select name="status" class="form-select form-select-sm">
                         <option value="">{{ __('admin.vendor.tour_disputes.filter.all') }}</option>
                         @foreach(['open','in_review','resolved','closed'] as $s)
-                        <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ $s }}</option>
+                        <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ __('admin.vendor.tour_disputes.filter.' . $s) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -39,7 +39,18 @@
                         <td>{{ $d->id }}</td>
                         <td><a href="{{ route('admin.tour-disputes.show', $d) }}">{{ $d->booking->uuid ?? $d->tour_booking_id }}</a></td>
                         <td>{{ $d->booking->tour->title ?? '-' }}</td>
-                        <td><span class="badge bg-secondary">{{ $d->status }}</span></td>
+                        <td>
+                            @php
+                                $statusColors = [
+                                    'open' => 'bg-warning',
+                                    'in_review' => 'bg-info',
+                                    'resolved' => 'bg-success',
+                                    'closed' => 'bg-secondary',
+                                ];
+                                $badgeClass = $statusColors[$d->status] ?? 'bg-secondary';
+                            @endphp
+                            <span class="badge {{ $badgeClass }}">{{ __('admin.vendor.tour_disputes.filter.' . $d->status) }}</span>
+                        </td>
                         <td>{{ $d->created_at->format('Y-m-d') }}</td>
                         <td><a href="{{ route('admin.tour-disputes.show', $d) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
                     </tr>
