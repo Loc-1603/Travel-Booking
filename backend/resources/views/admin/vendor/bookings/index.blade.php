@@ -66,7 +66,19 @@
                         <td>{{ $b->customer_id ? ($b->customer->name ?? $b->customer->email ?? '-') : ($b->guest_name ?? $b->guest_email ?? '-') }}</td>
                         <td>{{ $b->check_in ? $b->check_in->format('Y-m-d') : '-' }}</td>
                         <td>{{ $b->check_out ? $b->check_out->format('Y-m-d') : '-' }}</td>
-                        <td><span class="badge bg-secondary">{{ $b->status }}</span></td>
+                        <td>
+                            @php
+                                $statusColors = [
+                                    'completed' => 'bg-primary',
+                                    'confirmed' => 'bg-success',
+                                    'pending_payment' => 'bg-warning',
+                                    'cancelled' => 'bg-danger',
+                                    'pending' => 'bg-secondary',
+                                ];
+                                $badgeClass = $statusColors[$b->status] ?? 'bg-secondary';
+                            @endphp
+                            <span class="badge {{ $badgeClass }}">{{ __('admin.status.' . $b->status) }}</span>
+                        </td>
                         <td>{{ format_vnd($b->total_price ?? 0) }}</td>
                         <td>
                             <a href="{{ route('admin.vendor.bookings.invoice', $b->uuid) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="{{ __('admin.vendor.bookings.view_invoice') }}">{{ __('admin.vendor.bookings.invoice') }}</a>
