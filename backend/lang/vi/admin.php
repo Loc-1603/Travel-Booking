@@ -79,9 +79,13 @@ return [
     'months_short' => ['Thg 1', 'Thg 2', 'Thg 3', 'Thg 4', 'Thg 5', 'Thg 6', 'Thg 7', 'Thg 8', 'Thg 9', 'Thg 10', 'Thg 11', 'Thg 12'],
     'status' => [
         'pending' => 'Chờ xử lý',
+        'pending_payment' => 'Chờ thanh toán',
         'confirmed' => 'Đã xác nhận',
         'cancelled' => 'Đã hủy',
         'completed' => 'Đã hoàn tất',
+        'ongoing' => 'Đang diễn ra',
+        'disputed' => 'Tranh chấp',
+        'refunded' => 'Đã hoàn tiền',
     ],
     'actions' => [
         'view' => 'Xem',
@@ -128,6 +132,9 @@ return [
         'confirmed' => 'Đã xác nhận',
         'cancelled' => 'Đã hủy',
         'completed' => 'Đã hoàn tất',
+        'ongoing' => 'Đang diễn ra',
+        'disputed' => 'Tranh chấp',
+        'refunded' => 'Đã hoàn tiền',
     ],
     'sidebar' => [
         'menu' => 'Danh mục',
@@ -1368,6 +1375,10 @@ return [
             'filter' => [
                 'status' => 'Trạng thái',
                 'all' => 'Tất cả',
+                'open' => 'Mở',
+                'in_review' => 'Đang xem xét',
+                'resolved' => 'Đã giải quyết',
+                'closed' => 'Đã đóng',
                 'apply' => 'Lọc',
             ],
             'table' => [

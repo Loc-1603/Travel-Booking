@@ -79,6 +79,9 @@ return [
         'confirmed' => 'Confirmed',
         'cancelled' => 'Cancelled',
         'completed' => 'Completed',
+        'ongoing' => 'Ongoing',
+        'disputed' => 'Disputed',
+        'refunded' => 'Refunded',
     ],
     'actions' => [
         'view' => 'View',
@@ -125,6 +128,9 @@ return [
         'confirmed' => 'Confirmed',
         'cancelled' => 'Cancelled',
         'completed' => 'Completed',
+        'ongoing' => 'Ongoing',
+        'disputed' => 'Disputed',
+        'refunded' => 'Refunded',
     ],
     'sidebar' => [
         'menu' => 'Menu',
@@ -1364,6 +1370,10 @@ return [
             'filter' => [
                 'status' => 'Status',
                 'all' => 'All',
+                'open' => 'Open',
+                'in_review' => 'In review',
+                'resolved' => 'Resolved',
+                'closed' => 'Closed',
                 'apply' => 'Filter',
             ],
             'table' => [
