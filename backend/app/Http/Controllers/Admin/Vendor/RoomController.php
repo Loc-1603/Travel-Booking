@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Amenity;
 use App\Models\Hotel;
 use App\Models\Room;
+use App\Models\RoomType;
 use App\Models\RoomAvailability;
 use App\Services\AvailabilityService;
 use Illuminate\Http\RedirectResponse;
@@ -26,7 +27,7 @@ class RoomController extends Controller
             $hotel = Hotel::where('id', $request->hotel_id)->where('vendor_id', auth()->id())->firstOrFail();
             $query->where('hotel_id', $hotel->id);
         }
-        $rooms = $query->with(['hotel', 'images', 'bannerImage'])->latest()->paginate(15);
+        $rooms = $query->with(['hotel', 'images', 'bannerImage', 'roomType'])->latest()->paginate(15);
         $hotels = Hotel::where('vendor_id', auth()->id())->orderBy('name')->get();
         return view('admin.vendor.rooms.index', compact('rooms', 'hotels'));
     }
@@ -37,7 +38,10 @@ class RoomController extends Controller
         $hotels = Hotel::where('vendor_id', auth()->id())->orderBy('name')->get();
         $hotelId = $request->get('hotel_id');
         $amenities = Amenity::orderBy('sort_order')->orderBy('name')->get();
-        return view('admin.vendor.rooms.create', compact('hotels', 'hotelId', 'amenities'));
+        $roomTypes = $hotelId
+            ? RoomType::where('hotel_id', $hotelId)->orderBy('sort_order')->get()
+            : collect();
+        return view('admin.vendor.rooms.create', compact('hotels', 'hotelId', 'amenities', 'roomTypes'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -45,10 +49,15 @@ class RoomController extends Controller
         $this->authorize('create', Room::class);
         $validated = $request->validate([
             'hotel_id' => 'required|exists:hotels,id',
+            'room_type_id' => 'nullable|exists:room_types,id',
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'base_price' => 'required|numeric|min:0',
             'total_rooms' => 'required|integer|min:1',
+            'description' => 'nullable|string',
+            'size' => 'nullable|numeric|min:0',
+            'bed_type' => 'nullable|string|max:255',
+            'view_type' => 'nullable|string|max:255',
             'cancellation_policy_preset' => 'nullable|string|in:,none,non_refundable,free_24,free_48,free_168,custom',
             'cancellation_policy_custom' => 'nullable|string',
             'amenities' => 'nullable|array',
@@ -66,19 +75,25 @@ class RoomController extends Controller
     public function edit(Room $room): View
     {
         $this->authorize('update', $room);
-        $room->load(['hotel', 'amenities']);
+        $room->load(['hotel', 'amenities', 'roomType']);
         $amenities = Amenity::orderBy('sort_order')->orderBy('name')->get();
-        return view('admin.vendor.rooms.edit', compact('room', 'amenities'));
+        $roomTypes = RoomType::where('hotel_id', $room->hotel_id)->orderBy('sort_order')->get();
+        return view('admin.vendor.rooms.edit', compact('room', 'amenities', 'roomTypes'));
     }
 
     public function update(Request $request, Room $room): RedirectResponse
     {
         $this->authorize('update', $room);
         $validated = $request->validate([
+            'room_type_id' => 'nullable|exists:room_types,id',
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'base_price' => 'required|numeric|min:0',
             'total_rooms' => 'required|integer|min:1',
+            'description' => 'nullable|string',
+            'size' => 'nullable|numeric|min:0',
+            'bed_type' => 'nullable|string|max:255',
+            'view_type' => 'nullable|string|max:255',
             'cancellation_policy_preset' => 'nullable|string|in:,none,non_refundable,free_24,free_48,free_168,custom',
             'cancellation_policy_custom' => 'nullable|string',
             'amenities' => 'nullable|array',

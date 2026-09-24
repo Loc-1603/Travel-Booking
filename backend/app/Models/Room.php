@@ -19,18 +19,28 @@ class Room extends Model
         'base_price',
         'total_rooms',
         'cancellation_policy',
+        'description',
+        'size',
+        'bed_type',
+        'view_type',
     ];
 
     protected function casts(): array
     {
         return [
             'cancellation_policy' => 'array',
+            'size' => 'decimal:2',
         ];
     }
 
     public function hotel()
     {
         return $this->belongsTo(Hotel::class);
+    }
+
+    public function roomType()
+    {
+        return $this->belongsTo(RoomType::class);
     }
 
     public function availability()

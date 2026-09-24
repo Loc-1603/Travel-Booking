@@ -131,7 +131,7 @@ class HotelSearchController extends BaseApiController
             ->where('status', 'active')
             ->whereHas('vendor', fn ($q) => $q->whereHas('vendorProfile', fn ($q2) => $q2->where('status', 'approved')))
             ->selectRaw('hotels.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as review_count')
-            ->with(['rooms.hotel', 'rooms.images', 'rooms.amenities', 'images', 'amenities'])
+            ->with(['rooms.hotel', 'rooms.images', 'rooms.amenities', 'rooms.roomType', 'images', 'amenities'])
             ->firstOrFail();
         return $this->success(new HotelResource($hotel));
     }

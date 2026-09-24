@@ -19,6 +19,31 @@ class RoomResource extends JsonResource
             'base_price' => (float) $this->base_price,
             'total_rooms' => $this->total_rooms,
             'hotel_id' => $this->hotel_id,
+            'description' => $this->when(
+                $this->description !== null,
+                fn () => $this->description
+            ),
+            'size' => $this->when(
+                $this->size !== null,
+                fn () => (float) $this->size
+            ),
+            'bed_type' => $this->when(
+                $this->bed_type !== null,
+                fn () => $this->bed_type
+            ),
+            'view_type' => $this->when(
+                $this->view_type !== null,
+                fn () => $this->view_type
+            ),
+            'room_type' => $this->whenLoaded('roomType', function () {
+                return [
+                    'id' => $this->roomType->id,
+                    'name' => $this->roomType->name,
+                    'slug' => $this->roomType->slug,
+                    'description' => $this->roomType->description,
+                    'sort_order' => $this->roomType->sort_order,
+                ];
+            }),
             'images' => $this->whenLoaded('images', function () {
                 return $this->images->map(function ($image) {
                     return [
