@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo } from 'react';
 
 function PolicyCard({ title, description, icon, children }) {
   if (!description && !children) return null;
@@ -29,7 +29,7 @@ function PolicyRow({ label, value }) {
   );
 }
 
-export function PoliciesTab({ room }) {
+export const PoliciesTab = memo(function PoliciesTab({ room }) {
   const {
     cancellation_policy,
     cancellation_policy_summary,
@@ -121,4 +121,4 @@ export function PoliciesTab({ room }) {
       )}
     </div>
   );
-}
+});

@@ -6,6 +6,13 @@ export function useRoomDetailModal({ isOpen, onClose }) {
   const startY = useRef(0);
   const currentY = useRef(0);
   const isDragging = useRef(false);
+  const canDrag = useRef(true);
+  const startedInScrollArea = useRef(false);
+
+  const getScrollContainer = useCallback(
+    () => modalRef.current?.querySelector('[data-modal-scroll]'),
+    []
+  );
 
   const handleKeyDown = useCallback((e) => {
     if (!isOpen) return;
@@ -40,22 +47,40 @@ export function useRoomDetailModal({ isOpen, onClose }) {
     startY.current = e.touches[0].clientY;
     currentY.current = startY.current;
     isDragging.current = true;
-  }, [isOpen]);
+    // Swipe-dismiss is only allowed when the scrollable content is at the top,
+    // or when the gesture starts outside of it (header/tabs/footer)
+    startedInScrollArea.current = !!e.target.closest?.('[data-modal-scroll]');
+    const scrollEl = getScrollContainer();
+    canDrag.current = !startedInScrollArea.current || !scrollEl || scrollEl.scrollTop <= 0;
+  }, [isOpen, getScrollContainer]);
 
   const handleTouchMove = useCallback((e) => {
     if (!isDragging.current || !isOpen) return;
     currentY.current = e.touches[0].clientY;
+
+    if (!canDrag.current) {
+      // Native scroll consumed the gesture; re-enable drag once it reaches the top
+      const scrollEl = getScrollContainer();
+      if (startedInScrollArea.current && scrollEl && scrollEl.scrollTop <= 0) {
+        canDrag.current = true;
+        startY.current = currentY.current;
+      } else {
+        return;
+      }
+    }
+
     const deltaY = currentY.current - startY.current;
 
     if (deltaY > 0 && modalRef.current) {
       modalRef.current.style.transform = `translateY(${Math.min(deltaY, 150)}px)`;
       modalRef.current.style.transition = 'none';
     }
-  }, [isOpen]);
+  }, [isOpen, getScrollContainer]);
 
   const handleTouchEnd = useCallback(() => {
     if (!isDragging.current) return;
     isDragging.current = false;
+    if (!canDrag.current) return;
 
     const deltaY = currentY.current - startY.current;
     const modal = modalRef.current;
@@ -71,12 +96,12 @@ export function useRoomDetailModal({ isOpen, onClose }) {
   }, [onClose]);
 
   useEffect(() => {
+    const modal = modalRef.current;
     if (isOpen) {
       previousActiveElement.current = document.activeElement;
       document.body.style.overflow = 'hidden';
       document.addEventListener('keydown', handleKeyDown);
 
-      const modal = modalRef.current;
       if (modal) {
         modal.addEventListener('touchstart', handleTouchStart, { passive: true });
         modal.addEventListener('touchmove', handleTouchMove, { passive: true });
@@ -94,7 +119,6 @@ export function useRoomDetailModal({ isOpen, onClose }) {
     return () => {
       document.body.style.overflow = '';
       document.removeEventListener('keydown', handleKeyDown);
-      const modal = modalRef.current;
       if (modal) {
         modal.removeEventListener('touchstart', handleTouchStart);
         modal.removeEventListener('touchmove', handleTouchMove);

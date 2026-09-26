@@ -1,8 +1,8 @@
-import React from 'react';
-import { cn, formatPrice } from '../../../lib/utils';
+import { memo } from 'react';
+import { cn, formatPrice } from '../../lib/utils';
 import { Minus, Plus, User, Lock } from 'lucide-react';
 
-export function RoomDetailFooter({
+export const RoomDetailFooter = memo(function RoomDetailFooter({
   room,
   nights,
   quantity,
@@ -22,7 +22,7 @@ export function RoomDetailFooter({
   return (
     <footer
       className={cn(
-        'sticky bottom-0 z-10 flex items-center justify-between gap-4 px-4 py-4 bg-white/95 backdrop-blur-sm border-t border-[#e8e4dd] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] safe-area-inset-bottom',
+        'sticky bottom-0 z-10 flex items-center justify-between gap-4 px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-white/95 backdrop-blur-sm border-t border-[#e8e4dd] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]',
         className
       )}
       role="contentinfo"
@@ -113,4 +113,4 @@ export function RoomDetailFooter({
       )}
     </footer>
   );
-}
+});

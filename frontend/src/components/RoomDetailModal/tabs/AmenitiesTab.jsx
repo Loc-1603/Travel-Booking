@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo } from 'react';
 import { getAmenityLabel } from '../../../lib/amenities';
 import { AmenityIcon } from '../../AmenityIcon';
 import { cn } from '../../../lib/utils';
@@ -28,7 +28,7 @@ const DEFAULT_CATEGORY_SLUGS = {
   accessibility: ['wheelchair_accessible', 'grab_bars', 'roll_in_shower', 'visual_alarms'],
 };
 
-export function AmenitiesTab({ room }) {
+export const AmenitiesTab = memo(function AmenitiesTab({ room }) {
   const { amenities = [] } = room;
 
   if (amenities.length === 0) {
@@ -100,4 +100,4 @@ export function AmenitiesTab({ room }) {
       })}
     </div>
   );
-}
+});

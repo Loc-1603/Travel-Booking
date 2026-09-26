@@ -1,18 +1,18 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { memo, useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '../../../lib/utils';
+import { LazyImage } from '../../LazyImage';
 import { X, ChevronLeft, ChevronRight, Expand } from 'lucide-react';
 
-const BLUR_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const SWIPE_THRESHOLD = 50;
 
-export function GalleryTab({ room }) {
+export const GalleryTab = memo(function GalleryTab({ room }) {
   const { images = [] } = room;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [loadedImages, setLoadedImages] = useState(new Set());
 
-  const handleImageLoad = useCallback((src) => {
-    setLoadedImages((prev) => new Set(prev).add(src));
-  }, []);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isTrackingTouch = useRef(false);
 
   const openLightbox = useCallback((index) => {
     setSelectedIndex(index);
@@ -26,6 +26,23 @@ export function GalleryTab({ room }) {
   const navigate = useCallback((delta) => {
     setSelectedIndex((prev) => (prev + delta + images.length) % images.length);
   }, [images.length]);
+
+  const handleLightboxTouchStart = useCallback((e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isTrackingTouch.current = true;
+  }, []);
+
+  const handleLightboxTouchEnd = useCallback((e) => {
+    if (!isTrackingTouch.current) return;
+    isTrackingTouch.current = false;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    // Horizontal swipe only: must dominate the vertical movement (scroll/none)
+    if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
+      navigate(deltaX < 0 ? 1 : -1);
+    }
+  }, [navigate]);
 
   useEffect(() => {
     if (!isLightboxOpen) return;
@@ -81,18 +98,13 @@ export function GalleryTab({ room }) {
               aria-label={`Xem hình ảnh ${idx + 1}`}
               aria-current={selectedIndex === idx ? 'true' : undefined}
             >
-              <img
-                src={loadedImages.has(img.url) ? img.url : BLUR_PLACEHOLDER}
-                data-src={img.url}
+              <LazyImage
+                src={img.url}
                 alt={img.alt_text || `Hình ảnh phòng ${idx + 1}`}
-                className={cn(
-                  'w-full h-full object-cover transition-opacity duration-300',
-                  loadedImages.has(img.url) ? 'opacity-100' : 'opacity-0 blur-[20px]'
-                )}
-                onLoad={() => handleImageLoad(img.url)}
-                loading={idx < 4 ? 'eager' : 'lazy'}
+                eager={idx < 4}
                 width={800}
                 height={600}
+                className="w-full h-full object-cover"
               />
               {allImages.length > 1 && idx === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -118,6 +130,8 @@ export function GalleryTab({ room }) {
         <div
           className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
           onClick={closeLightbox}
+          onTouchStart={handleLightboxTouchStart}
+          onTouchEnd={handleLightboxTouchEnd}
           role="dialog"
           aria-modal="true"
           aria-label="Phóng to hình ảnh"
@@ -175,4 +189,4 @@ export function GalleryTab({ room }) {
       )}
     </>
   );
-}
+});

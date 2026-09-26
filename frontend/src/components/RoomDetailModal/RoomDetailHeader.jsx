@@ -1,14 +1,14 @@
-import React from 'react';
+import { memo } from 'react';
 import { X } from 'lucide-react';
-import { formatPrice } from '../../../lib/utils';
-import { cn } from '../../../lib/utils';
+import { formatPrice } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 
-export function RoomDetailHeader({ room, onClose, className }) {
+export const RoomDetailHeader = memo(function RoomDetailHeader({ room, onClose, className }) {
   const { name, room_type, base_price, average_rating, review_count } = room;
   const price = base_price != null ? Number(base_price) : null;
 
   return (
-    <header className={cn('sticky top-0 z-10 flex items-start justify-between gap-4 p-4 bg-white/95 backdrop-blur-sm border-b border-[#e8e4dd]', className)}>
+    <header className={cn('sticky top-0 z-10 flex items-start justify-between gap-4 p-4 pt-[calc(env(safe-area-inset-top)+1rem)] sm:pt-4 bg-white/95 backdrop-blur-sm border-b border-[#e8e4dd]', className)}>
       <div className="flex-1 min-w-0 pr-4">
         <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] truncate">{name}</h1>
         {room_type && (
@@ -51,4 +51,4 @@ export function RoomDetailHeader({ room, onClose, className }) {
       </div>
     </header>
   );
-}
+});

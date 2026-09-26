@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo } from 'react';
 import { getAmenityLabel } from '../../../lib/amenities';
 import { AmenityIcon } from '../../AmenityIcon';
 
@@ -52,7 +52,7 @@ function PolicyRow({ label, value, icon }) {
   );
 }
 
-export function OverviewTab({ room }) {
+export const OverviewTab = memo(function OverviewTab({ room }) {
   const {
     description,
     size,
@@ -117,4 +117,4 @@ export function OverviewTab({ room }) {
       )}
     </div>
   );
-}
+});

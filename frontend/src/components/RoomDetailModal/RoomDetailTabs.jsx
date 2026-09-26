@@ -1,5 +1,5 @@
-import React from 'react';
-import { cn } from '../../../lib/utils';
+import { memo } from 'react';
+import { cn } from '../../lib/utils';
 
 const TABS = [
   { key: 'overview', label: 'Tổng quan', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
@@ -16,7 +16,7 @@ function TabIcon({ path }) {
   );
 }
 
-export function RoomDetailTabs({ activeTab, onTabChange, className }) {
+export const RoomDetailTabs = memo(function RoomDetailTabs({ activeTab, onTabChange, className }) {
   return (
     <nav
       className={cn('flex gap-1 overflow-x-auto pb-2 px-4 bg-white/95 backdrop-blur-sm border-b border-[#e8e4dd] sticky top-14 z-10', className)}
@@ -44,4 +44,4 @@ export function RoomDetailTabs({ activeTab, onTabChange, className }) {
       ))}
     </nav>
   );
-}
+});
