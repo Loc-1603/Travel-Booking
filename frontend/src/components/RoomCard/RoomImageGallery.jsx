@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect, memo } from 'react';
+import { memo } from 'react';
 import { cn } from '../../lib/utils';
+import { LazyImage } from '../LazyImage';
 
-const BLUR_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-
-export function RoomImageGallery({
+export const RoomImageGallery = memo(function RoomImageGallery({
   images = [],
   variant = 'card',
   featuredImage,
@@ -11,40 +10,8 @@ export function RoomImageGallery({
   onClick,
   className,
 }) {
-  const [loadedImages, setLoadedImages] = useState(new Set());
-  const observerRef = useRef(null);
-
   const allImages = featuredImage ? [featuredImage, ...remainingImages] : images;
   const hasImages = allImages.length > 0;
-
-  useEffect(() => {
-    if (variant !== 'card' && variant !== 'detailed') return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            if (img.dataset.src && !loadedImages.has(img.dataset.src)) {
-              img.src = img.dataset.src;
-              setLoadedImages((prev) => new Set(prev).add(img.dataset.src));
-            }
-            observerRef.current?.unobserve(img);
-          }
-        });
-      },
-      { rootMargin: '100px', threshold: 0.01 }
-    );
-
-    const imgs = document.querySelectorAll('[data-lazy-img]');
-    imgs.forEach((img) => observerRef.current?.observe(img));
-
-    return () => observerRef.current?.disconnect();
-  }, [variant, loadedImages]);
-
-  const handleImageLoad = (src) => {
-    setLoadedImages((prev) => new Set(prev).add(src));
-  };
 
   if (!hasImages) {
     return (
@@ -57,32 +24,27 @@ export function RoomImageGallery({
   }
 
   const renderImage = (img, index) => {
-    const isLoaded = loadedImages.has(img?.url);
     const isFeatured = index === 0 && variant !== 'gallery';
 
     return (
       <div
         key={img.id || index}
+        onClick={onClick}
         className={cn(
           'relative overflow-hidden',
+          onClick && 'cursor-pointer',
           isFeatured && variant !== 'gallery' && 'col-span-2 row-span-2',
           variant === 'gallery' && 'aspect-[4/3]'
         )}
         style={variant === 'card' || variant === 'detailed' ? { aspectRatio: isFeatured ? '4/3' : '1/1' } : {}}
       >
-        <img
-          data-lazy-img
-          data-src={img.url}
-          src={isLoaded ? img.url : BLUR_PLACEHOLDER}
+        <LazyImage
+          src={img.url}
           alt={img.alt_text || ''}
-          className={cn(
-            'w-full h-full object-cover transition-opacity duration-300',
-            isLoaded ? 'opacity-100' : 'opacity-0 blur-[20px]'
-          )}
-          onLoad={() => handleImageLoad(img.url)}
-          loading={index === 0 ? 'eager' : 'lazy'}
+          eager={index === 0}
           width={isFeatured ? 800 : 400}
           height={isFeatured ? 600 : 400}
+          className="w-full h-full object-cover"
         />
         {variant === 'card' && index === 0 && remainingImages.length > 0 && (
           <div className="absolute bottom-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
@@ -102,11 +64,13 @@ export function RoomImageGallery({
         tabIndex={onClick ? 0 : undefined}
         onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
       >
-        <img
+        <LazyImage
           src={featuredImage?.url || allImages[0]?.url}
           alt={featuredImage?.alt_text || allImages[0]?.alt_text || ''}
+          eager
+          width={800}
+          height={256}
           className="w-full h-64 object-cover"
-          loading="eager"
         />
         {allImages.length > 1 && (
           <div className="absolute bottom-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
@@ -130,7 +94,4 @@ export function RoomImageGallery({
       ))}
     </div>
   );
-}
-
-export const MemoizedRoomImageGallery = memo(RoomImageGallery);
-MemoizedRoomImageGallery.displayName = 'RoomImageGallery';
+});

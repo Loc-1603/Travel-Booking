@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo, useMemo } from 'react';
 import { cn } from '../../lib/utils';
 import { RoomImageGallery } from './RoomImageGallery';
 import { RoomPriceBadge } from './RoomPriceBadge';
@@ -18,7 +18,7 @@ const CAPACITY_ICONS = {
   4: 'quad',
 };
 
-export function RoomCard({
+export const RoomCard = memo(function RoomCard({
   room,
   variant = 'card',
   nights,
@@ -44,7 +44,7 @@ export function RoomCard({
 
   const price = base_price != null ? Number(base_price) : null;
   const featuredImage = images[0];
-  const remainingImages = images.slice(1);
+  const remainingImages = useMemo(() => images.slice(1), [images]);
 
   const variantClass = VARIANT_CLASSES[variant] || VARIANT_CLASSES.card;
 
@@ -202,6 +202,4 @@ export function RoomCard({
       </div>
     </article>
   );
-}
-
-RoomCard.displayName = 'RoomCard';
+});
