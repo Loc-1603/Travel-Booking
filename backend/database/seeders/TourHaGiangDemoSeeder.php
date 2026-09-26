@@ -108,7 +108,7 @@ class TourHaGiangDemoSeeder extends Seeder
         foreach ($this->guides as $i => $g) {
             $user = User::firstOrCreate(
                 ['email' => $g['email']],
-                ['name' => $g['name'], 'password' => bcrypt('12345678'), 'role' => Role::VENDOR, 'status' => 'active']
+                ['name' => $g['name'], 'password' => bcrypt('12345678'), 'role' => Role::VENDOR, 'status' => 'active', 'email_verified_at' => now()]
             );
             if (! $user->hasRole('vendor')) {
                 $user->assignRole('vendor');
@@ -172,7 +172,7 @@ class TourHaGiangDemoSeeder extends Seeder
         for ($i = 1; $i <= 4; $i++) {
             $user = User::firstOrCreate(
                 ['email' => "customer-hg-0{$i}@test.local"],
-                ['name' => "Khách HG 0{$i}", 'password' => bcrypt('12345678'), 'role' => Role::CUSTOMER, 'status' => 'active']
+                ['name' => "Khách HG 0{$i}", 'password' => bcrypt('12345678'), 'role' => Role::CUSTOMER, 'status' => 'active', 'email_verified_at' => now()]
             );
             if (! $user->hasRole('customer')) {
                 $user->assignRole('customer');

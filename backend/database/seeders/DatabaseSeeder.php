@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             VietnamCitiesSeeder::class,
             AmenitySeeder::class,
             HotelSeeder::class,
+            RoomTypeSeeder::class,
             RoomSeeder::class,
             HotelImageSeeder::class,
             RoomAvailabilitySeeder::class,

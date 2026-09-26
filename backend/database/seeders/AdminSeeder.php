@@ -26,6 +26,7 @@ class AdminSeeder extends Seeder
                 'password' => bcrypt('12345678'),
                 'role' => Role::SUPER_ADMIN,
                 'status' => 'active',
+                'email_verified_at' => now(),
             ]
         );
         if (!$admin->hasRole('super-admin')) {
@@ -43,6 +44,7 @@ class AdminSeeder extends Seeder
                 'password' => bcrypt('12345678'),
                 'role' => Role::ADMIN,
                 'status' => 'active',
+                'email_verified_at' => now(),
             ]
         );
         if (!$user->hasRole('admin')) {
@@ -60,6 +62,7 @@ class AdminSeeder extends Seeder
                 'password' => bcrypt('12345678'),
                 'role' => Role::VENDOR,
                 'status' => 'active',
+                'email_verified_at' => now(),
             ]
         );
         if (!$user->hasRole('vendor')) {
@@ -101,6 +104,7 @@ class AdminSeeder extends Seeder
                     'password' => bcrypt('12345678'),
                     'role' => Role::VENDOR,
                     'status' => 'active',
+                    'email_verified_at' => now(),
                 ]
             );
             if (!$user->hasRole('vendor')) {
@@ -119,6 +123,7 @@ class AdminSeeder extends Seeder
                 'password' => bcrypt('12345678'),
                 'role' => Role::CUSTOMER,
                 'status' => 'active',
+                'email_verified_at' => now(),
             ]
         );
         if (!$user->hasRole('customer')) {

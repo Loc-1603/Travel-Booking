@@ -42,6 +42,7 @@ class BookingSeeder extends Seeder
                     'password' => bcrypt('12345678'),
                     'role' => Role::CUSTOMER,
                     'status' => 'active',
+                    'email_verified_at' => now(),
                 ]
             );
             if (!$customer->hasRole('customer')) {

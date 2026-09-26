@@ -25,7 +25,7 @@ class RoomTypeSeeder extends Seeder
         $hotels = Hotel::all();
 
         foreach ($hotels as $hotel) {
-            foreach ($defaultRoomTypes as $index => $type) {
+            foreach ($defaultRoomTypes as $type) {
                 RoomType::firstOrCreate(
                     ['hotel_id' => $hotel->id, 'slug' => $type['slug']],
                     array_merge($type, ['hotel_id' => $hotel->id])
