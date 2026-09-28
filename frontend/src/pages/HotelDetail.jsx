@@ -1,11 +1,17 @@
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useMemo } from 'react';
-import { MapPin, Calendar, Users, X, ChevronLeft, ChevronRight, Star, Sparkles } from 'lucide-react';
+import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
+import { MapPin, X, ChevronLeft, ChevronRight, Star, Sparkles, SlidersHorizontal, SearchX } from 'lucide-react';
+import { RoomCard, RoomCardSkeletonList } from '../components/RoomCard';
+import { RoomFilterPanelSkeleton } from '../components/RoomFilterPanel/RoomFilterPanelSkeleton';
+import { LazyRoomFilterPanel } from '../components/RoomFilterPanel/lazy';
+import { preloadRoomFilterPanel } from '../components/RoomFilterPanel/preload';
+import { LazyRoomDetailModal } from '../components/RoomDetailModal/lazy';
+import { preloadRoomDetailModal } from '../components/RoomDetailModal/preload';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
 import { useWishlist } from '../hooks/useWishlist';
-import { HotelDetailSkeleton } from '../components/Skeleton';
+import { Skeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
 import { formatPrice, getRatingLabel, calculateNights, cn } from '../lib/utils';
 import { getAmenityLabel } from '../lib/amenities';
@@ -18,6 +24,22 @@ const TABS = [
   { key: 'rooms', label: 'hotelDetail.tabs.rooms' },
   { key: 'reviews', label: 'hotelDetail.tabs.reviews' },
   { key: 'location', label: 'hotelDetail.tabs.location' },
+];
+
+const DEFAULT_ROOM_FILTERS = {
+  capacity: '',
+  price: { min: '', max: '' },
+  roomTypes: [],
+  bedTypes: [],
+  viewTypes: [],
+  amenities: [],
+};
+
+const ROOM_SORT_OPTIONS = [
+  { value: 'recommended', label: 'hotelDetail.rooms.sortRecommended' },
+  { value: 'price_asc', label: 'hotelDetail.rooms.sortPriceAsc' },
+  { value: 'price_desc', label: 'hotelDetail.rooms.sortPriceDesc' },
+  { value: 'capacity', label: 'hotelDetail.rooms.sortCapacity' },
 ];
 
 function WishlistHeart({ hotelId, checkIn, checkOut }) {
@@ -85,6 +107,39 @@ function StarDistribution({ reviews }) {
   );
 }
 
+// Composite skeleton mirroring the real HotelDetail layout (hero, title, tabs, rooms grid, booking widget)
+function HotelDetailLoadingSkeleton() {
+  return (
+    <div className="py-4 sm:py-6" role="status" aria-label="Đang tải chi tiết khách sạn">
+      <div className="mb-6">
+        <Skeleton className="w-full aspect-[21/9] sm:aspect-[3/1] max-h-[400px] rounded-2xl" />
+      </div>
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <div className="flex-1 min-w-0">
+          <div className="mb-4 space-y-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <div className="border-b border-[#e8e4dd] mb-6">
+            <Skeleton className="h-10 w-72 rounded-none" />
+          </div>
+          <div className="flex gap-6 items-start">
+            <div className="hidden lg:block w-[280px] shrink-0">
+              <Skeleton className="h-[480px] w-full rounded-2xl" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <RoomCardSkeletonList count={6} variant="detailed" />
+            </div>
+          </div>
+        </div>
+        <div className="lg:w-96 shrink-0 hidden lg:block">
+          <Skeleton className="h-[480px] w-full rounded-2xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HotelDetail() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -102,6 +157,40 @@ export default function HotelDetail() {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentGalleryImages, setCurrentGalleryImages] = useState([]);
   const [reviewsPage, setReviewsPage] = useState(1);
+  const [roomFilters, setRoomFilters] = useState(DEFAULT_ROOM_FILTERS);
+  const [debouncedRoomFilters, setDebouncedRoomFilters] = useState(DEFAULT_ROOM_FILTERS);
+  const [roomSortBy, setRoomSortBy] = useState('recommended');
+  const [selectedRoomForModal, setSelectedRoomForModal] = useState(null);
+  const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [modalQuantity, setModalQuantity] = useState(1);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
+  );
+  const [prevHotelId, setPrevHotelId] = useState(id);
+  if (prevHotelId !== id) {
+    setPrevHotelId(id);
+    setRoomFilters(DEFAULT_ROOM_FILTERS);
+    setDebouncedRoomFilters(DEFAULT_ROOM_FILTERS);
+    setRoomSortBy('recommended');
+    setSelectedRoomForModal(null);
+    setIsRoomModalOpen(false);
+    setIsMobileFilterOpen(false);
+    setSelectedRoom(null);
+    setRoomQuantity(1);
+  }
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)');
+    const handleChange = (e) => setIsMobileViewport(e.matches);
+    mq.addEventListener('change', handleChange);
+    return () => mq.removeEventListener('change', handleChange);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedRoomFilters(roomFilters), 300);
+    return () => clearTimeout(timer);
+  }, [roomFilters]);
 
   const handleDateSearch = () => {
     if (localCheckIn && localCheckOut) {
@@ -176,11 +265,107 @@ export default function HotelDetail() {
     return fit.length > 0 ? fit : rooms;
   }, [rooms, guests]);
 
+  // Latest refs so memoized children receive stable callbacks (React.memo needs stable props)
+  const selectedRoomRef = useRef(selectedRoom);
+  const roomQuantityRef = useRef(roomQuantity);
+  useEffect(() => {
+    selectedRoomRef.current = selectedRoom;
+    roomQuantityRef.current = roomQuantity;
+  });
+
+  const openRoomModal = useCallback((room) => {
+    preloadRoomDetailModal();
+    setSelectedRoomForModal(room);
+    setModalQuantity(selectedRoomRef.current?.id === room.id ? roomQuantityRef.current : 1);
+    setIsRoomModalOpen(true);
+  }, []);
+
+  const closeRoomModal = useCallback(() => {
+    setIsRoomModalOpen(false);
+    setSelectedRoomForModal(null);
+  }, []);
+
+  const handleModalQuantityChange = useCallback((delta) => {
+    setModalQuantity((q) => {
+      if (!selectedRoomForModal) return Math.max(1, q + delta);
+      const maxQty = Math.min(selectedRoomForModal.total_rooms || 5, selectedRoomForModal.max_quantity_per_booking || 5, 5);
+      return Math.min(Math.max(1, q + delta), maxQty);
+    });
+  }, [selectedRoomForModal]);
+
+  const handleSelectRoomFromModal = useCallback(() => {
+    if (!selectedRoomForModal) return;
+    setSelectedRoom(selectedRoomForModal);
+    setRoomQuantity(modalQuantity);
+    closeRoomModal();
+  }, [selectedRoomForModal, modalQuantity, closeRoomModal]);
+
+  const handleSelectRoom = useCallback((room) => {
+    if (!room || selectedRoomRef.current?.id === room.id) return;
+    setSelectedRoom(room);
+    setRoomQuantity(1);
+  }, []);
+
+  const clearRoomFilters = useCallback(() => {
+    setRoomFilters(DEFAULT_ROOM_FILTERS);
+  }, []);
+
+  const closeMobileFilter = useCallback(() => setIsMobileFilterOpen(false), []);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (roomFilters.capacity) count++;
+    if (roomFilters.price?.min || roomFilters.price?.max) count++;
+    if (roomFilters.roomTypes?.length) count += roomFilters.roomTypes.length;
+    if (roomFilters.bedTypes?.length) count += roomFilters.bedTypes.length;
+    if (roomFilters.viewTypes?.length) count += roomFilters.viewTypes.length;
+    if (roomFilters.amenities?.length) count += roomFilters.amenities.length;
+    return count;
+  }, [roomFilters]);
+
+  const filteredRooms = useMemo(() => {
+    const { capacity, price, roomTypes, bedTypes, viewTypes, amenities } = debouncedRoomFilters;
+    return rooms.filter((room) => {
+      if (capacity && Number(room.capacity) < Number(capacity)) return false;
+      const roomPrice = Number(room.base_price || 0);
+      if (price?.min !== '' && price?.min != null && roomPrice < Number(price.min)) return false;
+      if (price?.max !== '' && price?.max != null && roomPrice > Number(price.max)) return false;
+      if (roomTypes?.length && !roomTypes.includes(room.room_type?.id)) return false;
+      if (bedTypes?.length && !bedTypes.includes(room.bed_type)) return false;
+      if (viewTypes?.length && !viewTypes.includes(room.view_type)) return false;
+      if (amenities?.length) {
+        const slugs = (room.amenities || []).map((a) => a.slug);
+        if (!amenities.every((slug) => slugs.includes(slug))) return false;
+      }
+      return true;
+    });
+  }, [rooms, debouncedRoomFilters]);
+
+  const sortedRooms = useMemo(() => {
+    const list = [...filteredRooms];
+    if (roomSortBy === 'price_asc') {
+      list.sort((a, b) => Number(a.base_price || 0) - Number(b.base_price || 0));
+    } else if (roomSortBy === 'price_desc') {
+      list.sort((a, b) => Number(b.base_price || 0) - Number(a.base_price || 0));
+    } else if (roomSortBy === 'capacity') {
+      list.sort((a, b) => Number(b.capacity || 0) - Number(a.capacity || 0));
+    }
+    return list;
+  }, [filteredRooms, roomSortBy]);
+
+  const roomsByType = useMemo(() => {
+    const groups = new Map();
+    sortedRooms.forEach((room) => {
+      const type = room.room_type?.name || t('hotelDetail.rooms.otherType');
+      if (!groups.has(type)) groups.set(type, []);
+      groups.get(type).push(room);
+    });
+    return Array.from(groups.entries()).map(([type, typeRooms]) => ({ type, rooms: typeRooms }));
+  }, [sortedRooms, t]);
+
   if (isLoading) {
     return (
-      <div className="py-6">
-        <HotelDetailSkeleton />
-      </div>
+      <HotelDetailLoadingSkeleton />
     );
   }
 
@@ -203,6 +388,8 @@ export default function HotelDetail() {
                 src={images[selectedImageIndex]?.url || images[0]?.url}
                 alt={images[selectedImageIndex]?.alt_text || hotel.name}
                 className="w-full h-full object-cover cursor-pointer"
+                fetchPriority="high"
+                decoding="async"
                 onClick={() => {
                   setCurrentGalleryImages(images);
                   setSelectedImageIndex(0);
@@ -334,87 +521,114 @@ export default function HotelDetail() {
           )}
 
           {activeTab === 'rooms' && (
-            <section className="space-y-6">
+            <section className="space-y-5">
               {rooms.length === 0 ? (
                 <p className="text-[#5c5852]">{t('hotelDetail.rooms.noRooms')}</p>
               ) : (
-                <ul className="space-y-6">
-                  {rooms.map((room) => {
-                    const roomImg = room.images?.[0] || room.banner_image || images[0];
-                    const price = room.base_price != null ? Number(room.base_price) : null;
-                    const totalPrice = price != null && nights ? price * nights : null;
-                    return (
-                      <li key={room.id} className="rounded-2xl overflow-hidden border border-[#e8e4dd]/80 bg-white shadow-sm hover:shadow-xl hover:border-[#b8860b]200/60 transition-all duration-300">
-                        <div className="flex flex-col sm:flex-row">
-                          <div
-                            className="sm:w-72 flex-shrink-0 aspect-[4/3] sm:aspect-auto sm:h-52 bg-[#e8e4dd] relative cursor-pointer"
-                            onClick={() => room.images?.length > 0 && (setCurrentGalleryImages(room.images), setSelectedImageIndex(0), setIsGalleryOpen(true))}
-                          >
-                            {roomImg?.url ? (
-                              <img src={roomImg.url} alt={roomImg.alt_text || room.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-[#7a756d]">
-                                <MapPin className="w-12 h-12" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-4 sm:p-5 flex-1 flex flex-col sm:flex-row sm:justify-between gap-4">
-                            <div>
-                              <h3 className="font-semibold text-[#1a1a1a] text-lg">{room.name}</h3>
-                              <p className="text-sm text-[#5c5852] mt-0.5">{t('hotelDetail.rooms.capacity', { count: room.capacity })}</p>
-                              {nights != null && nights > 0 && (
-                                <p className="text-sm text-[#5c5852] mt-1">{t('common.nights', { count: nights })}</p>
-                              )}
-                              {room.amenities?.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-2">
-                                  {room.amenities?.slice(0, 5).map((a) => (
-                                    <span key={a.id} className="inline-flex items-center gap-1 text-[#5c5852] text-sm" title={getAmenityLabel(t, a)}>
-                                      <AmenityIcon slug={a.slug} className="w-3.5 h-3.5" />
-                                      {getAmenityLabel(t, a)}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                              {room.cancellation_policy_summary && (
-                                <p className="text-sm text-[#5c5852] mt-2">{room.cancellation_policy_summary}</p>
-                              )}
-                              {totalPrice != null && (
-                                <div className="mt-2">
-                                  <span className="font-semibold text-[#1a1a1a]">{formatPrice(totalPrice)}</span>
-                                  <span className="text-[#5c5852] text-sm">{nights > 0 ? ` ${t('common.total')}` : ''}</span>
-                                </div>
-                              )}
-                              {price != null && !checkIn && !checkOut && (
-                                <p className="mt-2 text-[#45423d] font-medium">{t('hotelDetail.rooms.fromPerNight', { price: formatPrice(price) })}</p>
-                              )}
-                            </div>
-                            <div className="flex items-end">
-                              {checkIn && checkOut ? (
-                                user ? (
-                                  <Link
-                                    to={`/book?hotel_id=${hotel.id}&room_id=${room.id}&check_in=${checkIn}&check_out=${checkOut}`}
-                                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#b8860b] text-white font-semibold hover:bg-[#996f09] transition-colors"
-                                  >
-                                    {t('hotelDetail.rooms.select')}
-                                  </Link>
-                                ) : (
-                                  <Link
-                                    to={`/login?redirect=${encodeURIComponent(`/book?hotel_id=${hotel.id}&room_id=${room.id}&check_in=${checkIn}&check_out=${checkOut}`)}`}
-                                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#b8860b] text-white font-semibold hover:bg-[#996f09] transition-colors"
-                                  >
-                                    {t('hotelDetail.rooms.select')}
-                                  </Link>
-                                )
-                              ) : (
-                                <span className="inline-block px-4 py-2 rounded-xl bg-[#f5f2ed] text-[#5c5852] text-sm">{t('hotelDetail.rooms.selectDatesToBook')}</span>
-                              )}
-                            </div>
-                          </div>
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm text-[#5c5852]">
+                      {t('hotelDetail.rooms.roomsCount', { count: sortedRooms.length })}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      {isMobileViewport && (
+                        <button
+                          type="button"
+                          onClick={() => { preloadRoomFilterPanel(); setIsMobileFilterOpen(true); }}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#e8e4dd] bg-white text-sm font-medium text-[#1a1a1a] hover:bg-[#faf8f5] transition-colors"
+                        >
+                          <SlidersHorizontal className="w-4 h-4" aria-hidden />
+                          {t('hotelDetail.rooms.filters')}
+                          {activeFilterCount > 0 && (
+                            <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#b8860b] text-white text-xs inline-flex items-center justify-center">
+                              {activeFilterCount}
+                            </span>
+                          )}
+                        </button>
+                      )}
+                      <label htmlFor="room-sort" className="sr-only">{t('hotelDetail.rooms.sortBy')}</label>
+                      <select
+                        id="room-sort"
+                        value={roomSortBy}
+                        onChange={(e) => setRoomSortBy(e.target.value)}
+                        className="rounded-xl border border-[#e8e4dd] bg-white px-3 py-2 text-sm text-[#1a1a1a]"
+                      >
+                        {ROOM_SORT_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>{t(option.label)}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-6 items-start">
+                    {!isMobileViewport && (
+                      <Suspense fallback={<RoomFilterPanelSkeleton />}>
+                        <LazyRoomFilterPanel
+                          rooms={rooms}
+                          filters={roomFilters}
+                          onFiltersChange={setRoomFilters}
+                        />
+                      </Suspense>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      {sortedRooms.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-[#d4cec4] bg-[#faf8f5] px-6 py-12 text-center">
+                          <SearchX className="w-12 h-12 mx-auto text-[#b8860b]/70 mb-3" aria-hidden />
+                          <p className="font-semibold text-[#1a1a1a]">{t('hotelDetail.rooms.noResults')}</p>
+                          <p className="text-sm text-[#5c5852] mt-1">{t('hotelDetail.rooms.noResultsHint')}</p>
+                          {activeFilterCount > 0 && (
+                            <button
+                              type="button"
+                              onClick={clearRoomFilters}
+                              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#b8860b]/40 text-[#b8860b] font-medium text-sm hover:bg-[#fff7e6] transition-colors"
+                            >
+                              <X className="w-4 h-4" aria-hidden />
+                              {t('hotelDetail.rooms.clearFilters')}
+                            </button>
+                          )}
                         </div>
-                      </li>
-                    );
-                  })}
-                </ul>
+                      ) : (
+                        <div className="space-y-8">
+                          {roomsByType.map(({ type, rooms: typeRooms }) => (
+                            <div key={type}>
+                              <div className="flex items-baseline gap-2 mb-3">
+                                <h3 className="font-semibold text-[#1a1a1a] text-lg">{type}</h3>
+                                <span className="text-sm text-[#5c5852]">
+                                  {t('hotelDetail.rooms.roomsCount', { count: typeRooms.length })}
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+                                {typeRooms.map((room) => (
+                                  <RoomCard
+                                    key={room.id}
+                                    room={room}
+                                    variant="detailed"
+                                    nights={nights}
+                                    onViewDetails={openRoomModal}
+                                    onSelect={handleSelectRoom}
+                                    selected={selectedRoom?.id === room.id}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {isMobileViewport && isMobileFilterOpen && (
+                    <Suspense fallback={null}>
+                      <LazyRoomFilterPanel
+                        rooms={rooms}
+                        filters={roomFilters}
+                        onFiltersChange={setRoomFilters}
+                        isMobile
+                        onClose={closeMobileFilter}
+                      />
+                    </Suspense>
+                  )}
+                </>
               )}
             </section>
           )}
@@ -581,23 +795,18 @@ export default function HotelDetail() {
               {effectiveCheckIn && effectiveCheckOut && rooms.length > 0 && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-[#45423d] mb-2">{t('hotelDetail.booking.room')}</label>
-                    <select
-                      value={selectedRoom?.id ?? ''}
-                      onChange={(e) => {
-                        const r = rooms.find((x) => String(x.id) === e.target.value);
-                        setSelectedRoom(r || null);
-                        setRoomQuantity(1);
-                      }}
-                      className="w-full rounded-lg border border-[#d4cec4] px-3 py-2 text-sm text-[#1a1a1a] bg-white"
-                    >
-                      <option value="">{t('hotelDetail.booking.selectRoom')}</option>
+                    <span id="room-picker-label" className="block text-sm font-medium text-[#45423d] mb-2">{t('hotelDetail.booking.selectRoom')}</span>
+                    <div className="grid grid-cols-2 gap-3" role="group" aria-labelledby="room-picker-label">
                       {roomsForGuests.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.name} — {formatPrice(r.base_price)}/{t('common.night')}
-                        </option>
+                        <RoomCard
+                          key={r.id}
+                          room={r}
+                          variant="gallery"
+                          onSelect={handleSelectRoom}
+                          selected={selectedRoom?.id === r.id}
+                        />
                       ))}
-                    </select>
+                    </div>
                   </div>
                   {selectedRoom && (
                     <div>
@@ -672,6 +881,23 @@ export default function HotelDetail() {
           </div>
         </aside>
       </div>
+
+      {/* Room Detail Modal — conditional mount + code-split (fallback=null avoids double-paint flash) */}
+      {isRoomModalOpen && selectedRoomForModal && (
+        <Suspense fallback={null}>
+          <LazyRoomDetailModal
+            room={selectedRoomForModal}
+            hotel={hotel}
+            isOpen={isRoomModalOpen}
+            onClose={closeRoomModal}
+            onSelectRoom={handleSelectRoomFromModal}
+            quantity={modalQuantity}
+            onQuantityChange={handleModalQuantityChange}
+            isLoggedIn={!!user}
+            nights={nights}
+          />
+        </Suspense>
+      )}
 
       {/* Lightbox */}
       {isGalleryOpen && currentGalleryImages.length > 0 && (

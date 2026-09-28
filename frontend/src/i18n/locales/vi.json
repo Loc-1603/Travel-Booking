@@ -329,6 +329,24 @@
     "roomAmenities": "Tiện ích phòng",
     "included": "Đã bao gồm",
     "notIncluded": "Chưa bao gồm",
+    "bedTypes": {
+      "single": "Giường đơn",
+      "double": "Giường đôi",
+      "queen": "Giường Queen",
+      "king": "Giường King",
+      "twin": "2 giường đơn",
+      "sofa_bed": "Sofa giường",
+      "bunk": "Giường tầng"
+    },
+    "viewTypes": {
+      "city": "View thành phố",
+      "sea": "View biển",
+      "mountain": "View núi",
+      "garden": "View vườn",
+      "pool": "View hồ bơi",
+      "courtyard": "View sân trong",
+      "landmark": "View điểm du lịch"
+    },
     "errors": {
       "missingParams": "Thiếu tham số tìm kiếm. Hãy bắt đầu từ khách sạn và chọn ngày, phòng.",
       "hotelNotFound": "Không tìm thấy khách sạn hoặc phòng.",
@@ -343,7 +361,13 @@
     "step1": {
       "title": "Chọn phòng",
       "quantity": "Số lượng",
-      "fromTotal": "Từ {{price}} tổng cộng"
+      "fromTotal": "Từ {{price}} tổng cộng",
+      "viewDetails": "Xem chi tiết phòng",
+      "size": "Diện tích",
+      "bedType": "Loại giường",
+      "viewType": "View",
+      "roomType": "Loại phòng",
+      "capacity": "Sức chứa"
     },
     "step2": {
       "title": "Thông tin khách",
@@ -371,6 +395,9 @@
       "specialRequestsPlaceholder": "Ví dụ: Đến muộn, tầng cao, khăn thêm",
       "creating": "Đang tạo…",
       "proceedToPayment": "Tiếp tục thanh toán",
+      "viewImages": "Xem ảnh",
+      "viewAmenities": "Tiện nghi",
+      "viewPolicies": "Chính sách",
       "alreadyHaveAccount": "Đã có tài khoản?",
       "logIn": "Đăng nhập",
       "toBookAndSeeHistory": "để đặt phòng và xem lịch sử."
@@ -711,7 +738,18 @@
       "fromPerNight": "Từ {{price}} / đêm",
       "select": "Chọn",
       "selectDatesToBook": "Chọn ngày để đặt phòng",
-      "selectRoom": "Chọn phòng"
+      "selectRoom": "Chọn phòng",
+      "otherType": "Khác",
+      "roomsCount": "{{count}} phòng",
+      "filters": "Bộ lọc",
+      "sortBy": "Sắp xếp phòng",
+      "sortRecommended": "Đề xuất",
+      "sortPriceAsc": "Giá: thấp → cao",
+      "sortPriceDesc": "Giá: cao → thấp",
+      "sortCapacity": "Sức chứa: nhiều nhất",
+      "noResults": "Không có phòng phù hợp với bộ lọc",
+      "noResultsHint": "Thử điều chỉnh hoặc xóa bộ lọc để xem thêm phòng.",
+      "clearFilters": "Xóa bộ lọc"
     },
     "reviews": {
       "sentimentTitle": "Tóm tắt cảm xúc đánh giá",
