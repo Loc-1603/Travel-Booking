@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { cn } from '../../lib/utils';
+import React, { useState } from 'react';
 
-export function PriceRangeSlider({ min, max, value, onChange, step = 10000, currency = 'đ' }) {
+export function PriceRangeSlider({ min, max, value, onChange, step = 10000 }) {
   const [minVal, setMinVal] = useState(value?.min ?? min ?? 0);
   const [maxVal, setMaxVal] = useState(value?.max ?? max ?? 0);
   const [minInput, setMinInput] = useState('');
   const [maxInput, setMaxInput] = useState('');
   const [activeField, setActiveField] = useState(null);
+  const [prevRange, setPrevRange] = useState({ min, max, value });
 
-  useEffect(() => {
+  if (prevRange.min !== min || prevRange.max !== max || prevRange.value !== value) {
+    setPrevRange({ min, max, value });
     setMinVal(value?.min ?? min ?? 0);
     setMaxVal(value?.max ?? max ?? 0);
-  }, [value?.min, value?.max, min, max]);
+  }
 
   const range = (maxVal || 1) - (min || 0);
   const minPercent = range > 0 ? ((minVal - (min || 0)) / range) * 100 : 0;
@@ -51,7 +52,7 @@ export function PriceRangeSlider({ min, max, value, onChange, step = 10000, curr
             onChange?.({ min: v, max: maxVal });
           }}
           className="absolute inset-0 w-full appearance-none bg-transparent pointer-events-none"
-          style={{ '--thumb': '#b8860b' } as React.CSSProperties}
+          style={{ '--thumb': '#b8860b' }}
         />
         <input
           type="range"
