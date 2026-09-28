@@ -1,12 +1,14 @@
-import { useMemo, useState } from 'react';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
-import { HotelDetailSkeleton } from '../components/Skeleton';
 import { AmenityIcon } from '../components/AmenityIcon';
+import { RoomImageGallery } from '../components/RoomCard';
+import { LazyRoomDetailModal } from '../components/RoomDetailModal/lazy';
+import { preloadRoomDetailModal } from '../components/RoomDetailModal/preload';
 import { formatPrice, formatDate, calculateNights } from '../lib/utils';
 import { getAmenityLabel } from '../lib/amenities';
 import { cn } from '../lib/utils';
@@ -20,7 +22,7 @@ const STEPS = [
 
 function BookingSkeleton() {
   return (
-    <div className="py-6 max-w-2xl">
+    <div className="py-6 max-w-3xl mx-auto">
       <div className="h-8 w-48 bg-stone-200 rounded animate-pulse mb-6" />
       <div className="space-y-4">
         <div className="h-32 bg-stone-200 rounded-xl animate-pulse" />
@@ -51,6 +53,22 @@ export default function Booking() {
   const [couponCode, setCouponCode] = useState('');
   const [lateCheckout, setLateCheckout] = useState(false);
   const [specialRequests, setSpecialRequests] = useState('');
+  const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [modalInitialTab, setModalInitialTab] = useState('overview');
+
+  const bedTypeLabel = (value) => {
+    if (!value) return null;
+    const key = `booking.bedTypes.${value}`;
+    const translated = t(key);
+    return translated === key ? value : translated;
+  };
+
+  const viewTypeLabel = (value) => {
+    if (!value) return null;
+    const key = `booking.viewTypes.${value}`;
+    const translated = t(key);
+    return translated === key ? value : translated;
+  };
 
   const nights = checkIn && checkOut ? calculateNights(checkIn, checkOut) : 0;
 
@@ -142,8 +160,27 @@ export default function Booking() {
   };
 
   const hotel = hotelData?.data ?? hotelData;
-  const room = hotel?.rooms?.find((r) => String(r.id) === String(roomId));
+  const room = useMemo(
+    () => hotel?.rooms?.find((r) => String(r.id) === String(roomId)) ?? null,
+    [hotel, roomId]
+  );
+  const roomImages = useMemo(() => room?.images || [], [room]);
+  const featuredImage = roomImages[0] || room?.banner_image;
+  const remainingImages = useMemo(() => roomImages.slice(1), [roomImages]);
   const breakdown = previewData?.data ?? previewData;
+
+  // Stable callbacks so memoized children (RoomDetailModal) skip re-renders
+  const openRoomModal = useCallback((tab = 'overview') => {
+    preloadRoomDetailModal();
+    setModalInitialTab(tab);
+    setIsRoomModalOpen(true);
+  }, []);
+
+  const closeRoomModal = useCallback(() => setIsRoomModalOpen(false), []);
+
+  const handleModalQuantityChange = useCallback((delta) => {
+    setQuantity((q) => Math.max(1, Math.min(room?.total_rooms || 5, q + delta)));
+  }, [room]);
 
   const estimatedSubtotal = room && nights ? Number(room.base_price) * nights * quantity : 0;
 
@@ -226,19 +263,50 @@ export default function Booking() {
           <h2 className="text-lg font-semibold text-stone-900">{t('booking.step1.title')}</h2>
           <div className="rounded-2xl border border-stone-200/80 bg-white shadow-sm p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="sm:w-40 shrink-0 aspect-[4/3] sm:aspect-square rounded-xl overflow-hidden bg-stone-200">
-                {(room.images?.[0] || room.banner_image)?.url ? (
-                  <img src={(room.images?.[0] || room.banner_image).url} alt={room.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-stone-400">
-                    <MapPin className="w-10 h-10" />
-                  </div>
-                )}
+              {/* 5.1: reuse RoomImageGallery instead of single <img> */}
+              <div
+                className="sm:w-64 shrink-0"
+                onClick={() => openRoomModal('gallery')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && openRoomModal('gallery')}
+                aria-label={t('booking.step1.viewDetails')}
+              >
+                <RoomImageGallery
+                  images={roomImages}
+                  variant="card"
+                  featuredImage={featuredImage}
+                  remainingImages={remainingImages}
+                  className="rounded-xl overflow-hidden cursor-pointer"
+                />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-stone-900">{room.name}</h3>
+                {room.room_type?.name && (
+                  <p className="text-sm text-stone-500 mt-0.5">{t('booking.step1.roomType')}: {room.room_type.name}</p>
+                )}
                 <p className="text-sm text-stone-600 mt-0.5">{hotel.name} · {[hotel.city, hotel.country].filter(Boolean).join(', ')}</p>
                 <p className="text-sm text-stone-600 mt-0.5">{formatDate(checkIn, dateLocale)} – {formatDate(checkOut, dateLocale)} · {nights} {t('common.nights', { count: nights })}</p>
+                {/* 5.3: size / bed_type / view_type */}
+                {(room.size || room.bed_type || room.view_type || room.capacity) && (
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone-600">
+                    {room.capacity && (
+                      <span>{t('booking.step1.capacity')}: {room.capacity}</span>
+                    )}
+                    {room.size && (
+                      <span>{t('booking.step1.size')}: {room.size} m²</span>
+                    )}
+                    {room.bed_type && (
+                      <span>{t('booking.step1.bedType')}: {bedTypeLabel(room.bed_type)}</span>
+                    )}
+                    {room.view_type && (
+                      <span>{t('booking.step1.viewType')}: {viewTypeLabel(room.view_type)}</span>
+                    )}
+                  </div>
+                )}
+                {room.description && (
+                  <p className="mt-2 text-sm text-stone-600 line-clamp-2">{room.description}</p>
+                )}
                 {room.amenities?.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {room.amenities.slice(0, 4).map((a) => (
@@ -248,6 +316,17 @@ export default function Booking() {
                     ))}
                   </div>
                 )}
+                {/* 5.2: open RoomDetailModal */}
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => openRoomModal('overview')}
+                    className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline"
+                  >
+                    {t('booking.step1.viewDetails')}
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-stone-700 mb-1">{t('booking.step1.quantity')}</label>
                   <select
@@ -312,17 +391,39 @@ export default function Booking() {
         <section className="space-y-6">
           <h2 className="text-lg font-semibold text-stone-900">{t('booking.step3.title')}</h2>
           <div className="rounded-2xl border border-stone-200/80 bg-white shadow-sm p-4 sm:p-6 space-y-4">
+            {/* 5.4: small gallery thumbnail + deep links into modal tabs */}
             <div className="flex gap-4">
-              <div className="w-20 shrink-0 aspect-[4/3] rounded-lg overflow-hidden bg-stone-200">
+              <button
+                type="button"
+                onClick={() => openRoomModal('gallery')}
+                className="w-24 shrink-0 aspect-[4/3] rounded-lg overflow-hidden bg-stone-200 hover:opacity-90 transition-opacity"
+                aria-label={t('booking.step3.viewImages')}
+              >
                 {(room.images?.[0] || room.banner_image)?.url ? (
-                  <img src={(room.images?.[0] || room.banner_image).url} alt={room.name} className="w-full h-full object-cover" />
+                  <img src={(room.images?.[0] || room.banner_image).url} alt={room.name} className="w-full h-full object-cover" loading="lazy" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-stone-400"><MapPin className="w-8 h-8" /></div>
                 )}
-              </div>
-              <div>
+              </button>
+              <div className="min-w-0">
                 <h3 className="font-semibold text-stone-900">{room.name}</h3>
                 <p className="text-sm text-stone-600">{formatDate(checkIn, dateLocale)} – {formatDate(checkOut, dateLocale)} · {quantity} {t('hotelDetail.booking.rooms', { count: quantity })}</p>
+                {(room.size || room.bed_type || room.view_type) && (
+                  <p className="mt-1 text-xs text-stone-500">
+                    {[room.size ? `${room.size} m²` : null, bedTypeLabel(room.bed_type), viewTypeLabel(room.view_type)].filter(Boolean).join(' · ')}
+                  </p>
+                )}
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                  <button type="button" onClick={() => openRoomModal('gallery')} className="text-xs font-medium text-amber-600 hover:text-amber-700 hover:underline">
+                    {t('booking.step3.viewImages')}
+                  </button>
+                  <button type="button" onClick={() => openRoomModal('amenities')} className="text-xs font-medium text-amber-600 hover:text-amber-700 hover:underline">
+                    {t('booking.step3.viewAmenities')}
+                  </button>
+                  <button type="button" onClick={() => openRoomModal('policies')} className="text-xs font-medium text-amber-600 hover:text-amber-700 hover:underline">
+                    {t('booking.step3.viewPolicies')}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -427,6 +528,25 @@ export default function Booking() {
             </div>
           </form>
         </section>
+      )}
+
+      {/* 5.2 + 5.4: reused RoomDetailModal with deep-link initial tab
+          (conditional mount + code-split; fallback=null avoids double-paint flash) */}
+      {isRoomModalOpen && room && (
+        <Suspense fallback={null}>
+          <LazyRoomDetailModal
+            room={room}
+            hotel={hotel}
+            isOpen={isRoomModalOpen}
+            onClose={closeRoomModal}
+            onSelectRoom={closeRoomModal}
+            quantity={quantity}
+            onQuantityChange={handleModalQuantityChange}
+            isLoggedIn={!!user}
+            nights={nights}
+            initialTab={modalInitialTab}
+          />
+        </Suspense>
       )}
     </div>
   );
