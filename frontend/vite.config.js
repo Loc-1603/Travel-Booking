@@ -14,4 +14,23 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split heavy vendor libraries into their own chunks for better caching
+        // and a smaller entry file (pages are code-split via React.lazy in App.jsx).
+        // Function form: react/react-dom entries are ESM facades, so the object
+        // form cannot reliably match them — match on resolved node_modules paths.
+        manualChunks(id) {
+          const p = id.replace(/\\/g, '/');
+          if (!p.includes('/node_modules/')) return undefined;
+          if (/\/node_modules\/(react|react-dom|scheduler)\//.test(p) || p.includes('/node_modules/react-jsx-runtime/')) return 'react-vendor';
+          if (p.includes('/node_modules/react-router') || p.includes('/node_modules/@remix-run/')) return 'router';
+          if (p.includes('/node_modules/@tanstack/')) return 'query';
+          if (p.includes('/node_modules/leaflet') || p.includes('/node_modules/react-leaflet/') || p.includes('/node_modules/@react-leaflet/')) return 'map-vendor';
+          return undefined;
+        },
+      },
+    },
+  },
 })

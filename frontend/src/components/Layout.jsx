@@ -1,8 +1,10 @@
+import { Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './layout/Footer';
 import DocumentHead from './DocumentHead';
 import AiChatWidget from './AiChatWidget';
+import RouteLoader from './RouteLoader';
 
 export default function Layout() {
   const location = useLocation();
@@ -20,7 +22,9 @@ export default function Layout() {
         id="main-content"
         role="main"
       >
-        <Outlet />
+        <Suspense fallback={<RouteLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
       {!isMapPage && <Footer />}
       {!isMapPage && <AiChatWidget />}

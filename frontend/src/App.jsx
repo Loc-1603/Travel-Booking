@@ -1,35 +1,39 @@
 // Main App component with routing configuration
+import { lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { WebsiteSettingsProvider } from './contexts/WebsiteSettingsContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Layout from './components/Layout';
+// Home stays statically imported for fast first paint (LCP on "/"); all other
+// pages are code-split via React.lazy (Suspense boundary lives in Layout).
 import Home from './pages/Home';
-import HotelList from './pages/HotelList';
-import MapSearch from './pages/MapSearch';
-import HotelDetail from './pages/HotelDetail';
-import Booking from './pages/Booking';
-import Checkout from './pages/Checkout';
-import VnpayReturn from './pages/VnpayReturn';
-import Profile from './pages/Profile';
-import MyBookings from './pages/MyBookings';
-import Wishlist from './pages/Wishlist';
-import Support from './pages/Support';
-import SupportTicketNew from './pages/SupportTicketNew';
-import SupportTicketDetail from './pages/SupportTicketDetail';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import VerifyEmail from './pages/VerifyEmail';
-import Tours from './pages/Tours';
-import TourProvinceDetail from './pages/TourProvinceDetail';
-import GuideDetail from './pages/GuideDetail';
-import TourDetail from './pages/TourDetail';
-import TourBookingWizard from './pages/TourBookingWizard';
-import TourCheckout from './pages/TourCheckout';
-import MyTourBookings from './pages/MyTourBookings';
-import TourBookingReview from './pages/TourBookingReview';
-import SavedTours from './pages/SavedTours';
+
+const HotelList = lazy(() => import('./pages/HotelList'));
+const MapSearch = lazy(() => import('./pages/MapSearch'));
+const HotelDetail = lazy(() => import('./pages/HotelDetail'));
+const Booking = lazy(() => import('./pages/Booking'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const VnpayReturn = lazy(() => import('./pages/VnpayReturn'));
+const Profile = lazy(() => import('./pages/Profile'));
+const MyBookings = lazy(() => import('./pages/MyBookings'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
+const Support = lazy(() => import('./pages/Support'));
+const SupportTicketNew = lazy(() => import('./pages/SupportTicketNew'));
+const SupportTicketDetail = lazy(() => import('./pages/SupportTicketDetail'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const Tours = lazy(() => import('./pages/Tours'));
+const TourProvinceDetail = lazy(() => import('./pages/TourProvinceDetail'));
+const GuideDetail = lazy(() => import('./pages/GuideDetail'));
+const TourDetail = lazy(() => import('./pages/TourDetail'));
+const TourBookingWizard = lazy(() => import('./pages/TourBookingWizard'));
+const TourCheckout = lazy(() => import('./pages/TourCheckout'));
+const MyTourBookings = lazy(() => import('./pages/MyTourBookings'));
+const TourBookingReview = lazy(() => import('./pages/TourBookingReview'));
+const SavedTours = lazy(() => import('./pages/SavedTours'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
