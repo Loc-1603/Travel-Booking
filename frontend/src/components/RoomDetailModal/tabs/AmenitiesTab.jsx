@@ -75,12 +75,12 @@ export const AmenitiesTab = memo(function AmenitiesTab({ room }) {
 
         return (
           <section key={category} className="space-y-3">
-            <h3 className="flex items-center gap-2 text-lg font-semibold text-[#1a1a1a]">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#1a1a1a]">
               <span className="w-10 h-10 rounded-xl bg-[#f5f2ed] flex items-center justify-center text-[#b8860b]600">
                 {categoryIcon(icon)}
               </span>
               {label} ({items.length})
-            </h3>
+            </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {items.map((a) => (
                 <div
@@ -91,7 +91,7 @@ export const AmenitiesTab = memo(function AmenitiesTab({ room }) {
                   )}
                 >
                   <AmenityIcon slug={a.slug} className="w-5 h-5 text-[#b8860b]600 shrink-0" />
-                  <span className="text-[#45423d] text-sm">{getAmenityLabel((k) => k, a)}</span>
+                  <span className="text-[#45423d] text-sm">{getAmenityLabel(null, a)}</span>
                 </div>
               ))}
             </div>

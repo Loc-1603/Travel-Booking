@@ -96,7 +96,7 @@ export const OverviewTab = memo(function OverviewTab({ room }) {
             {amenities.map((a) => (
               <div key={a.id} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#faf8f5] border border-[#e8e4dd]">
                 <AmenityIcon slug={a.slug} className="w-5 h-5 text-[#b8860b]600 shrink-0" />
-                <span className="text-[#45423d] text-sm">{getAmenityLabel((k) => k, a)}</span>
+                <span className="text-[#45423d] text-sm">{getAmenityLabel(null, a)}</span>
               </div>
             ))}
           </div>

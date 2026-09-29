@@ -9,7 +9,7 @@ function PolicyCard({ title, description, icon, children }) {
         <div className="w-10 h-10 rounded-xl bg-[#f5f2ed] flex items-center justify-center text-[#b8860b]600 shrink-0">
           {icon}
         </div>
-        <h3 className="font-semibold text-[#1a1a1a]">{title}</h3>
+        <h2 className="font-semibold text-lg text-[#1a1a1a]">{title}</h2>
       </div>
       <div className="p-5">
         {description && <p className="text-[#45423d] leading-relaxed">{description}</p>}

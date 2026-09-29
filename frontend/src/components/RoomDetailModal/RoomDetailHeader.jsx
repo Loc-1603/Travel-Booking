@@ -10,7 +10,7 @@ export const RoomDetailHeader = memo(function RoomDetailHeader({ room, onClose, 
   return (
     <header className={cn('sticky top-0 z-10 flex items-start justify-between gap-4 p-4 pt-[calc(env(safe-area-inset-top)+1rem)] sm:pt-4 bg-white/95 backdrop-blur-sm border-b border-[#e8e4dd]', className)}>
       <div className="flex-1 min-w-0 pr-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] truncate">{name}</h1>
+        <h1 id="room-detail-title" className="text-xl sm:text-2xl font-bold text-[#1a1a1a] truncate">{name}</h1>
         {room_type && (
           <span className="inline-block mt-1.5 px-2.5 py-0.5 text-xs font-medium rounded-full bg-[#f5f2ed] text-[#b8860b]700">
             {room_type.name}

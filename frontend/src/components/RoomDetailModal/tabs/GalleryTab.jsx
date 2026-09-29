@@ -47,17 +47,22 @@ export const GalleryTab = memo(function GalleryTab({ room }) {
   useEffect(() => {
     if (!isLightboxOpen) return;
 
+    // Capture phase: runs BEFORE the modal's own document-level Escape handler
+    // (registered earlier), so Escape dismisses only the topmost overlay.
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        closeLightbox();
+      }
       if (e.key === 'ArrowLeft') navigate(-1);
       if (e.key === 'ArrowRight') navigate(1);
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown, true);
     document.body.style.overflow = 'hidden';
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown, true);
       document.body.style.overflow = '';
     };
   }, [isLightboxOpen, closeLightbox, navigate]);

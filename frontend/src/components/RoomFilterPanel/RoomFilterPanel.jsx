@@ -151,6 +151,7 @@ export const RoomFilterPanel = memo(function RoomFilterPanel({
         <select
           value={filters.capacity || ''}
           onChange={(e) => update('capacity', e.target.value)}
+          aria-label="Sức chứa tối thiểu"
           className="w-full rounded-xl border border-[#e8e4dd] px-4 py-2.5 text-sm bg-white"
         >
           <option value="">Bất kỳ</option>
@@ -232,7 +233,7 @@ export const RoomFilterPanel = memo(function RoomFilterPanel({
           <div className="px-6 pt-3 pb-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Bộ lọc</h3>
-              <button onClick={onClose} className="p-2 rounded-full hover:bg-[#f5f2ed]">
+              <button onClick={onClose} aria-label="Đóng bộ lọc" className="p-2 rounded-full hover:bg-[#f5f2ed]">
                 <X className="w-5 h-5" />
               </button>
             </div>

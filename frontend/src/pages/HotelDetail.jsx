@@ -14,6 +14,14 @@ import { useWishlist } from '../hooks/useWishlist';
 import { Skeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
 import { formatPrice, getRatingLabel, calculateNights, cn } from '../lib/utils';
+import {
+  createDefaultRoomFilters,
+  countActiveFilters,
+  filterRooms,
+  sortRooms,
+  groupRoomsByType,
+  calculatePriceSummary,
+} from '../lib/rooms';
 import { getAmenityLabel } from '../lib/amenities';
 import { AmenityIcon } from '../components/AmenityIcon';
 import { DatePicker } from '../components/DatePicker';
@@ -25,15 +33,6 @@ const TABS = [
   { key: 'reviews', label: 'hotelDetail.tabs.reviews' },
   { key: 'location', label: 'hotelDetail.tabs.location' },
 ];
-
-const DEFAULT_ROOM_FILTERS = {
-  capacity: '',
-  price: { min: '', max: '' },
-  roomTypes: [],
-  bedTypes: [],
-  viewTypes: [],
-  amenities: [],
-};
 
 const ROOM_SORT_OPTIONS = [
   { value: 'recommended', label: 'hotelDetail.rooms.sortRecommended' },
@@ -127,7 +126,7 @@ function HotelDetailLoadingSkeleton() {
             <div className="hidden lg:block w-[280px] shrink-0">
               <Skeleton className="h-[480px] w-full rounded-2xl" />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 @container">
               <RoomCardSkeletonList count={6} variant="detailed" />
             </div>
           </div>
@@ -157,8 +156,8 @@ export default function HotelDetail() {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentGalleryImages, setCurrentGalleryImages] = useState([]);
   const [reviewsPage, setReviewsPage] = useState(1);
-  const [roomFilters, setRoomFilters] = useState(DEFAULT_ROOM_FILTERS);
-  const [debouncedRoomFilters, setDebouncedRoomFilters] = useState(DEFAULT_ROOM_FILTERS);
+  const [roomFilters, setRoomFilters] = useState(createDefaultRoomFilters);
+  const [debouncedRoomFilters, setDebouncedRoomFilters] = useState(createDefaultRoomFilters);
   const [roomSortBy, setRoomSortBy] = useState('recommended');
   const [selectedRoomForModal, setSelectedRoomForModal] = useState(null);
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
@@ -170,8 +169,8 @@ export default function HotelDetail() {
   const [prevHotelId, setPrevHotelId] = useState(id);
   if (prevHotelId !== id) {
     setPrevHotelId(id);
-    setRoomFilters(DEFAULT_ROOM_FILTERS);
-    setDebouncedRoomFilters(DEFAULT_ROOM_FILTERS);
+    setRoomFilters(createDefaultRoomFilters());
+    setDebouncedRoomFilters(createDefaultRoomFilters());
     setRoomSortBy('recommended');
     setSelectedRoomForModal(null);
     setIsRoomModalOpen(false);
@@ -244,15 +243,17 @@ export default function HotelDetail() {
   const effectiveCheckOut = checkOut || localCheckOut;
   const effectiveNights = effectiveCheckIn && effectiveCheckOut ? calculateNights(effectiveCheckIn, effectiveCheckOut) : null;
 
-  const priceSummary = useMemo(() => {
-    if (!selectedRoom || !effectiveNights || effectiveNights < 1) return null;
-    const subTotal = Number(selectedRoom.base_price) * effectiveNights * roomQuantity;
-    const taxRate = hotel?.tax_rate ?? 0;
-    const taxRatePct = taxRate * 100;
-    const taxAmount = hotel?.tax_inclusive ? 0 : subTotal * taxRate;
-    const total = subTotal + taxAmount;
-    return { subTotal, taxAmount, taxRatePct, total };
-  }, [selectedRoom, effectiveNights, roomQuantity, hotel?.tax_rate, hotel?.tax_inclusive]);
+  const priceSummary = useMemo(
+    () =>
+      calculatePriceSummary({
+        basePrice: selectedRoom?.base_price,
+        nights: effectiveNights,
+        quantity: roomQuantity,
+        taxRate: hotel?.tax_rate ?? 0,
+        taxInclusive: hotel?.tax_inclusive,
+      }),
+    [selectedRoom, effectiveNights, roomQuantity, hotel?.tax_rate, hotel?.tax_inclusive]
+  );
 
   const bookUrl = selectedRoom && effectiveCheckIn && effectiveCheckOut
     ? `/book?hotel_id=${id}&room_id=${selectedRoom.id}&check_in=${effectiveCheckIn}&check_out=${effectiveCheckOut}&quantity=${roomQuantity}`
@@ -307,61 +308,24 @@ export default function HotelDetail() {
   }, []);
 
   const clearRoomFilters = useCallback(() => {
-    setRoomFilters(DEFAULT_ROOM_FILTERS);
+    setRoomFilters(createDefaultRoomFilters());
   }, []);
 
   const closeMobileFilter = useCallback(() => setIsMobileFilterOpen(false), []);
 
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (roomFilters.capacity) count++;
-    if (roomFilters.price?.min || roomFilters.price?.max) count++;
-    if (roomFilters.roomTypes?.length) count += roomFilters.roomTypes.length;
-    if (roomFilters.bedTypes?.length) count += roomFilters.bedTypes.length;
-    if (roomFilters.viewTypes?.length) count += roomFilters.viewTypes.length;
-    if (roomFilters.amenities?.length) count += roomFilters.amenities.length;
-    return count;
-  }, [roomFilters]);
+  const activeFilterCount = useMemo(() => countActiveFilters(roomFilters), [roomFilters]);
 
-  const filteredRooms = useMemo(() => {
-    const { capacity, price, roomTypes, bedTypes, viewTypes, amenities } = debouncedRoomFilters;
-    return rooms.filter((room) => {
-      if (capacity && Number(room.capacity) < Number(capacity)) return false;
-      const roomPrice = Number(room.base_price || 0);
-      if (price?.min !== '' && price?.min != null && roomPrice < Number(price.min)) return false;
-      if (price?.max !== '' && price?.max != null && roomPrice > Number(price.max)) return false;
-      if (roomTypes?.length && !roomTypes.includes(room.room_type?.id)) return false;
-      if (bedTypes?.length && !bedTypes.includes(room.bed_type)) return false;
-      if (viewTypes?.length && !viewTypes.includes(room.view_type)) return false;
-      if (amenities?.length) {
-        const slugs = (room.amenities || []).map((a) => a.slug);
-        if (!amenities.every((slug) => slugs.includes(slug))) return false;
-      }
-      return true;
-    });
-  }, [rooms, debouncedRoomFilters]);
+  const filteredRooms = useMemo(
+    () => filterRooms(rooms, debouncedRoomFilters),
+    [rooms, debouncedRoomFilters]
+  );
 
-  const sortedRooms = useMemo(() => {
-    const list = [...filteredRooms];
-    if (roomSortBy === 'price_asc') {
-      list.sort((a, b) => Number(a.base_price || 0) - Number(b.base_price || 0));
-    } else if (roomSortBy === 'price_desc') {
-      list.sort((a, b) => Number(b.base_price || 0) - Number(a.base_price || 0));
-    } else if (roomSortBy === 'capacity') {
-      list.sort((a, b) => Number(b.capacity || 0) - Number(a.capacity || 0));
-    }
-    return list;
-  }, [filteredRooms, roomSortBy]);
+  const sortedRooms = useMemo(() => sortRooms(filteredRooms, roomSortBy), [filteredRooms, roomSortBy]);
 
-  const roomsByType = useMemo(() => {
-    const groups = new Map();
-    sortedRooms.forEach((room) => {
-      const type = room.room_type?.name || t('hotelDetail.rooms.otherType');
-      if (!groups.has(type)) groups.set(type, []);
-      groups.get(type).push(room);
-    });
-    return Array.from(groups.entries()).map(([type, typeRooms]) => ({ type, rooms: typeRooms }));
-  }, [sortedRooms, t]);
+  const roomsByType = useMemo(
+    () => groupRoomsByType(sortedRooms, t('hotelDetail.rooms.otherType')),
+    [sortedRooms, t]
+  );
 
   if (isLoading) {
     return (
@@ -570,7 +534,7 @@ export default function HotelDetail() {
                         />
                       </Suspense>
                     )}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 @container">
                       {sortedRooms.length === 0 ? (
                         <div className="rounded-2xl border border-dashed border-[#d4cec4] bg-[#faf8f5] px-6 py-12 text-center">
                           <SearchX className="w-12 h-12 mx-auto text-[#b8860b]/70 mb-3" aria-hidden />
@@ -597,7 +561,10 @@ export default function HotelDetail() {
                                   {t('hotelDetail.rooms.roomsCount', { count: typeRooms.length })}
                                 </span>
                               </div>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+                              {/* Container queries (not viewport): the cards column is only ~240-432px wide
+                                  on desktop (container max-w-6xl minus booking aside 384px minus filter
+                                  sidebar 280px), so lg:grid-cols-3 stretched cards to ~69-133px. */}
+                              <div className="grid grid-cols-1 @xl:grid-cols-2 @4xl:grid-cols-3 gap-4 items-start">
                                 {typeRooms.map((room) => (
                                   <RoomCard
                                     key={room.id}
@@ -754,8 +721,9 @@ export default function HotelDetail() {
             <form onSubmit={(e) => { e.preventDefault(); if (!user) return; if (bookUrl) window.location.href = bookUrl; }} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkIn')}</label>
+                  <label htmlFor="booking-check-in" className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkIn')}</label>
                   <DatePicker
+                    id="booking-check-in"
                     value={localCheckIn}
                     onChange={setLocalCheckIn}
                     min={today}
@@ -763,8 +731,9 @@ export default function HotelDetail() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkOut')}</label>
+                  <label htmlFor="booking-check-out" className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkOut')}</label>
                   <DatePicker
+                    id="booking-check-out"
                     value={localCheckOut}
                     onChange={setLocalCheckOut}
                     min={localCheckIn || tomorrow}
@@ -773,8 +742,9 @@ export default function HotelDetail() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#45423d] mb-1">{t('common.guests')}</label>
+                <label htmlFor="booking-guests" className="block text-sm font-medium text-[#45423d] mb-1">{t('common.guests')}</label>
                 <select
+                  id="booking-guests"
                   value={guests}
                   onChange={(e) => setGuests(Number(e.target.value))}
                   className="w-full rounded-lg border border-[#d4cec4] px-3 py-2 text-sm text-[#1a1a1a] bg-white"
@@ -810,8 +780,9 @@ export default function HotelDetail() {
                   </div>
                   {selectedRoom && (
                     <div>
-                      <label className="block text-sm font-medium text-[#45423d] mb-1">{t('hotelDetail.booking.quantity')}</label>
+                      <label htmlFor="booking-quantity" className="block text-sm font-medium text-[#45423d] mb-1">{t('hotelDetail.booking.quantity')}</label>
                       <select
+                        id="booking-quantity"
                         value={roomQuantity}
                         onChange={(e) => setRoomQuantity(Number(e.target.value))}
                         className="w-full rounded-lg border border-[#d4cec4] px-3 py-2 text-sm text-[#1a1a1a] bg-white"

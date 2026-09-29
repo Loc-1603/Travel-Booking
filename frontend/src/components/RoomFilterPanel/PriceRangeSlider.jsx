@@ -39,12 +39,17 @@ export function PriceRangeSlider({ min, max, value, onChange, step = 10000 }) {
           className="absolute h-2 bg-[#b8860b]/30 rounded-full"
           style={{ left: `${minPercent}%`, right: `${100 - maxPercent}%` }}
         />
+        {/* Visual-only dual-range track. The two labelled number inputs below are the
+            keyboard-operable controls, so the hidden ranges are removed from the a11y tree
+            (aria-hidden + tabIndex -1 keeps them off the tab order). */}
         <input
           type="range"
           min={min || 0}
           max={max || 1000000}
           step={step}
           value={minVal}
+          aria-hidden="true"
+          tabIndex={-1}
           onChange={(e) => {
             const v = Number(e.target.value);
             setMinVal(v);
@@ -60,6 +65,8 @@ export function PriceRangeSlider({ min, max, value, onChange, step = 10000 }) {
           max={max || 1000000}
           step={step}
           value={maxVal}
+          aria-hidden="true"
+          tabIndex={-1}
           onChange={(e) => {
             const v = Number(e.target.value);
             setMaxVal(v);
@@ -79,6 +86,7 @@ export function PriceRangeSlider({ min, max, value, onChange, step = 10000 }) {
             onChange={(e) => setMinInput(e.target.value)}
             onBlur={() => commit('min')}
             onKeyDown={(e) => e.key === 'Enter' && commit('min')}
+            aria-label="Giá tối thiểu"
             className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
             placeholder="0"
           />
@@ -92,6 +100,7 @@ export function PriceRangeSlider({ min, max, value, onChange, step = 10000 }) {
             onChange={(e) => setMaxInput(e.target.value)}
             onBlur={() => commit('max')}
             onKeyDown={(e) => e.key === 'Enter' && commit('max')}
+            aria-label="Giá tối đa"
             className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
             placeholder={String(max)}
           />

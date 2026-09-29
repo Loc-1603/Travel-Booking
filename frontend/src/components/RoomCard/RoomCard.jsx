@@ -50,7 +50,8 @@ export const RoomCard = memo(function RoomCard({
 
   if (variant === 'gallery') {
     return (
-      <article
+      // div, not article: <article role="button"> trips axe's aria-allowed-role rule
+      <div
         className={cn(variantClass, selected && 'ring-2 ring-[#b8860b] ring-offset-2', className)}
         onClick={() => onSelect?.(room)}
         role="button"
@@ -83,7 +84,7 @@ export const RoomCard = memo(function RoomCard({
             </svg>
           </div>
         )}
-      </article>
+      </div>
     );
   }
 
@@ -98,7 +99,9 @@ export const RoomCard = memo(function RoomCard({
           variant={variant}
           featuredImage={featuredImage}
           remainingImages={remainingImages}
-          onClick={onViewDetails}
+          // bind the room — passing onViewDetails straight through would hand the
+          // click event to openRoomModal(room) and render an empty modal
+          onClick={onViewDetails ? () => onViewDetails(room) : undefined}
         />
         {variant === 'detailed' && (
           <div className="absolute top-3 right-3 flex gap-1">
@@ -169,7 +172,7 @@ export const RoomCard = memo(function RoomCard({
             {amenities.slice(0, 4).map((a) => (
               <span key={a.id} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#f5f2ed] text-[#45423d] text-xs">
                 <AmenityIcon slug={a.slug} className="w-3.5 h-3.5 text-[#b8860b]600" />
-                {getAmenityLabel((k) => k, a)}
+                {getAmenityLabel(null, a)}
               </span>
             ))}
             {amenities.length > 4 && (

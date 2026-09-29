@@ -45,7 +45,7 @@ export function RoomCardSkeleton({ variant = 'card', className }) {
 
 export function RoomCardSkeletonList({ count = 3, variant = 'card' }) {
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Đang tải danh sách phòng">
+    <div className="grid gap-4 @xl:grid-cols-2 @4xl:grid-cols-3" role="status" aria-label="Đang tải danh sách phòng">
       {Array.from({ length: count }).map((_, i) => (
         <RoomCardSkeleton key={i} variant={variant} />
       ))}
