@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { RoomFilterPanel } from './RoomFilterPanel';
 import { expectNoAxeViolations } from '../../test/axe';
@@ -124,6 +124,71 @@ describe('RoomFilterPanel — desktop sidebar', () => {
 
   it('has no axe violations', async () => {
     const { container } = render(<RoomFilterPanel rooms={rooms} filters={baseFilters} onFiltersChange={vi.fn()} />);
+    await expectNoAxeViolations(container);
+  });
+});
+
+describe('RoomFilterPanel — desktop right drawer (redesign FE-6)', () => {
+  function renderDrawer(onClose = vi.fn()) {
+    render(
+      <RoomFilterPanel rooms={rooms} filters={baseFilters} onFiltersChange={vi.fn()} position="right" onClose={onClose} />
+    );
+    return onClose;
+  }
+
+  it('renders a 384px right drawer dialog with the filter controls', () => {
+    renderDrawer();
+    const dialog = screen.getByRole('dialog', { name: 'Bộ lọc phòng' });
+    expect(dialog).toBeInTheDocument();
+    const aside = dialog.querySelector('aside');
+    expect(aside?.className).toMatch('w-96');
+    expect(aside?.className).toMatch('animate-slide-in-right');
+    expect(screen.getByRole('combobox', { name: 'Sức chứa tối thiểu' })).toBeInTheDocument();
+    expect(document.body.style.overflow).toBe('hidden');
+  });
+
+  it('closes via backdrop click after the slide-out animation', async () => {
+    const onClose = renderDrawer();
+    fireEvent.click(screen.getByTestId('drawer-backdrop'));
+    // slide-out plays first; onClose fires after the animation
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: 'Bộ lọc phòng' }).querySelector('aside')?.className).toMatch(
+      'animate-slide-out-right'
+    );
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1), { timeout: 1000 });
+  });
+
+  it('closes via the ESC key', async () => {
+    const onClose = renderDrawer();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1), { timeout: 1000 });
+  });
+
+  it('closes via the header X and the apply button', async () => {
+    const onClose = renderDrawer();
+    fireEvent.click(screen.getByRole('button', { name: 'Đóng bộ lọc' }));
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1), { timeout: 1000 });
+
+    const onClose2 = vi.fn();
+    cleanup();
+    render(
+      <RoomFilterPanel rooms={rooms} filters={baseFilters} onFiltersChange={vi.fn()} position="right" onClose={onClose2} />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Áp dụng bộ lọc' }));
+    await waitFor(() => expect(onClose2).toHaveBeenCalledTimes(1), { timeout: 1000 });
+  });
+
+  it('keeps the inline sidebar (no dialog, no scroll lock) when position is omitted', () => {
+    render(<RoomFilterPanel rooms={rooms} filters={baseFilters} onFiltersChange={vi.fn()} />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+    expect(screen.getByRole('combobox', { name: 'Sức chứa tối thiểu' })).toBeInTheDocument();
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(
+      <RoomFilterPanel rooms={rooms} filters={baseFilters} onFiltersChange={vi.fn()} position="right" onClose={vi.fn()} />
+    );
     await expectNoAxeViolations(container);
   });
 });

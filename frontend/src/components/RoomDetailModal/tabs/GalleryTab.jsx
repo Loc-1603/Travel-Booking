@@ -9,12 +9,15 @@ export const GalleryTab = memo(function GalleryTab({ room }) {
   const { images = [] } = room;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  // Hướng trượt để replay animation khi đổi ảnh trong lightbox.
+  const [direction, setDirection] = useState(0);
 
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const isTrackingTouch = useRef(false);
 
   const openLightbox = useCallback((index) => {
+    setDirection(0);
     setSelectedIndex(index);
     setIsLightboxOpen(true);
   }, []);
@@ -24,6 +27,7 @@ export const GalleryTab = memo(function GalleryTab({ room }) {
   }, []);
 
   const navigate = useCallback((delta) => {
+    setDirection(delta > 0 ? 1 : -1);
     setSelectedIndex((prev) => (prev + delta + images.length) % images.length);
   }, [images.length]);
 
@@ -97,7 +101,7 @@ export const GalleryTab = memo(function GalleryTab({ room }) {
               type="button"
               onClick={() => openLightbox(idx)}
               className={cn(
-                'relative aspect-[4/3] rounded-xl overflow-hidden bg-[#e8e4dd] transition-all duration-200 hover:shadow-lg hover:scale-[1.02]',
+                'relative aspect-[4/3] rounded-xl overflow-hidden bg-[#e8e4dd] transition-all duration-200 hover:shadow-lg hover:scale-[1.02] max-h-[220px]',
                 selectedIndex === idx && 'ring-2 ring-[#b8860b] ring-offset-2'
               )}
               aria-label={`Xem hình ảnh ${idx + 1}`}
@@ -150,11 +154,19 @@ export const GalleryTab = memo(function GalleryTab({ room }) {
           </button>
 
           <div className="relative max-w-6xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={allImages[selectedIndex]?.url}
-              alt={allImages[selectedIndex]?.alt_text || `Hình ảnh ${selectedIndex + 1}`}
-              className="max-w-full max-h-[80vh] object-contain"
-            />
+            <div
+              key={selectedIndex}
+              className={cn(
+                'flex justify-center aspect-[4/3] sm:aspect-auto w-full max-h-[80vh] overflow-hidden rounded-lg bg-black/20',
+                direction > 0 ? 'animate-gallery-next' : direction < 0 ? 'animate-gallery-prev' : 'animate-gallery-fade'
+              )}
+            >
+              <img
+                src={allImages[selectedIndex]?.url}
+                alt={allImages[selectedIndex]?.alt_text || `Hình ảnh ${selectedIndex + 1}`}
+                className="max-w-full max-h-[80vh] w-full h-full object-cover"
+              />
+            </div>
 
             {allImages.length > 1 && (
               <>
@@ -173,14 +185,19 @@ export const GalleryTab = memo(function GalleryTab({ room }) {
                   <ChevronRight className="w-8 h-8" />
                 </button>
 
-                <div className="flex justify-center gap-2 mt-6">
+                <div className="flex justify-center items-center gap-1.5 mt-6">
                   {allImages.map((_, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setSelectedIndex(idx)}
+                      onClick={() => {
+                        setDirection(idx > selectedIndex ? 1 : idx < selectedIndex ? -1 : 0);
+                        setSelectedIndex(idx);
+                      }}
+                      // min-h-0/min-w-0/p-0: override global 44px rule so dots stay tiny.
+                      // Chấm xanh dương = ảnh đang hiển thị, chấm trắng = ảnh còn lại.
                       className={cn(
-                        'w-2.5 h-2.5 rounded-full transition-all duration-200',
-                        selectedIndex === idx ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/75'
+                        'h-1.5 w-1.5 min-h-0 min-w-0 shrink-0 rounded-full p-0 shadow ring-1 ring-black/20 transition-colors duration-200',
+                        selectedIndex === idx ? 'scale-110 bg-blue-600' : 'bg-white hover:bg-white'
                       )}
                       aria-label={`Ảnh ${idx + 1}`}
                       aria-current={selectedIndex === idx ? 'true' : undefined}

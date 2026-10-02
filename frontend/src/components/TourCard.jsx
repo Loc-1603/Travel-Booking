@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { formatPrice, getRatingLabel } from '../lib/utils';
 import { getTourPrice } from '../lib/tourSearch';
 
 export function TourCard({ tour, to, currency = 'VND', imageOverlay, children }) {
+  const { t } = useTranslation();
   const price = getTourPrice(tour);
   const img = tour.banner_image || tour.images?.[0];
   const rating = tour.average_rating != null ? Number(tour.average_rating) : null;
@@ -48,7 +50,7 @@ export function TourCard({ tour, to, currency = 'VND', imageOverlay, children })
             <span className="text-[#5c5852] text-sm">{getRatingLabel(rating)}</span>
             {reviewCount > 0 && (
               <span className="text-[#7a756d] text-sm">
-                {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+                {t('tours.reviewCount', { count: reviewCount })}
               </span>
             )}
           </div>

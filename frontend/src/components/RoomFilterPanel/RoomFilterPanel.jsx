@@ -1,8 +1,12 @@
-import { memo, useMemo, useRef, useEffect, useCallback } from 'react';
+import { memo, useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { X, SlidersHorizontal } from 'lucide-react';
 import { FilterSection } from './FilterSection';
 import { CheckboxGroup } from './CheckboxGroup';
 import { PriceRangeSlider } from './PriceRangeSlider';
+import { cn } from '../../lib/utils';
+
+// Keep in sync with --animate-slide-out-right (0.25s) in index.css
+const DRAWER_CLOSE_MS = 250;
 
 export const RoomFilterPanel = memo(function RoomFilterPanel({
   rooms = [],
@@ -10,6 +14,8 @@ export const RoomFilterPanel = memo(function RoomFilterPanel({
   onFiltersChange,
   onClose,
   isMobile = false,
+  // 'left': inline sidebar (backward compat) | 'right': desktop right drawer 384px
+  position = 'left',
 }) {
   // Derive options from rooms
   const roomTypes = useMemo(() => {
@@ -216,6 +222,36 @@ export const RoomFilterPanel = memo(function RoomFilterPanel({
     </div>
   );
 
+  // --- Desktop right drawer: animated close (slide-out, then unmount via onClose) ---
+  const [drawerClosing, setDrawerClosing] = useState(false);
+  const drawerCloseTimer = useRef(null);
+  const drawerCloseStarted = useRef(false);
+
+  const requestDrawerClose = useCallback(() => {
+    // ref guard: state updaters may run twice under StrictMode — schedule onClose once
+    if (drawerCloseStarted.current) return;
+    drawerCloseStarted.current = true;
+    setDrawerClosing(true);
+    drawerCloseTimer.current = setTimeout(() => onClose?.(), DRAWER_CLOSE_MS);
+  }, [onClose]);
+
+  useEffect(() => () => clearTimeout(drawerCloseTimer.current), []);
+
+  // ESC to close + body scroll lock while the drawer is open
+  useEffect(() => {
+    if (isMobile || position !== 'right') return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') requestDrawerClose();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previous;
+    };
+  }, [isMobile, position, requestDrawerClose]);
+
   if (isMobile) {
     return (
       <div className="fixed inset-0 z-50">
@@ -248,6 +284,43 @@ export const RoomFilterPanel = memo(function RoomFilterPanel({
             </button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (position === 'right' && !isMobile) {
+    return (
+      <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Bộ lọc phòng">
+        <div className="absolute inset-0 bg-black/50" onClick={requestDrawerClose} data-testid="drawer-backdrop" />
+        <aside
+          className={cn(
+            'absolute right-0 top-0 h-full w-96 max-w-[90vw] bg-white shadow-2xl overflow-y-auto overscroll-contain',
+            drawerClosing ? 'animate-slide-out-right' : 'animate-slide-in-right'
+          )}
+        >
+          <div className="sticky top-0 bg-white/95 backdrop-blur px-5 pt-4 pb-3 flex items-center justify-end border-b border-[#e8e4dd]">
+            <button
+              type="button"
+              onClick={requestDrawerClose}
+              aria-label="Đóng bộ lọc"
+              className="p-2 rounded-full hover:bg-[#f5f2ed]"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="px-5 pt-4 pb-6">
+            {panelContent}
+          </div>
+          <div className="sticky bottom-0 bg-white border-t border-[#e8e4dd] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+            <button
+              type="button"
+              onClick={requestDrawerClose}
+              className="w-full py-3 rounded-xl bg-[#b8860b] text-white font-semibold hover:bg-[#996f09] transition-colors"
+            >
+              Áp dụng bộ lọc
+            </button>
+          </div>
+        </aside>
       </div>
     );
   }

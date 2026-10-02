@@ -13,10 +13,19 @@ export function RoomCardSkeleton({ variant = 'card', className }) {
     );
   }
 
+  // FX-4: mirror the horizontal `detailed` row (photo left, info right on sm+).
+  const horizontalClass = variant === 'detailed' ? 'sm:flex sm:items-start' : '';
+
   return (
-    <article className={variantClass} {...(className ? { className } : {})}>
-      <Skeleton className="w-full aspect-[4/3]" />
-      <div className="p-4 sm:p-5 space-y-3">
+    <article className={`${variantClass} ${horizontalClass}`} {...(className ? { className } : {})}>
+      <Skeleton
+        className={
+          variant === 'detailed'
+            ? 'w-full aspect-[4/3] sm:aspect-[4/3] sm:max-h-[420px] sm:w-[300px] sm:shrink-0 lg:w-[340px] sm:rounded-r-none'
+            : 'w-full aspect-[4/3]'
+        }
+      />
+      <div className="p-4 sm:p-5 space-y-3 flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 space-y-2">
             <Skeleton className="h-6 w-3/4" />
@@ -44,8 +53,11 @@ export function RoomCardSkeleton({ variant = 'card', className }) {
 }
 
 export function RoomCardSkeletonList({ count = 3, variant = 'card' }) {
+  // FX-4: `detailed` cards render as a full-width vertical list, not a grid.
+  const listClass =
+    variant === 'detailed' ? 'flex flex-col gap-4' : 'grid gap-4 @xl:grid-cols-2 @4xl:grid-cols-3';
   return (
-    <div className="grid gap-4 @xl:grid-cols-2 @4xl:grid-cols-3" role="status" aria-label="Đang tải danh sách phòng">
+    <div className={listClass} role="status" aria-label="Đang tải danh sách phòng">
       {Array.from({ length: count }).map((_, i) => (
         <RoomCardSkeleton key={i} variant={variant} />
       ))}

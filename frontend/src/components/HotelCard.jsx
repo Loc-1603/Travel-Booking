@@ -63,7 +63,7 @@ export function HotelCard({ hotel, nights, dealLabel, originalPrice, to, currenc
             <span className="text-[#5c5852] text-sm">{getRatingLabel(rating)}</span>
             {reviewCount > 0 && (
               <span className="text-[#7a756d] text-sm">
-                {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+                {t('hotels.reviewCount', { count: reviewCount })}
               </span>
             )}
           </div>
@@ -75,7 +75,7 @@ export function HotelCard({ hotel, nights, dealLabel, originalPrice, to, currenc
         )}
         <div className="mt-auto pt-2">
           {nights != null && nights > 0 && (
-            <p className="text-sm text-[#5c5852] mt-1">{nights} {nights === 1 ? 'night' : 'nights'}</p>
+            <p className="text-sm text-[#5c5852] mt-1">{t('hotels.nightsCount', { count: nights })}</p>
           )}
           {displayPrice != null && (
             <div className="mt-2 flex items-baseline gap-2 flex-wrap">

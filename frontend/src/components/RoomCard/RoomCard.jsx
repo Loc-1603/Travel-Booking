@@ -89,11 +89,14 @@ export const RoomCard = memo(function RoomCard({
   }
 
   return (
+    // @container: inner tweaks key off the card width, not the viewport.
+    // FX-4: `detailed` is a full-width horizontal row (Booking.com style) —
+    // photo left, info right on sm+; stacked on mobile.
     <article
-      className={cn(variantClass, className)}
+      className={cn(variantClass, '@container', variant === 'detailed' && 'sm:flex sm:items-start', className)}
       {...props}
     >
-      <div className="relative">
+      <div className={cn('relative', variant === 'detailed' && 'sm:w-[300px] sm:shrink-0 lg:w-[340px]')}>
         <RoomImageGallery
           images={images}
           variant={variant}
@@ -102,6 +105,7 @@ export const RoomCard = memo(function RoomCard({
           // bind the room — passing onViewDetails straight through would hand the
           // click event to openRoomModal(room) and render an empty modal
           onClick={onViewDetails ? () => onViewDetails(room) : undefined}
+          className={variant === 'detailed' ? 'sm:aspect-[4/3] sm:max-h-[420px]' : undefined}
         />
         {variant === 'detailed' && (
           <div className="absolute top-3 right-3 flex gap-1">
@@ -114,10 +118,11 @@ export const RoomCard = memo(function RoomCard({
         )}
       </div>
 
-      <div className="p-4 sm:p-5 flex flex-col gap-3">
+      <div className="p-4 @min-[340px]:p-5 flex flex-col gap-3 h-full flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-[#1a1a1a] text-lg truncate">{name}</h3>
+            {/* line-clamp-2 (not truncate): room names stay readable at 320px card width */}
+            <h3 className="font-semibold text-[#1a1a1a] text-lg line-clamp-2">{name}</h3>
             {room_type && (
               <p className="text-sm text-[#5c5852] mt-0.5">{room_type.name}</p>
             )}
@@ -126,6 +131,7 @@ export const RoomCard = memo(function RoomCard({
             price={price}
             nights={nights}
             variant={variant === 'detailed' ? 'detailed' : 'compact'}
+            className="shrink-0"
           />
         </div>
 
