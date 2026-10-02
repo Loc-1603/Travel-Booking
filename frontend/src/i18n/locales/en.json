@@ -264,6 +264,8 @@
     "totalPrice": "Total Price",
     "averageRating": "Average Rating",
     "reviewCount": "{{count}} reviews",
+    "nightsCount_one": "{{count}} night",
+    "nightsCount_other": "{{count}} nights",
     "cancellationPolicy": "Cancellation Policy",
     "cancellationPolicySummary": "Cancellation Policy Summary",
     "hotelDescription": "Description",
@@ -719,7 +721,7 @@
       "ariaLabel": "Hotel detail sections"
     },
     "gallery": {
-      "prev": "Previous image",
+      "carouselLabel": "Room photos ({{count}} photos)",      "prev": "Previous image",
       "next": "Next image",
       "close": "Close gallery",
       "imageAriaLabel": "Image {{index}}"
@@ -751,7 +753,21 @@
       "sortCapacity": "Capacity: most",
       "noResults": "No rooms match your filters",
       "noResultsHint": "Try adjusting or clearing filters to see more rooms.",
-      "clearFilters": "Clear filters"
+      "clearFilters": "Clear filters",
+      "filterBar": {
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "guests": "Guests",
+        "guestSummary": "{{adults}} adults · {{rooms}} room",
+        "adults": "Adults",
+        "rooms": "Rooms",
+        "search": "Search",
+        "filter": "Filters",
+        "decreaseAdults": "Decrease adults",
+        "increaseAdults": "Increase adults",
+        "decreaseRooms": "Decrease rooms",
+        "increaseRooms": "Increase rooms"
+      }
     },
     "reviews": {
       "sentimentTitle": "Review sentiment summary",
@@ -891,6 +907,8 @@
     }
   },
   "tours": {
+    "reviewCount_one": "{{count}} review",
+    "reviewCount_other": "{{count}} reviews",
     "list": {
       "title": "Private 1vs1 Tours",
       "subtitle": "One guest, one local guide — pick your province and time.",

@@ -264,6 +264,7 @@
     "totalPrice": "Tổng giá",
     "averageRating": "Đánh giá trung bình",
     "reviewCount": "{{count}} đánh giá",
+    "nightsCount": "{{count}} đêm",
     "cancellationPolicy": "Chính sách hủy",
     "cancellationPolicySummary": "Tóm tắt chính sách hủy",
     "hotelDescription": "Mô tả",
@@ -719,7 +720,7 @@
       "ariaLabel": "Các phần chi tiết khách sạn"
     },
     "gallery": {
-      "prev": "Ảnh trước",
+      "carouselLabel": "Hình ảnh phòng ({{count}} ảnh)",      "prev": "Ảnh trước",
       "next": "Ảnh sau",
       "close": "Đóng thư viện ảnh",
       "imageAriaLabel": "Ảnh {{index}}"
@@ -749,7 +750,21 @@
       "sortCapacity": "Sức chứa: nhiều nhất",
       "noResults": "Không có phòng phù hợp với bộ lọc",
       "noResultsHint": "Thử điều chỉnh hoặc xóa bộ lọc để xem thêm phòng.",
-      "clearFilters": "Xóa bộ lọc"
+      "clearFilters": "Xóa bộ lọc",
+      "filterBar": {
+        "checkIn": "Nhận phòng",
+        "checkOut": "Trả phòng",
+        "guests": "Khách",
+        "guestSummary": "{{adults}} người lớn · {{rooms}} phòng",
+        "adults": "Người lớn",
+        "rooms": "Phòng",
+        "search": "Tìm kiếm",
+        "filter": "Bộ lọc",
+        "decreaseAdults": "Giảm người lớn",
+        "increaseAdults": "Tăng người lớn",
+        "decreaseRooms": "Giảm số phòng",
+        "increaseRooms": "Tăng số phòng"
+      }
     },
     "reviews": {
       "sentimentTitle": "Tóm tắt cảm xúc đánh giá",
@@ -883,6 +898,7 @@
     }
   },
   "tours": {
+    "reviewCount": "{{count}} đánh giá",
     "list": {
       "title": "Tour riêng 1 kèm 1",
       "subtitle": "Một khách, một hướng dẫn viên — chọn tỉnh thành và thời gian.",

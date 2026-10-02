@@ -41,8 +41,7 @@ export function countActiveFilters(filters = {}) {
  * AND-semantics across filter groups, OR-semantics within a group.
  * `price.min/max` may be '' or null (unset) or number/string.
  */
-export function filterRooms(rooms = [], filters = {}) {
-  const { capacity, price, roomTypes, bedTypes, viewTypes, amenities } = filters;
+export function filterRooms(rooms = [], filters = {}) {  const { capacity, price, roomTypes, bedTypes, viewTypes, amenities } = filters;
   return rooms.filter((room) => {
     if (capacity && Number(room.capacity) < Number(capacity)) return false;
     const roomPrice = Number(room.base_price || 0);
@@ -59,8 +58,35 @@ export function filterRooms(rooms = [], filters = {}) {
   });
 }
 
-/** 'recommended' keeps the (already filtered) order stable — only explicit sorts mutate. */
-export function sortRooms(rooms = [], sortBy = 'recommended') {
+/**
+ * Availability + guest filter for the room search bar (redesign FE-8).
+ * Note: the parameter is named `roomCount` (not `rooms`) because duplicate
+ * parameter names are a SyntaxError in modules.
+ *
+ * - `capacity >= adults` always applies (client-side guest fit).
+ * - `min_available_rooms >= roomCount` applies only when the API returned
+ *   availability for the requested dates. A missing field (no dates, legacy
+ *   payload) must NOT hide rooms — the server is the source of truth for
+ *   date filtering (BE-1 already filters by quantity server-side).
+ */
+export function filterRoomsByAvailabilityAndGuests(roomList = [], checkIn, checkOut, adults, roomCount = 1) {
+  const needAdults = Number(adults) || 0;
+  const needRooms = Number(roomCount) || 1;
+  const hasDates = Boolean(checkIn && checkOut && checkOut > checkIn);
+  return (roomList || []).filter((room) => {
+    if (needAdults > 0 && Number(room.capacity || 0) < needAdults) return false;
+    if (
+      hasDates &&
+      room.min_available_rooms != null &&
+      Number(room.min_available_rooms) < needRooms
+    ) {
+      return false;
+    }
+    return true;
+  });
+}
+
+/** 'recommended' keeps the (already filtered) order stable — only explicit sorts mutate. */export function sortRooms(rooms = [], sortBy = 'recommended') {
   const list = [...rooms];
   if (sortBy === 'price_asc') {
     list.sort((a, b) => Number(a.base_price || 0) - Number(b.base_price || 0));

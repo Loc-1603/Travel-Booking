@@ -3,6 +3,7 @@ import {
   createDefaultRoomFilters,
   countActiveFilters,
   filterRooms,
+  filterRoomsByAvailabilityAndGuests,
   sortRooms,
   groupRoomsByType,
   calculatePriceSummary,
@@ -208,8 +209,7 @@ describe('groupRoomsByType', () => {
   });
 });
 
-describe('calculatePriceSummary', () => {
-  it('returns null when there is no room price or no nights', () => {
+describe('calculatePriceSummary', () => {  it('returns null when there is no room price or no nights', () => {
     expect(calculatePriceSummary({ basePrice: null, nights: 2 })).toBeNull();
     expect(calculatePriceSummary({ basePrice: 100, nights: 0 })).toBeNull();
     expect(calculatePriceSummary({ basePrice: 100, nights: -1 })).toBeNull();
@@ -232,5 +232,47 @@ describe('calculatePriceSummary', () => {
 
     const inclusive = calculatePriceSummary({ basePrice: 1000000, nights: 2, taxRate: 0.1, taxInclusive: true });
     expect(inclusive).toEqual({ subTotal: 2000000, taxAmount: 0, taxRatePct: 10, total: 2000000 });
+  });
+});
+
+describe('filterRoomsByAvailabilityAndGuests (redesign FE-8)', () => {
+  const CHECK_IN = '2026-10-01';
+  const CHECK_OUT = '2026-10-03';
+
+  // rooms fixture (capacities 2/4/6/2) + availability overlay mirroring RoomResource
+  const withAvailability = (minAvailable) =>
+    rooms.map((r) => ({ ...r, min_available_rooms: minAvailable[r.id] }));
+
+  it('filters by guest capacity (capacity >= adults)', () => {
+    const result = filterRoomsByAvailabilityAndGuests(rooms, CHECK_IN, CHECK_OUT, 5, 1);
+    expect(result.map((r) => r.id)).toEqual([103]);
+  });
+
+  it('keeps rooms whose min_available_rooms covers the requested quantity', () => {
+    const list = withAvailability({ 101: 3, 102: 1, 103: 0, 104: 5 });
+    const result = filterRoomsByAvailabilityAndGuests(list, CHECK_IN, CHECK_OUT, 2, 2);
+    // 102 needs 2 rooms but only 1 free; 103 has none free; capacity also applies (adults=2)
+    expect(result.map((r) => r.id)).toEqual([101, 104]);
+  });
+
+  it('never hides rooms when the availability field is absent (no dates / legacy payload)', () => {
+    expect(
+      filterRoomsByAvailabilityAndGuests(rooms, CHECK_IN, CHECK_OUT, 2, 5).map((r) => r.id)
+    ).toEqual([101, 102, 103, 104]);
+  });
+
+  it('ignores availability when the date range is missing or invalid', () => {
+    const list = withAvailability({ 101: 0, 102: 0, 103: 0, 104: 0 });
+    expect(filterRoomsByAvailabilityAndGuests(list, '', '', 2, 1)).toHaveLength(4);
+    expect(filterRoomsByAvailabilityAndGuests(list, CHECK_OUT, CHECK_IN, 2, 1)).toHaveLength(4);
+    expect(filterRoomsByAvailabilityAndGuests(list, null, null, 2, 1)).toHaveLength(4);
+  });
+
+  it('defaults the requested quantity to 1 and tolerates empty input', () => {
+    const list = withAvailability({ 101: 1, 102: 0, 103: 2, 104: 1 });
+    const result = filterRoomsByAvailabilityAndGuests(list, CHECK_IN, CHECK_OUT, 2);
+    expect(result.map((r) => r.id)).toEqual([101, 103, 104]);
+    expect(filterRoomsByAvailabilityAndGuests([], CHECK_IN, CHECK_OUT, 2, 1)).toEqual([]);
+    expect(filterRoomsByAvailabilityAndGuests(undefined, CHECK_IN, CHECK_OUT, 2, 1)).toEqual([]);
   });
 });
