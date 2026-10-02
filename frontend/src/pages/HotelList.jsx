@@ -48,7 +48,7 @@ function WishlistHeart({ hotelId, checkIn, checkOut, className = '' }) {
     );
   }
 
-  const inList = isInWishlist(hotelId);
+  const inList = isInWishlist(Number(hotelId));
   const pending = addPending || removePending;
 
   const handleClick = async (e) => {
@@ -58,7 +58,7 @@ function WishlistHeart({ hotelId, checkIn, checkOut, className = '' }) {
     try {
       if (inList) await removeFromWishlist(hotelId);
       else await addToWishlist({ hotelId, checkIn, checkOut });
-    } catch { /* ignore */ }
+    } catch { /* rollback handled by the optimistic update in useWishlist (FX-6) */ }
   };
 
   return (
@@ -66,6 +66,7 @@ function WishlistHeart({ hotelId, checkIn, checkOut, className = '' }) {
       type="button"
       onClick={handleClick}
       disabled={pending}
+      aria-pressed={inList}
       className={`absolute top-2 right-2 p-2 rounded-full bg-white/90 shadow hover:bg-white disabled:opacity-60 ${className}`}
       aria-label={inList ? t('hotels.wishlist.remove') : t('hotels.wishlist.add')}
     >

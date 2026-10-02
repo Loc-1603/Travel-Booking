@@ -1,10 +1,21 @@
 @import "tailwindcss";
 @import "./styles/design-tokens.css";
 
+/* Site header height (Header.jsx inner bar is h-16). Used as the sticky
+   offset for in-page sticky bars (e.g. HotelDetail tabs). */
+:root {
+  --header-height: 64px;
+}
+
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 
   --animate-slide-up: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in-right: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-out-right: slide-out-right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-gallery-fade: gallery-fade 0.45s ease;
+  --animate-gallery-next: gallery-next 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-gallery-prev: gallery-prev 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes slide-up {
     from {
@@ -14,6 +25,57 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-out-right {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes gallery-fade {
+    from {
+      opacity: 0;
+      transform: scale(1.03);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes gallery-next {
+    from {
+      opacity: 0;
+      transform: translateX(48px) scale(1.02);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes gallery-prev {
+    from {
+      opacity: 0;
+      transform: translateX(-48px) scale(1.02);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
     }
   }
 }
@@ -69,6 +131,15 @@ a:focus-visible, button:focus-visible {
 .rich-text strong { @apply font-semibold text-[#1a1a1a]; }
 .rich-text hr { @apply my-5 border-[#e8e4dd]; }
 
+/* Hide scrollbars on horizontal carousels (native scroll kept for touch/mouse/keyboard) */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Refined scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -83,4 +154,12 @@ a:focus-visible, button:focus-visible {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #a39e94;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-gallery-fade,
+  .animate-gallery-next,
+  .animate-gallery-prev {
+    animation: none;
+  }
 }

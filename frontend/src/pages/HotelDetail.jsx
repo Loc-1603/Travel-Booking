@@ -1,9 +1,9 @@
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
-import { MapPin, X, ChevronLeft, ChevronRight, Star, Sparkles, SlidersHorizontal, SearchX } from 'lucide-react';
+import { useState, useMemo, useEffect, useCallback, Suspense } from 'react';
+import { MapPin, X, ChevronLeft, ChevronRight, Star, Sparkles, SearchX } from 'lucide-react';
 import { RoomCard, RoomCardSkeletonList } from '../components/RoomCard';
-import { RoomFilterPanelSkeleton } from '../components/RoomFilterPanel/RoomFilterPanelSkeleton';
+import { HotelRoomFilterBar } from '../components/HotelRoomFilterBar';
 import { LazyRoomFilterPanel } from '../components/RoomFilterPanel/lazy';
 import { preloadRoomFilterPanel } from '../components/RoomFilterPanel/preload';
 import { LazyRoomDetailModal } from '../components/RoomDetailModal/lazy';
@@ -13,18 +13,18 @@ import { useAuth } from '../contexts/useAuth';
 import { useWishlist } from '../hooks/useWishlist';
 import { Skeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
-import { formatPrice, getRatingLabel, calculateNights, cn } from '../lib/utils';
+import { getRatingLabel, calculateNights, cn } from '../lib/utils';
 import {
   createDefaultRoomFilters,
   countActiveFilters,
   filterRooms,
+  filterRoomsByAvailabilityAndGuests,
   sortRooms,
   groupRoomsByType,
-  calculatePriceSummary,
 } from '../lib/rooms';
 import { getAmenityLabel } from '../lib/amenities';
+import { toISODateLocal, parseISODateLocal, addDaysLocal, isValidISODate } from '../lib/dates';
 import { AmenityIcon } from '../components/AmenityIcon';
-import { DatePicker } from '../components/DatePicker';
 import { useTranslation } from 'react-i18next';
 
 const TABS = [
@@ -40,6 +40,21 @@ const ROOM_SORT_OPTIONS = [
   { value: 'price_desc', label: 'hotelDetail.rooms.sortPriceDesc' },
   { value: 'capacity', label: 'hotelDetail.rooms.sortCapacity' },
 ];
+
+// --- Room search defaults: tomorrow → day after tomorrow (redesign FE-4) ---
+/** Initial room search: URL check_in/check_out win when valid, else tomorrow/day-after. */
+function resolveInitialRoomSearch(searchParams) {
+  const fallbackIn = toISODateLocal(addDaysLocal(new Date(), 1));
+  const fallbackOut = toISODateLocal(addDaysLocal(new Date(), 2));
+  const rawIn = searchParams.get('check_in');
+  const rawOut = searchParams.get('check_out');
+  const checkIn = isValidISODate(rawIn) ? rawIn : fallbackIn;
+  let checkOut = isValidISODate(rawOut) ? rawOut : fallbackOut;
+  if (checkOut <= checkIn) {
+    checkOut = toISODateLocal(addDaysLocal(parseISODateLocal(checkIn), 1));
+  }
+  return { checkIn, checkOut, adults: 2, rooms: 1 };
+}
 
 function WishlistHeart({ hotelId, checkIn, checkOut }) {
   const { t } = useTranslation();
@@ -59,10 +74,10 @@ function WishlistHeart({ hotelId, checkIn, checkOut }) {
     try {
       if (inList) await removeFromWishlist(hotelId);
       else await addToWishlist({ hotelId: Number(hotelId), checkIn, checkOut });
-    } catch { /* ignore */ }
+    } catch { /* rollback handled by the optimistic update in useWishlist (FX-6) */ }
   };
   return (
-    <button type="button" onClick={handleClick} disabled={pending} className="p-2 rounded-full border border-[#e8e4dd] hover:bg-[#faf8f5] disabled:opacity-60 inline-flex" aria-label={inList ? t('hotels.wishlist.remove') : t('hotels.wishlist.add')}>
+    <button type="button" onClick={handleClick} disabled={pending} aria-pressed={inList} className="p-2 rounded-full border border-[#e8e4dd] hover:bg-[#faf8f5] disabled:opacity-60 inline-flex" aria-label={inList ? t('hotels.wishlist.remove') : t('hotels.wishlist.add')}>
       <HeartIcon filled={inList} />
     </button>
   );
@@ -106,15 +121,15 @@ function StarDistribution({ reviews }) {
   );
 }
 
-// Composite skeleton mirroring the real HotelDetail layout (hero, title, tabs, rooms grid, booking widget)
+// Composite skeleton mirroring the real HotelDetail layout (hero, title, tabs, rooms grid)
 function HotelDetailLoadingSkeleton() {
   return (
     <div className="py-4 sm:py-6" role="status" aria-label="Đang tải chi tiết khách sạn">
       <div className="mb-6">
         <Skeleton className="w-full aspect-[21/9] sm:aspect-[3/1] max-h-[400px] rounded-2xl" />
       </div>
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-        <div className="flex-1 min-w-0">
+      <div>
+        <div className="min-w-0">
           <div className="mb-4 space-y-2">
             <Skeleton className="h-8 w-64" />
             <Skeleton className="h-4 w-40" />
@@ -131,9 +146,6 @@ function HotelDetailLoadingSkeleton() {
             </div>
           </div>
         </div>
-        <div className="lg:w-96 shrink-0 hidden lg:block">
-          <Skeleton className="h-[480px] w-full rounded-2xl" />
-        </div>
       </div>
     </div>
   );
@@ -143,16 +155,19 @@ export default function HotelDetail() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { id } = useParams();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const checkIn = searchParams.get('check_in');
-  const checkOut = searchParams.get('check_out');
+  // Room search (FX-3): `roomSearch` is the DRAFT edited in the filter bar
+  // (editing never fetches); `appliedRoomSearch` is the last APPLIED search
+  // and the ONLY thing that drives the API query + URL + client filters.
+  const [roomSearch, setRoomSearch] = useState(() => resolveInitialRoomSearch(searchParams));
+  const [appliedRoomSearch, setAppliedRoomSearch] = useState(roomSearch);
+  const checkIn = appliedRoomSearch.checkIn;
+  const checkOut = appliedRoomSearch.checkOut;
   const [activeTab, setActiveTab] = useState('overview');
-  const [localCheckIn, setLocalCheckIn] = useState(checkIn || '');
-  const [localCheckOut, setLocalCheckOut] = useState(checkOut || '');
-  const [guests, setGuests] = useState(1);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [roomQuantity, setRoomQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  // Hướng trượt ảnh hotel: 1 = tiếp theo, -1 = trước đó, 0 = mở/thumbnail (fade).
+  const [galleryDirection, setGalleryDirection] = useState(0);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentGalleryImages, setCurrentGalleryImages] = useState([]);
   const [reviewsPage, setReviewsPage] = useState(1);
@@ -163,6 +178,7 @@ export default function HotelDetail() {
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
   const [modalQuantity, setModalQuantity] = useState(1);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isDesktopDrawerOpen, setIsDesktopDrawerOpen] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
   );
@@ -175,8 +191,7 @@ export default function HotelDetail() {
     setSelectedRoomForModal(null);
     setIsRoomModalOpen(false);
     setIsMobileFilterOpen(false);
-    setSelectedRoom(null);
-    setRoomQuantity(1);
+    setReviewsPage(1);
   }
 
   useEffect(() => {
@@ -191,16 +206,40 @@ export default function HotelDetail() {
     return () => clearTimeout(timer);
   }, [roomFilters]);
 
-  const handleDateSearch = () => {
-    if (localCheckIn && localCheckOut) {
-      setSearchParams({ check_in: localCheckIn, check_out: localCheckOut });
-    }
-  };
+  // Sync APPLIED check_in/check_out into URL params (FX-2 + FX-3).
+  // `replace: true` is load-bearing: every date/guest edit used to push a new
+  // history entry (via the old 300ms debounce), so the browser Back button
+  // only undid param changes instead of leaving the page. Applied searches
+  // replace the entry; editing the draft touches neither URL nor history.
+  useEffect(() => {
+    setSearchParams((prev) => {
+      if (
+        prev.get('check_in') === appliedRoomSearch.checkIn &&
+        prev.get('check_out') === appliedRoomSearch.checkOut
+      ) {
+        return prev;
+      }
+      const next = new URLSearchParams(prev);
+      next.set('check_in', appliedRoomSearch.checkIn);
+      next.set('check_out', appliedRoomSearch.checkOut);
+      return next;
+    }, { replace: true });
+  }, [appliedRoomSearch, setSearchParams]);
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['hotel', id],
+  // Note: the desktop drawer (position="right") owns its own ESC + scroll-lock
+  // handling inside RoomFilterPanel — no page-level effect needed.
+
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
+    queryKey: ['hotel', id, appliedRoomSearch.checkIn, appliedRoomSearch.checkOut, appliedRoomSearch.adults, appliedRoomSearch.rooms],
     queryFn: async () => {
-      const res = await api.get(`/hotels/${id}`);
+      const res = await api.get(`/hotels/${id}`, {
+        params: {
+          check_in: appliedRoomSearch.checkIn,
+          check_out: appliedRoomSearch.checkOut,
+          adults: appliedRoomSearch.adults,
+          rooms: appliedRoomSearch.rooms,
+        },
+      });
       if (!res.data?.success) throw new Error(res.data?.message || 'Failed to load');
       return res.data;
     },
@@ -213,7 +252,8 @@ export default function HotelDetail() {
       const res = await api.get('/reviews', { params: { hotel_id: id, per_page: 10, page: reviewsPage } });
       return res.data;
     },
-    enabled: !!id,
+    // Lazy: only fetch when the user actually opens the reviews tab (FX-1).
+    enabled: !!id && activeTab === 'reviews',
   });
 
   const { data: sentimentData } = useQuery({
@@ -227,58 +267,33 @@ export default function HotelDetail() {
   });
 
   const hotel = data?.data ?? data;
-  const reviewsRaw = reviewsData?.data ?? reviewsData?.data?.data ?? [];
+  // API envelope: { success, data: { data: [...], meta: {...} } } (FX-1).
+  // NOTE: `reviewsData?.data` is the wrapper object — it must NOT be used as
+  // the list, otherwise the tab is always empty.
+  const reviewsRaw = reviewsData?.data?.data ?? [];
   const reviews = Array.isArray(reviewsRaw) ? reviewsRaw : [];
-  const reviewsMeta = reviewsData?.meta ?? {};
-
-  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
-  const tomorrow = useMemo(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
-  }, []);
+  const reviewsMeta = reviewsData?.data?.meta ?? {};
 
   const nights = checkIn && checkOut ? calculateNights(checkIn, checkOut) : null;
-  const effectiveCheckIn = checkIn || localCheckIn;
-  const effectiveCheckOut = checkOut || localCheckOut;
-  const effectiveNights = effectiveCheckIn && effectiveCheckOut ? calculateNights(effectiveCheckIn, effectiveCheckOut) : null;
-
-  const priceSummary = useMemo(
-    () =>
-      calculatePriceSummary({
-        basePrice: selectedRoom?.base_price,
-        nights: effectiveNights,
-        quantity: roomQuantity,
-        taxRate: hotel?.tax_rate ?? 0,
-        taxInclusive: hotel?.tax_inclusive,
-      }),
-    [selectedRoom, effectiveNights, roomQuantity, hotel?.tax_rate, hotel?.tax_inclusive]
-  );
-
-  const bookUrl = selectedRoom && effectiveCheckIn && effectiveCheckOut
-    ? `/book?hotel_id=${id}&room_id=${selectedRoom.id}&check_in=${effectiveCheckIn}&check_out=${effectiveCheckOut}&quantity=${roomQuantity}`
-    : null;
 
   const images = hotel?.images ?? [];
   const rooms = useMemo(() => hotel?.rooms ?? [], [hotel]);
-  const roomsForGuests = useMemo(() => {
-    const fit = rooms.filter((r) => r.capacity >= guests);
-    return fit.length > 0 ? fit : rooms;
-  }, [rooms, guests]);
-
-  // Latest refs so memoized children receive stable callbacks (React.memo needs stable props)
-  const selectedRoomRef = useRef(selectedRoom);
-  const roomQuantityRef = useRef(roomQuantity);
-  useEffect(() => {
-    selectedRoomRef.current = selectedRoom;
-    roomQuantityRef.current = roomQuantity;
-  });
+  // Class animation tương ứng hướng chuyển ảnh hotel (replay qua key={selectedImageIndex}).
+  const gallerySlideClass =
+    galleryDirection > 0 ? 'animate-gallery-next' : galleryDirection < 0 ? 'animate-gallery-prev' : 'animate-gallery-fade';
 
   const openRoomModal = useCallback((room) => {
     preloadRoomDetailModal();
     setSelectedRoomForModal(room);
-    setModalQuantity(selectedRoomRef.current?.id === room.id ? roomQuantityRef.current : 1);
+    setModalQuantity(1);
     setIsRoomModalOpen(true);
+  }, []);
+
+  // Chuyển ảnh hotel kèm hướng trượt để replay animation (key + direction).
+  const goHotelImage = useCallback((delta, total) => {
+    if (!total || total <= 1) return;
+    setGalleryDirection(delta > 0 ? 1 : -1);
+    setSelectedImageIndex((i) => (i + delta + total) % total);
   }, []);
 
   const closeRoomModal = useCallback(() => {
@@ -295,17 +310,12 @@ export default function HotelDetail() {
   }, [selectedRoomForModal]);
 
   const handleSelectRoomFromModal = useCallback(() => {
-    if (!selectedRoomForModal) return;
-    setSelectedRoom(selectedRoomForModal);
-    setRoomQuantity(modalQuantity);
+    if (!selectedRoomForModal || !checkIn || !checkOut) return;
     closeRoomModal();
-  }, [selectedRoomForModal, modalQuantity, closeRoomModal]);
-
-  const handleSelectRoom = useCallback((room) => {
-    if (!room || selectedRoomRef.current?.id === room.id) return;
-    setSelectedRoom(room);
-    setRoomQuantity(1);
-  }, []);
+    // SPA navigation (FX-2): window.location.href would hard-reload and
+    // break the browser-history stack.
+    navigate(`/book?hotel_id=${id}&room_id=${selectedRoomForModal.id}&check_in=${checkIn}&check_out=${checkOut}&quantity=${modalQuantity}`);
+  }, [selectedRoomForModal, modalQuantity, checkIn, checkOut, id, closeRoomModal, navigate]);
 
   const clearRoomFilters = useCallback(() => {
     setRoomFilters(createDefaultRoomFilters());
@@ -313,11 +323,43 @@ export default function HotelDetail() {
 
   const closeMobileFilter = useCallback(() => setIsMobileFilterOpen(false), []);
 
+  const closeDesktopDrawer = useCallback(() => setIsDesktopDrawerOpen(false), []);
+
+  const handleRoomSearchChange = useCallback((patch) => {
+    setRoomSearch((prev) => ({ ...prev, ...patch }));
+  }, []);
+
+  // Explicit "Tìm kiếm" click: apply the draft. This is the ONLY path that
+  // hits the API / URL — editing filter-bar inputs never fetches. (FX-3)
+  const handleRoomSearch = useCallback(() => {
+    setAppliedRoomSearch(roomSearch);
+  }, [roomSearch]);
+
+  // "Bộ lọc" button: bottom sheet on mobile, right drawer on desktop.
+  const openFilterPanel = useCallback(() => {
+    preloadRoomFilterPanel();
+    if (isMobileViewport) setIsMobileFilterOpen(true);
+    else setIsDesktopDrawerOpen(true);
+  }, [isMobileViewport]);
+
   const activeFilterCount = useMemo(() => countActiveFilters(roomFilters), [roomFilters]);
 
+  // Search-bar pre-filter (FE-8): guest fit + availability quantity from the
+  // API response. Runs on the APPLIED search only (FX-3).
+  const availabilityFilteredRooms = useMemo(
+    () => filterRoomsByAvailabilityAndGuests(
+      rooms,
+      appliedRoomSearch.checkIn,
+      appliedRoomSearch.checkOut,
+      appliedRoomSearch.adults,
+      appliedRoomSearch.rooms
+    ),
+    [rooms, appliedRoomSearch]
+  );
+
   const filteredRooms = useMemo(
-    () => filterRooms(rooms, debouncedRoomFilters),
-    [rooms, debouncedRoomFilters]
+    () => filterRooms(availabilityFilteredRooms, debouncedRoomFilters),
+    [availabilityFilteredRooms, debouncedRoomFilters]
   );
 
   const sortedRooms = useMemo(() => sortRooms(filteredRooms, roomSortBy), [filteredRooms, roomSortBy]);
@@ -348,18 +390,24 @@ export default function HotelDetail() {
         <div className="relative rounded-2xl overflow-hidden bg-[#e8e4dd] aspect-[21/9] sm:aspect-[3/1] max-h-[400px]">
           {images.length > 0 ? (
             <>
-              <img
-                src={images[selectedImageIndex]?.url || images[0]?.url}
-                alt={images[selectedImageIndex]?.alt_text || hotel.name}
-                className="w-full h-full object-cover cursor-pointer"
-                fetchPriority="high"
-                decoding="async"
-                onClick={() => {
-                  setCurrentGalleryImages(images);
-                  setSelectedImageIndex(0);
-                  setIsGalleryOpen(true);
-                }}
-              />
+              <div
+                key={selectedImageIndex}
+                className={cn('h-full w-full', gallerySlideClass)}
+              >
+                <img
+                  src={images[selectedImageIndex]?.url || images[0]?.url}
+                  alt={images[selectedImageIndex]?.alt_text || hotel.name}
+                  className="w-full h-full object-cover cursor-pointer"
+                  fetchPriority="high"
+                  decoding="async"
+                  onClick={() => {
+                    setCurrentGalleryImages(images);
+                    setGalleryDirection(0);
+                    setSelectedImageIndex(0);
+                    setIsGalleryOpen(true);
+                  }}
+                />
+              </div>
               {images.length > 1 && (
                 <>
                   <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-lg text-sm">
@@ -367,7 +415,7 @@ export default function HotelDetail() {
                   </div>
                   <button
                     type="button"
-                    onClick={(e) => { e.stopPropagation(); setSelectedImageIndex((i) => (i - 1 + images.length) % images.length); }}
+                    onClick={(e) => { e.stopPropagation(); goHotelImage(-1, images.length); }}
                     className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow"
                     aria-label={t('hotelDetail.gallery.prev')}
                   >
@@ -375,7 +423,7 @@ export default function HotelDetail() {
                   </button>
                   <button
                     type="button"
-                    onClick={(e) => { e.stopPropagation(); setSelectedImageIndex((i) => (i + 1) % images.length); }}
+                    onClick={(e) => { e.stopPropagation(); goHotelImage(1, images.length); }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow"
                     aria-label={t('hotelDetail.gallery.next')}
                   >
@@ -396,7 +444,10 @@ export default function HotelDetail() {
             {images.map((img, idx) => (
               <button
                 key={img.id}
-                onClick={() => setSelectedImageIndex(idx)}
+                onClick={() => {
+                  setGalleryDirection(idx > selectedImageIndex ? 1 : idx < selectedImageIndex ? -1 : 0);
+                  setSelectedImageIndex(idx);
+                }}
                 className={cn(
                   'flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all',
                   selectedImageIndex === idx ? 'border-[#b8860b]500 scale-105' : 'border-[#d4cec4] hover:border-[#e8e4dd]400'
@@ -409,9 +460,9 @@ export default function HotelDetail() {
         )}
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      <div>
         {/* Main content */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-[#1a1a1a]">{hotel.name}</h1>
@@ -427,7 +478,7 @@ export default function HotelDetail() {
                   </span>
                 )}
                 {hotel.review_count != null && hotel.review_count > 0 && (
-                  <span className="text-[#5c5852] text-sm">{hotel.review_count} {t('common.reviews')}</span>
+                  <span className="text-[#5c5852] text-sm">{t('hotels.reviewCount', { count: Number(hotel.review_count) })}</span>
                 )}
               </div>
             </div>
@@ -435,15 +486,15 @@ export default function HotelDetail() {
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-[#e8e4dd] mb-6">
-            <nav className="flex gap-4 overflow-x-auto" aria-label={t('hotelDetail.tabs.ariaLabel')}>
+          <div className="sticky top-[var(--header-height,0px)] z-40 bg-white/95 backdrop-blur border-b border-[#e8e4dd] mb-6">
+            <nav className="flex gap-4 overflow-x-auto px-4 py-3" aria-label={t('hotelDetail.tabs.ariaLabel')}>
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
                   className={cn(
-                    'py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors',
-                    activeTab === tab.key ? 'border-[#b8860b] text-[#b8860b]600' : 'border-transparent text-[#5c5852] hover:text-[#1a1a1a]'
+                    'py-3 px-1 border-b-2 font-semibold text-base sm:text-lg whitespace-nowrap transition-colors',
+                    activeTab === tab.key ? 'border-[#b8860b] text-[#b8860b]' : 'border-transparent text-[#5c5852] hover:text-[#1a1a1a]'
                   )}
                 >
                   {t(tab.label)}
@@ -490,26 +541,19 @@ export default function HotelDetail() {
                 <p className="text-[#5c5852]">{t('hotelDetail.rooms.noRooms')}</p>
               ) : (
                 <>
+                  <HotelRoomFilterBar
+                    roomSearch={roomSearch}
+                    onSearchChange={handleRoomSearchChange}
+                    onSearch={handleRoomSearch}
+                    onFilterClick={openFilterPanel}
+                    isLoading={isLoading || isFetching}
+                    activeFilterCount={activeFilterCount}
+                  />
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="text-sm text-[#5c5852]">
                       {t('hotelDetail.rooms.roomsCount', { count: sortedRooms.length })}
                     </p>
                     <div className="flex items-center gap-2">
-                      {isMobileViewport && (
-                        <button
-                          type="button"
-                          onClick={() => { preloadRoomFilterPanel(); setIsMobileFilterOpen(true); }}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#e8e4dd] bg-white text-sm font-medium text-[#1a1a1a] hover:bg-[#faf8f5] transition-colors"
-                        >
-                          <SlidersHorizontal className="w-4 h-4" aria-hidden />
-                          {t('hotelDetail.rooms.filters')}
-                          {activeFilterCount > 0 && (
-                            <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#b8860b] text-white text-xs inline-flex items-center justify-center">
-                              {activeFilterCount}
-                            </span>
-                          )}
-                        </button>
-                      )}
                       <label htmlFor="room-sort" className="sr-only">{t('hotelDetail.rooms.sortBy')}</label>
                       <select
                         id="room-sort"
@@ -524,17 +568,8 @@ export default function HotelDetail() {
                     </div>
                   </div>
 
-                  <div className="flex gap-6 items-start">
-                    {!isMobileViewport && (
-                      <Suspense fallback={<RoomFilterPanelSkeleton />}>
-                        <LazyRoomFilterPanel
-                          rooms={rooms}
-                          filters={roomFilters}
-                          onFiltersChange={setRoomFilters}
-                        />
-                      </Suspense>
-                    )}
-                    <div className="flex-1 min-w-0 @container">
+                  {/* Filters live in the drawer on desktop (FE-6) / bottom sheet on mobile */}
+                  <div className="flex-1 min-w-0">
                       {sortedRooms.length === 0 ? (
                         <div className="rounded-2xl border border-dashed border-[#d4cec4] bg-[#faf8f5] px-6 py-12 text-center">
                           <SearchX className="w-12 h-12 mx-auto text-[#b8860b]/70 mb-3" aria-hidden />
@@ -556,15 +591,16 @@ export default function HotelDetail() {
                           {roomsByType.map(({ type, rooms: typeRooms }) => (
                             <div key={type}>
                               <div className="flex items-baseline gap-2 mb-3">
-                                <h3 className="font-semibold text-[#1a1a1a] text-lg">{type}</h3>
+                                {/* h2 (not h3): keeps heading order h1 → h2 for axe */}
+                                <h2 className="font-semibold text-[#1a1a1a] text-lg">{type}</h2>
                                 <span className="text-sm text-[#5c5852]">
                                   {t('hotelDetail.rooms.roomsCount', { count: typeRooms.length })}
                                 </span>
                               </div>
-                              {/* Container queries (not viewport): the cards column is only ~240-432px wide
-                                  on desktop (container max-w-6xl minus booking aside 384px minus filter
-                                  sidebar 280px), so lg:grid-cols-3 stretched cards to ~69-133px. */}
-                              <div className="grid grid-cols-1 @xl:grid-cols-2 @4xl:grid-cols-3 gap-4 items-start">
+                              {/* FX-4: full-width vertical list (Booking.com style).
+                                  Every group — even a single-room one — spans the
+                                  same width as the filter bar above. */}
+                              <div className="flex flex-col gap-4">
                                 {typeRooms.map((room) => (
                                   <RoomCard
                                     key={room.id}
@@ -572,8 +608,7 @@ export default function HotelDetail() {
                                     variant="detailed"
                                     nights={nights}
                                     onViewDetails={openRoomModal}
-                                    onSelect={handleSelectRoom}
-                                    selected={selectedRoom?.id === room.id}
+                                    className="w-full"
                                   />
                                 ))}
                               </div>
@@ -581,7 +616,6 @@ export default function HotelDetail() {
                           ))}
                         </div>
                       )}
-                    </div>
                   </div>
 
                   {isMobileViewport && isMobileFilterOpen && (
@@ -592,6 +626,19 @@ export default function HotelDetail() {
                         onFiltersChange={setRoomFilters}
                         isMobile
                         onClose={closeMobileFilter}
+                      />
+                    </Suspense>
+                  )}
+
+                  {/* Desktop filters live in the panel's own right drawer (FE-6) */}
+                  {!isMobileViewport && isDesktopDrawerOpen && (
+                    <Suspense fallback={null}>
+                      <LazyRoomFilterPanel
+                        rooms={rooms}
+                        filters={roomFilters}
+                        onFiltersChange={setRoomFilters}
+                        position="right"
+                        onClose={closeDesktopDrawer}
                       />
                     </Suspense>
                   )}
@@ -714,143 +761,6 @@ export default function HotelDetail() {
           )}
         </div>
 
-        {/* Sticky Booking Widget */}
-        <aside className="lg:w-96 shrink-0">
-          <div className="lg:sticky lg:top-24 rounded-2xl border border-[#e8e4dd] bg-white shadow-lg p-6">
-            <h2 className="font-semibold text-[#1a1a1a] text-lg mb-4">{t('hotelDetail.booking.title')}</h2>
-            <form onSubmit={(e) => { e.preventDefault(); if (!user) return; if (bookUrl) window.location.href = bookUrl; }} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="booking-check-in" className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkIn')}</label>
-                  <DatePicker
-                    id="booking-check-in"
-                    value={localCheckIn}
-                    onChange={setLocalCheckIn}
-                    min={today}
-                    className="w-full rounded-xl border border-[#e8e4dd] px-4 py-2.5 text-sm text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="booking-check-out" className="block text-sm font-medium text-[#45423d] mb-1">{t('common.date.checkOut')}</label>
-                  <DatePicker
-                    id="booking-check-out"
-                    value={localCheckOut}
-                    onChange={setLocalCheckOut}
-                    min={localCheckIn || tomorrow}
-                    className="w-full rounded-xl border border-[#e8e4dd] px-4 py-2.5 text-sm text-[#1a1a1a] focus:ring-2 focus:ring-[#b8860b]/30 focus:border-[#b8860b] bg-white"
-                  />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="booking-guests" className="block text-sm font-medium text-[#45423d] mb-1">{t('common.guests')}</label>
-                <select
-                  id="booking-guests"
-                  value={guests}
-                  onChange={(e) => setGuests(Number(e.target.value))}
-                  className="w-full rounded-lg border border-[#d4cec4] px-3 py-2 text-sm text-[#1a1a1a] bg-white"
-                >
-                  {[1, 2, 3, 4, 5, 6].map((n) => (
-                    <option key={n} value={n}>{n} {n === 1 ? t('common.guest') : t('common.guests')}</option>
-                  ))}
-                </select>
-              </div>
-              <button
-                type="button"
-                onClick={handleDateSearch}
-                className="w-full py-2.5 text-sm font-medium text-[#b8860b]600 hover:text-[#b8860b]700 border border-[#b8860b]200 rounded-xl transition-colors"
-              >
-                {t('hotelDetail.booking.checkAvailability')}
-              </button>
-
-              {effectiveCheckIn && effectiveCheckOut && rooms.length > 0 && (
-                <>
-                  <div>
-                    <span id="room-picker-label" className="block text-sm font-medium text-[#45423d] mb-2">{t('hotelDetail.booking.selectRoom')}</span>
-                    <div className="grid grid-cols-2 gap-3" role="group" aria-labelledby="room-picker-label">
-                      {roomsForGuests.map((r) => (
-                        <RoomCard
-                          key={r.id}
-                          room={r}
-                          variant="gallery"
-                          onSelect={handleSelectRoom}
-                          selected={selectedRoom?.id === r.id}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  {selectedRoom && (
-                    <div>
-                      <label htmlFor="booking-quantity" className="block text-sm font-medium text-[#45423d] mb-1">{t('hotelDetail.booking.quantity')}</label>
-                      <select
-                        id="booking-quantity"
-                        value={roomQuantity}
-                        onChange={(e) => setRoomQuantity(Number(e.target.value))}
-                        className="w-full rounded-lg border border-[#d4cec4] px-3 py-2 text-sm text-[#1a1a1a] bg-white"
-                      >
-                        {Array.from({ length: Math.min(selectedRoom.total_rooms || 5, 5) }, (_, i) => i + 1).map((n) => (
-                          <option key={n} value={n}>{n} {t('hotelDetail.booking.rooms', { count: n })}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {priceSummary && (
-                <div className="border-t border-[#e8e4dd] pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#5c5852]">{t('hotelDetail.booking.subtotal')}</span>
-                    <span>{formatPrice(priceSummary.subTotal)}</span>
-                  </div>
-                  {priceSummary.taxAmount > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#5c5852]">{t('hotelDetail.booking.tax', { rate: priceSummary.taxRatePct })}</span>
-                      <span>{formatPrice(priceSummary.taxAmount)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between font-semibold text-[#1a1a1a] pt-2">
-                    <span>{t('hotelDetail.booking.total')}</span>
-                    <span>{formatPrice(priceSummary.total)}</span>
-                  </div>
-                </div>
-              )}
-
-              {!user && bookUrl && (
-                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
-                  <p className="text-sm text-[#7a4a00]">{t('hotelDetail.booking.loginRequired')}</p>
-                  <div className="flex gap-2">
-                    <Link to="/login" className="flex-1 py-2.5 rounded-xl bg-[#b8860b] text-white font-semibold text-center hover:bg-[#996f09] transition-colors">
-                      {t('common.login', 'Đăng nhập')}
-                    </Link>
-                    <Link to="/register" className="flex-1 py-2.5 rounded-xl border border-[#b8860b] text-[#b8860b] font-semibold text-center hover:bg-[#fff7e6] transition-colors">
-                      {t('common.register', 'Đăng ký')}
-                    </Link>
-                  </div>
-                </div>
-              )}
-
-              {user && (
-                <button
-                  type="submit"
-                  disabled={!bookUrl}
-                  className="w-full py-3 rounded-xl bg-[#b8860b] text-white font-semibold hover:bg-[#996f09] disabled:bg-[#d4cec4] disabled:text-[#7a756d] disabled:cursor-not-allowed transition-colors"
-                >
-                  {t('hotelDetail.booking.bookNow')}
-                </button>
-              )}
-
-              {!user && !bookUrl && (
-                <button
-                  type="submit"
-                  disabled
-                  className="w-full py-3 rounded-xl bg-[#d4cec4] text-[#7a756d] font-semibold cursor-not-allowed transition-colors"
-                >
-                  {t('hotelDetail.booking.bookNow')}
-                </button>
-              )}
-            </form>
-          </div>
-        </aside>
       </div>
 
       {/* Room Detail Modal — conditional mount + code-split (fallback=null avoids double-paint flash) */}
@@ -884,35 +794,41 @@ export default function HotelDetail() {
             <X className="w-6 h-6" />
           </button>
           <div className="relative max-w-5xl max-h-full" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={currentGalleryImages[selectedImageIndex]?.url}
-              alt={currentGalleryImages[selectedImageIndex]?.alt_text || hotel.name}
-              className="max-w-full max-h-[80vh] object-contain rounded-lg"
-            />
+            <div key={selectedImageIndex} className={cn('flex justify-center', gallerySlideClass)}>
+              <img
+                src={currentGalleryImages[selectedImageIndex]?.url}
+                alt={currentGalleryImages[selectedImageIndex]?.alt_text || hotel.name}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              />
+            </div>
             {currentGalleryImages.length > 1 && (
               <>
                 <button
-                  onClick={() => setSelectedImageIndex((i) => (i - 1 + currentGalleryImages.length) % currentGalleryImages.length)}
+                  onClick={() => goHotelImage(-1, currentGalleryImages.length)}
                   className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white"
                   aria-label={t('hotelDetail.gallery.prev')}
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
-                  onClick={() => setSelectedImageIndex((i) => (i + 1) % currentGalleryImages.length)}
+                  onClick={() => goHotelImage(1, currentGalleryImages.length)}
                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white"
                   aria-label={t('hotelDetail.gallery.next')}
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
-                <div className="flex justify-center gap-2 mt-4">
+                <div className="flex justify-center items-center gap-1.5 mt-4">
                   {currentGalleryImages.map((_, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setSelectedImageIndex(idx)}
+                      onClick={() => {
+                        setGalleryDirection(idx > selectedImageIndex ? 1 : idx < selectedImageIndex ? -1 : 0);
+                        setSelectedImageIndex(idx);
+                      }}
+                      // min-h-0/min-w-0/p-0: override global 44px rule so dots stay tiny.
                       className={cn(
-                        'w-2 h-2 rounded-full transition-colors',
-                        selectedImageIndex === idx ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
+                        'h-1.5 w-1.5 min-h-0 min-w-0 shrink-0 rounded-full p-0 transition-colors duration-200',
+                        selectedImageIndex === idx ? 'scale-110 bg-white' : 'bg-white/50 hover:bg-white/75'
                       )}
                       aria-label={t('hotelDetail.gallery.imageAriaLabel', { index: idx + 1 })}
                     />
