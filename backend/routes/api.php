@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AiController;
 use App\Http\Controllers\Api\V1\AmenityController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BookingController;
+use App\Http\Controllers\Api\V1\HotelAvailabilityController;
 use App\Http\Controllers\Api\V1\HotelSearchController;
 use App\Http\Controllers\Api\V1\LocationController;
 use App\Http\Controllers\Api\V1\ReviewController;
@@ -59,6 +60,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         ->whereNumber('id')
         ->middleware('throttle:40,1')
         ->name('hotels.review-sentiment');
+    Route::get('/hotels/{id}/rooms/availability', [HotelAvailabilityController::class, 'index'])
+        ->whereNumber('id')
+        ->name('hotels.rooms.availability');
     Route::get('/hotels/{id}', [HotelSearchController::class, 'show'])->name('hotels.show');
 
     // AI features (optional auth on recommendations via Bearer token)

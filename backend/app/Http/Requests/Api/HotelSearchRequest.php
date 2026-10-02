@@ -26,6 +26,8 @@ class HotelSearchRequest extends BaseApiRequest
             'radius_km' => 'nullable|numeric|min:0|max:500',
             'check_in' => 'nullable|date|after_or_equal:today',
             'check_out' => 'nullable|date|after:check_in',
+            'adults' => 'nullable|integer|min:1|max:20',
+            'rooms' => 'nullable|integer|min:1|max:10',
             'min_price' => 'nullable|numeric|min:0',
             'max_price' => 'nullable|numeric|min:0',
             'min_rating' => 'nullable|numeric|min:0|max:5',

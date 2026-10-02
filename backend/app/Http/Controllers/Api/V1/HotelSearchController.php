@@ -108,7 +108,7 @@ class HotelSearchController extends BaseApiController
         }
 
         $perPage = (int) $request->input('per_page', 15);
-        $paginator = $query->with(['rooms', 'rooms.images', 'images', 'amenities'])->paginate($perPage);
+        $paginator = $query->with(['rooms', 'rooms.images', 'rooms.roomType', 'images', 'amenities'])->paginate($perPage);
 
         return $this->success([
             'data' => HotelResource::collection($paginator->items()),
@@ -124,7 +124,7 @@ class HotelSearchController extends BaseApiController
     /**
      * Single hotel with rooms. Optional check_in/check_out for availability context.
      */
-    public function show(int $id): JsonResponse
+    public function show(int $id, HotelSearchRequest $request): JsonResponse
     {
         $hotel = Hotel::query()
             ->where('id', $id)
@@ -133,6 +133,17 @@ class HotelSearchController extends BaseApiController
             ->selectRaw('hotels.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as review_count')
             ->with(['rooms.hotel', 'rooms.images', 'rooms.amenities', 'rooms.roomType', 'images', 'amenities'])
             ->firstOrFail();
+
+        if ($request->filled('check_in') && $request->filled('check_out')) {
+            $minQuantity = (int) $request->input('rooms', 1);
+            $roomIds = $this->availabilityService->getRoomIdsWithAvailability(
+                $request->check_in,
+                $request->check_out,
+                $minQuantity
+            );
+            $hotel->setRelation('rooms', $hotel->rooms->whereIn('id', $roomIds)->values());
+        }
+
         return $this->success(new HotelResource($hotel));
     }
 }

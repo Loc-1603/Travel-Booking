@@ -81,6 +81,22 @@ class RoomResource extends JsonResource
                     return $policy !== null ? $svc->getSummaryForPolicy($policy) : null;
                 }
             ),
+            'availability_per_date' => $this->when(
+                $request->filled('check_in') && $request->filled('check_out'),
+                fn () => app(\App\Services\AvailabilityService::class)->getAvailabilityForRange(
+                    (int) $this->id,
+                    $request->input('check_in'),
+                    $request->input('check_out')
+                )
+            ),
+            'min_available_rooms' => $this->when(
+                $request->filled('check_in') && $request->filled('check_out'),
+                fn () => app(\App\Services\AvailabilityService::class)->getMinimumAvailability(
+                    (int) $this->id,
+                    $request->input('check_in'),
+                    $request->input('check_out')
+                )
+            ),
         ];
     }
 }
