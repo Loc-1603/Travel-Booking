@@ -157,7 +157,7 @@ export default function TourDetail() {
               {rating != null && rating > 0 && (
                 <p className="mt-1 text-sm text-[#5c5852]">
                   <span className="font-semibold text-[#1a1a1a]">{rating.toFixed(1)}</span> {getRatingLabel(rating)}
-                  {tour.review_count > 0 && ` · ${tour.review_count} reviews`}
+                  {tour.review_count > 0 && ` · ${t('tours.reviewCount', { count: Number(tour.review_count) })}`}
                 </p>
               )}
             </div>
