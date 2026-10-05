@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { WebsiteSettingsProvider } from './contexts/WebsiteSettingsContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ToastProvider } from './contexts/ToastContext';
 import Layout from './components/Layout';
 // Home stays statically imported for fast first paint (LCP on "/"); all other
 // pages are code-split via React.lazy (Suspense boundary lives in Layout).
@@ -44,9 +45,10 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <WebsiteSettingsProvider>
-          <LanguageProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <WebsiteSettingsProvider>
+            <LanguageProvider>
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Layout />}>
@@ -81,6 +83,7 @@ export default function App() {
           </LanguageProvider>
         </WebsiteSettingsProvider>
       </AuthProvider>
+      </ToastProvider>
     </QueryClientProvider>
   );
 }

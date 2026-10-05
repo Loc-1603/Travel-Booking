@@ -90,7 +90,8 @@
     "continue": "Tiếp tục",
     "home": "Trang chủ",
     "total": "tổng",
-    "any": "Tất cả"
+    "any": "Tất cả",
+    "notifications": "Thông báo"
   },
   "amenities": {
     "wifi": "Wi-Fi miễn phí",
@@ -720,7 +721,8 @@
       "ariaLabel": "Các phần chi tiết khách sạn"
     },
     "gallery": {
-      "carouselLabel": "Hình ảnh phòng ({{count}} ảnh)",      "prev": "Ảnh trước",
+      "carouselLabel": "Hình ảnh phòng ({{count}} ảnh)",
+      "prev": "Ảnh trước",
       "next": "Ảnh sau",
       "close": "Đóng thư viện ảnh",
       "imageAriaLabel": "Ảnh {{index}}"
@@ -1082,6 +1084,20 @@
       "cancelled": "Đã hủy",
       "disputed": "Khiếu nại",
       "refunded": "Đã hoàn tiền"
+    },
+    "price": {
+      "subtotal": "Tích lũy",
+      "transport": "Phí di chuyển",
+      "addon": "Phụ thu",
+      "discount": "Chiết khấu",
+      "tax": "Thuế (VAT)",
+      "total": "Tổng cộng"
+    },
+    "gallery": {
+      "prev": "Ảnh trước",
+      "next": "Ảnh tiếp",
+      "close": "Đóng ảnh",
+      "thumbnails": "Thumbnails"
     }
   }
-}
+}

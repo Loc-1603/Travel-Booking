@@ -90,7 +90,8 @@
     "continue": "Continue",
     "home": "Home",
     "total": "total",
-    "any": "All"
+    "any": "All",
+    "notifications": "Notifications"
   },
   "amenities": {
     "wifi": "Free Wi-Fi",
@@ -721,7 +722,8 @@
       "ariaLabel": "Hotel detail sections"
     },
     "gallery": {
-      "carouselLabel": "Room photos ({{count}} photos)",      "prev": "Previous image",
+      "carouselLabel": "Room photos ({{count}} photos)",
+      "prev": "Previous image",
       "next": "Next image",
       "close": "Close gallery",
       "imageAriaLabel": "Image {{index}}"
@@ -1092,6 +1094,20 @@
       "cancelled": "Cancelled",
       "disputed": "Disputed",
       "refunded": "Refunded"
+    },
+    "price": {
+      "subtotal": "Subtotal",
+      "transport": "Transport fee",
+      "addon": "Add-on",
+      "discount": "Discount",
+      "tax": "Tax (VAT)",
+      "total": "Total"
+    },
+    "gallery": {
+      "prev": "Previous photo",
+      "next": "Next photo",
+      "close": "Close photo",
+      "thumbnails": "Photo thumbnails"
     }
   }
-}
+}
