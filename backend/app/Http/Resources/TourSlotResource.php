@@ -20,6 +20,7 @@ class TourSlotResource extends JsonResource
             'end_time' => is_string($this->end_time) ? substr($this->end_time, 0, 5) : $this->end_time?->format('H:i'),
             'status' => $this->status,
             'price_override' => $this->price_override !== null ? (float) $this->price_override : null,
+            'held_until' => $this->held_until?->toIso8601String(),
         ];
     }
 }

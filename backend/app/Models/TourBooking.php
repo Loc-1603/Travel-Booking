@@ -107,4 +107,28 @@ class TourBooking extends Model
     {
         return $this->status === TourBookingStatus::CONFIRMED->value;
     }
+
+    /**
+     * Countdown giữ chỗ (Phase 1 BE-1.2): expires_at = created_at + hold_ttl.
+     */
+    public function expiresAt(): ?\Illuminate\Support\Carbon
+    {
+        if (! $this->created_at) {
+            return null;
+        }
+
+        return $this->created_at->copy()->addMinutes((int) config('tour.hold_ttl_minutes', 15));
+    }
+
+    public function isExpired(): bool
+    {
+        $expiresAt = $this->expiresAt();
+
+        return $expiresAt !== null && now()->greaterThanOrEqualTo($expiresAt);
+    }
+
+    public function canPay(): bool
+    {
+        return $this->status === TourBookingStatus::PENDING_PAYMENT->value && ! $this->isExpired();
+    }
 }

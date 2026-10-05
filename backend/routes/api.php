@@ -99,7 +99,13 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     Route::get('/tours/{uuid}', [TourSearchController::class, 'show'])->name('tours.show');
     Route::get('/tours/{uuid}/availability', [TourAvailabilityController::class, 'index'])->name('tours.availability');
 
-    // Authenticated customer routes (booking requires login — no guest flow by design)
+    // Tour price preview (public cho guest — login chỉ khi bấm đặt; BE-1.4)
+    Route::middleware('auth.optional')->group(function (): void {
+        Route::post('/tour-bookings/preview', [TourBookingController::class, 'preview'])->name('tour-bookings.preview');
+        Route::post('/tour-bookings/guide-preview', [TourBookingController::class, 'previewGuide'])->name('tour-bookings.guide-preview');
+    });
+
+    // Authenticated customer routes (booking requires login — chỉ preview là public)
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/me', [AuthController::class, 'me'])->name('me');
@@ -112,9 +118,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('/bookings/{uuid}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
         Route::post('/bookings/{uuid}/dispute', [BookingController::class, 'storeDispute'])->name('bookings.dispute.store');
         Route::post('/bookings/{uuid}/claim', [BookingController::class, 'claim'])->name('bookings.claim');
-        // Tour 1vs1 bookings (auth required — no guest flow by design)
-        Route::post('/tour-bookings/preview', [TourBookingController::class, 'preview'])->name('tour-bookings.preview');
-        Route::post('/tour-bookings/guide-preview', [TourBookingController::class, 'previewGuide'])->name('tour-bookings.guide-preview');
+        // Tour 1vs1 bookings (auth required — trừ preview public ở trên)
         Route::post('/tour-bookings/guide', [TourBookingController::class, 'storeGuide'])->name('tour-bookings.guide-store');
         Route::apiResource('tour-bookings', TourBookingController::class)->only(['index', 'store']);
         Route::get('/tour-bookings/{uuid}', [TourBookingController::class, 'show'])->name('tour-bookings.show');

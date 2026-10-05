@@ -30,6 +30,10 @@ class TourBookingResource extends JsonResource
             'currency' => $this->currency,
             'meeting_point' => $this->meeting_point,
             'customer_notes' => $this->customer_notes,
+            'created_at' => $this->created_at?->toIso8601String(),
+            'expires_at' => $this->resource->expiresAt()?->toIso8601String(),
+            'is_expired' => $this->resource->exists ? $this->resource->isExpired() : false,
+            'can_pay' => $this->resource->exists ? $this->resource->canPay() : false,
             'tour' => new TourProductResource($this->whenLoaded('tour')),
             'slot' => new TourSlotResource($this->whenLoaded('slot')),
             // true khi booking đã có review (cần withCount('review') hoặc load relation review).

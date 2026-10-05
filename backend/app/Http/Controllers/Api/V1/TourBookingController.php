@@ -25,7 +25,7 @@ class TourBookingController extends BaseApiController
     ) {}
 
     /**
-     * Preview price (no booking created, no slot lock).
+     * Preview price (public cho guest, không tạo booking/lock slot — BE-1.4).
      */
     public function preview(StoreTourBookingRequest $request): JsonResponse
     {
@@ -35,7 +35,7 @@ class TourBookingController extends BaseApiController
             $request->pricing_mode,
             (int) $request->duration_value,
             $request->filled('coupon_code') ? trim($request->coupon_code) : null,
-            (int) $request->user()->id,
+            $request->user()?->id,
         );
 
         return $this->success([
@@ -79,7 +79,7 @@ class TourBookingController extends BaseApiController
     }
 
     /**
-     * Preview giá 1 ngày theo Guide (không tạo booking, không lock slot).
+     * Preview giá 1 ngày theo Guide (public cho guest — BE-1.4).
      */
     public function previewGuide(\App\Http\Requests\Api\StoreGuideBookingRequest $request): JsonResponse
     {
@@ -89,7 +89,7 @@ class TourBookingController extends BaseApiController
                 $request->input('provider_uuid'),
                 $slotId,
                 $request->filled('coupon_code') ? trim($request->coupon_code) : null,
-                (int) $request->user()->id,
+                $request->user()?->id,
                 $request->input('travel_date'),
             );
         } catch (\RuntimeException $e) {
