@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
+import { Stepper } from '../components/Stepper';
 import { formatPrice } from '../lib/utils';
 
 export default function TourCheckout() {
@@ -37,6 +38,11 @@ export default function TourCheckout() {
   const booking = stateBooking || (data?.data ?? data?.booking ?? data);
   const isConfirmed = booking?.status === 'confirmed';
   const showSuccess = isSuccess || isConfirmed;
+  const checkoutSteps = [
+    t('tours.wizard.steps.slot'),
+    t('tours.wizard.steps.details'),
+    t('tours.wizard.steps.payment'),
+  ];
 
   const handlePayClick = async () => {
     setPaymentError(null);
@@ -108,7 +114,8 @@ export default function TourCheckout() {
 
   return (
     <div className="py-6">
-      <h1 className="text-2xl sm:text-3xl font-bold text-[#1a1a1a] mb-6">{t('tours.checkout.title')}</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-[#1a1a1a] mb-4">{t('tours.checkout.title')}</h1>
+      <Stepper steps={checkoutSteps} current={2} ariaLabel={t('tours.checkout.stepsAria')} className="mb-6" />
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
           <div className="rounded-2xl border border-[#e8e4dd] bg-white p-6">

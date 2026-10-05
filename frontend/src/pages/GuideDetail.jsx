@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -24,13 +24,27 @@ export default function GuideDetail() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { uuid } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const provinceSlug = searchParams.get('province') || '';
-  // Ngày đi + sort đã chọn từ trang tỉnh — read-only, không cho sửa ở đây.
-  // backTo khôi phục ?date=&sort= để giữ nguyên trạng thái lọc khi quay lại.
+  // Ngày đi chỉnh được inline: DatePicker + "Cập nhật" ghi vào ?date=,
+  // availability/preview refetch theo queryKey; giữ nguyên province/sort.
   const travelDate = searchParams.get('date') || '';
   const backSort = searchParams.get('sort') || '';
   const hasDate = !!travelDate;
+  const [draftDate, setDraftDate] = useState(travelDate);
+  useEffect(() => {
+    setDraftDate(travelDate);
+  }, [travelDate]);
+  const todayISO = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  const handleDateUpdate = () => {
+    if (!draftDate || draftDate === travelDate) return;
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('date', draftDate);
+      return next;
+    });
+  };
 
   const [couponCode, setCouponCode] = useState('');
   const [meetingPoint, setMeetingPoint] = useState('');
@@ -232,18 +246,57 @@ export default function GuideDetail() {
 
         {hasDate ? (
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-[#5c5852]">{t('tours.guides.fixedDate')}:</span>
-            <span className="font-semibold text-[#1a1a1a]">{travelDate}</span>
+            <label htmlFor="guide-travel-date" className="text-[#5c5852]">
+              {t('tours.guides.fixedDate')}:
+            </label>
+            <input
+              id="guide-travel-date"
+              type="date"
+              value={draftDate}
+              min={todayISO}
+              onChange={(e) => setDraftDate(e.target.value)}
+              className="rounded-xl border border-[#e8e4dd] px-3 py-1.5 text-sm text-[#1a1a1a]"
+            />
+            <button
+              type="button"
+              onClick={handleDateUpdate}
+              disabled={!draftDate || draftDate === travelDate}
+              className="px-3 py-1.5 rounded-xl border border-[#b8860b] text-[#996f09] text-sm font-medium hover:bg-[#f9edd1] disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {t('tours.guides.updateDate')}
+            </button>
             <Link to={backTo} className="text-[#b8860b] hover:underline">
               {t('tours.guides.changeDate')}
             </Link>
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-[#e8e4dd] bg-[#faf8f5] p-4 text-sm text-[#5c5852]">
-            {t('tours.guides.noDateHint')}{' '}
-            <Link to={backTo} className="text-[#b8860b] font-medium hover:underline">
-              {t('tours.guides.backToProvince')}
-            </Link>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <label htmlFor="guide-travel-date" className="text-[#5c5852]">
+              {t('tours.guides.travelDateLabel')}:
+            </label>
+            <input
+              id="guide-travel-date"
+              type="date"
+              value={draftDate}
+              min={todayISO}
+              placeholder={t('tours.guides.newDatePlaceholder')}
+              onChange={(e) => setDraftDate(e.target.value)}
+              className="rounded-xl border border-[#e8e4dd] px-3 py-1.5 text-sm text-[#1a1a1a]"
+            />
+            <button
+              type="button"
+              onClick={handleDateUpdate}
+              disabled={!draftDate}
+              className="px-3 py-1.5 rounded-xl border border-[#b8860b] text-[#996f09] text-sm font-medium hover:bg-[#f9edd1] disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {t('tours.guides.updateDate')}
+            </button>
+            <span className="text-[#5c5852]">
+              {t('tours.guides.noDateHint')}{' '}
+              <Link to={backTo} className="text-[#b8860b] font-medium hover:underline">
+                {t('tours.guides.backToProvince')}
+              </Link>
+            </span>
           </div>
         )}
 

@@ -2,12 +2,14 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
+import { Stepper } from '../components/Stepper';
+import { TourPriceSummary } from '../components/TourPriceSummary';
 import { TourSlotCalendar } from '../components/TourSlotCalendar';
-import { formatPrice, cn } from '../lib/utils';
+import { cn } from '../lib/utils';
 
 export default function TourBookingWizard() {
   const { t } = useTranslation();
@@ -25,6 +27,9 @@ export default function TourBookingWizard() {
   const [submitError, setSubmitError] = useState(null);
 
   const initialSlotId = searchParams.get('slot_id');
+  // Calendar is collapsed once a slot is chosen (deep-link or picked);
+  // it re-opens via "Change slot", or stays open when nothing is selected.
+  const [calendarOpen, setCalendarOpen] = useState(!initialSlotId);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['tour', uuid],
@@ -77,6 +82,12 @@ export default function TourBookingWizard() {
     retry: false,
   });
   const breakdown = previewData?.data;
+  const wizardSteps = [
+    t('tours.wizard.steps.slot'),
+    t('tours.wizard.steps.details'),
+    t('tours.wizard.steps.payment'),
+  ];
+  const showCalendar = calendarOpen || !activeSlot;
 
   if (!user) {
     return (
@@ -133,11 +144,50 @@ export default function TourBookingWizard() {
 
   return (
     <div className="py-6 max-w-3xl mx-auto">
+      <Link
+        to={`/tours/${uuid}`}
+        className="inline-flex items-center gap-1.5 text-sm text-[#5c5852] hover:text-[#b8860b] mb-4"
+      >
+        <ArrowLeft className="w-4 h-4" /> {t('tours.wizard.backToTour')}
+      </Link>
       <h1 className="text-2xl sm:text-3xl font-bold text-[#1a1a1a] mb-1">{t('tours.wizard.title')}</h1>
-      <p className="text-[#5c5852] mb-6">{tour.title} · {tour.province?.name}</p>
+      <p className="text-[#5c5852] mb-4">{tour.title} · {tour.province?.name}</p>
+      <Stepper steps={wizardSteps} current={activeSlot ? 1 : 0} ariaLabel={t('tours.wizard.stepsAria')} className="mb-6" />
 
       <div className="space-y-5">
-        <TourSlotCalendar tourUuid={uuid} selectedSlotId={activeSlot?.id} onSelect={setSlot} />
+        <div className="rounded-2xl border border-[#e8e4dd] bg-white p-5">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h2 className="font-semibold text-[#1a1a1a]">{t('tours.wizard.selectedSlot')}</h2>
+            {activeSlot && (
+              <button
+                type="button"
+                onClick={() => setCalendarOpen((o) => !o)}
+                className="text-sm font-medium text-[#b8860b] hover:underline"
+              >
+                {t('tours.wizard.changeSlot')}
+              </button>
+            )}
+          </div>
+          {activeSlot ? (
+            <p className="text-sm text-[#45423d]" data-testid="selected-slot">
+              <span className="font-semibold text-[#1a1a1a]">{activeSlot.date}</span>
+              {' · '}{activeSlot.start_time}–{activeSlot.end_time}
+            </p>
+          ) : (
+            <p className="text-sm text-[#7a756d]">{t('tours.wizard.noSlotSelected')}</p>
+          )}
+        </div>
+
+        {showCalendar && (
+          <TourSlotCalendar
+            tourUuid={uuid}
+            selectedSlotId={activeSlot?.id}
+            onSelect={(s) => {
+              setSlot(s);
+              setCalendarOpen(false);
+            }}
+          />
+        )}
 
         <div className="rounded-2xl border border-[#e8e4dd] bg-white p-5">
           <h2 className="font-semibold text-[#1a1a1a] mb-3">{t('tours.wizard.duration')}</h2>
@@ -204,21 +254,15 @@ export default function TourBookingWizard() {
           <h2 className="font-semibold text-[#1a1a1a] mb-3">{t('tours.wizard.price')}</h2>
           {previewLoading && <Loader2 className="w-5 h-5 animate-spin text-[#b8860b]" />}
           {breakdown && !previewLoading && (
-            <div className="space-y-1.5 text-sm">
-              <div className="flex justify-between"><span className="text-[#5c5852]">{t('tours.wizard.subtotal')}</span><span>{formatPrice(breakdown.subtotal, breakdown.currency)}</span></div>
-              {(breakdown.add_on_amount ?? 0) > 0 && (
-                <div className="flex justify-between"><span className="text-[#5c5852]">{t('tours.wizard.transport')}</span><span>{formatPrice(breakdown.add_on_amount, breakdown.currency)}</span></div>
-              )}
-              {(breakdown.discount ?? 0) > 0 && (
-                <div className="flex justify-between text-green-600"><span>{t('tours.wizard.discount')}</span><span>-{formatPrice(breakdown.discount, breakdown.currency)}</span></div>
-              )}
-              {(breakdown.tax ?? 0) > 0 && (
-                <div className="flex justify-between"><span className="text-[#5c5852]">{breakdown.tax_name || 'VAT'}</span><span>{formatPrice(breakdown.tax, breakdown.currency)}</span></div>
-              )}
-              <div className="flex justify-between font-semibold text-base pt-2 border-t border-[#e8e4dd]">
-                <span>{t('tours.wizard.total')}</span><span>{formatPrice(breakdown.total, breakdown.currency)}</span>
-              </div>
-            </div>
+            <TourPriceSummary
+              subtotal={breakdown.subtotal ?? 0}
+              transport={breakdown.add_on_amount ?? 0}
+              discount={breakdown.discount ?? 0}
+              tax={breakdown.tax ?? 0}
+              total={breakdown.total}
+              currency={breakdown.currency || 'VND'}
+              labels={breakdown.tax_name ? { tax: breakdown.tax_name } : undefined}
+            />
           )}
           {!breakdown && !previewLoading && (
             <p className="text-sm text-[#7a756d]">{activeSlot ? t('tours.wizard.previewHint') : t('tours.detail.pickSlotHint')}</p>

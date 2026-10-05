@@ -968,6 +968,17 @@
       "title": "Book your private tour",
       "loginRequired": "Log in required",
       "loginRequiredHint": "Tour booking requires an account (no guest checkout).",
+      "steps": {
+        "slot": "Pick slot",
+        "details": "Details & confirm",
+        "payment": "Payment"
+      },
+      "stepsAria": "Tour booking steps",
+      "selectedSlot": "Selected slot",
+      "changeSlot": "Change slot",
+      "chooseSlot": "Choose time slot",
+      "noSlotSelected": "No slot selected yet. Pick a time slot below to continue.",
+      "backToTour": "Back to tour",
       "duration": "Duration",
       "hour": "By hour",
       "day": "By day",
@@ -988,6 +999,7 @@
     "checkout": {
       "title": "Tour checkout",
       "summary": "Booking summary",
+      "stepsAria": "Tour checkout steps",
       "secure": "Secure payment via VNPay",
       "payNow": "Pay now",
       "successTitle": "Payment successful!",
@@ -1070,6 +1082,9 @@
       "about": "About the guide",
       "bookDayTitle": "Book this guide for 1 day",
       "fixedDate": "Travel date",
+      "travelDateLabel": "Travel date",
+      "newDatePlaceholder": "Select a new date",
+      "updateDate": "Update",
       "changeDate": "Change date",
       "noDateHint": "Please pick a travel date on the province page before booking.",
       "pickSlot": "Pick a free time slot",
@@ -1110,4 +1125,4 @@
       "thumbnails": "Photo thumbnails"
     }
   }
-}
+}

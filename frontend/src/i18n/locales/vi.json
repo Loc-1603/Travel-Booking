@@ -958,6 +958,17 @@
       "title": "Đặt tour riêng",
       "loginRequired": "Cần đăng nhập",
       "loginRequiredHint": "Đặt tour yêu cầu tài khoản (không hỗ trợ khách vãng lai).",
+      "steps": {
+        "slot": "Chọn slot",
+        "details": "Thông tin & xác nhận",
+        "payment": "Thanh toán"
+      },
+      "stepsAria": "Các bước đặt tour",
+      "selectedSlot": "Slot đã chọn",
+      "changeSlot": "Đổi slot",
+      "chooseSlot": "Chọn khung giờ",
+      "noSlotSelected": "Chưa chọn slot. Hãy chọn khung giờ bên dưới để tiếp tục.",
+      "backToTour": "Về trang tour",
       "duration": "Thời lượng",
       "hour": "Theo giờ",
       "day": "Theo ngày",
@@ -978,6 +989,7 @@
     "checkout": {
       "title": "Thanh toán tour",
       "summary": "Tóm tắt đặt tour",
+      "stepsAria": "Các bước thanh toán tour",
       "secure": "Thanh toán an toàn qua VNPay",
       "payNow": "Thanh toán ngay",
       "successTitle": "Thanh toán thành công!",
@@ -1060,6 +1072,9 @@
       "about": "Về hướng dẫn viên",
       "bookDayTitle": "Đặt guide 1 ngày",
       "fixedDate": "Ngày đi",
+      "travelDateLabel": "Ngày đi",
+      "newDatePlaceholder": "Chọn ngày mới",
+      "updateDate": "Cập nhật",
       "changeDate": "Đổi ngày",
       "noDateHint": "Vui lòng chọn ngày đi ở trang tỉnh trước khi đặt guide.",
       "pickSlot": "Chọn khung giờ trống",
@@ -1100,4 +1115,4 @@
       "thumbnails": "Thumbnails"
     }
   }
-}
+}
