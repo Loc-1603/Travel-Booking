@@ -50,8 +50,8 @@ export function TourReviewForm({ tourBookingId, onSubmitted }) {
   };
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border border-[#e8e4dd] bg-white p-5 space-y-3">
-      <h3 className="font-semibold text-[#1a1a1a]">{t('tours.reviews.writeTitle')}</h3>
+    <form onSubmit={submit} className="rounded-2xl border border-neutral-200 bg-white p-5 space-y-3">
+      <h3 className="font-semibold text-neutral-900">{t('tours.reviews.writeTitle')}</h3>
       <div className="flex items-center gap-1" role="radiogroup" aria-label={t('tours.reviews.writeTitle')}>
         {[1, 2, 3, 4, 5].map((s) => (
           <button
@@ -59,10 +59,10 @@ export function TourReviewForm({ tourBookingId, onSubmitted }) {
             type="button"
             onClick={() => setRating(s)}
             className="p-1"
-            aria-label={`Rate ${s}`}
+            aria-label={t('tours.reviews.rateStar', { count: s })}
             aria-pressed={s === rating}
           >
-            <Star className={`w-6 h-6 ${s <= rating ? 'text-[#b8860b] fill-current' : 'text-stone-300'}`} />
+            <Star className={`w-6 h-6 ${s <= rating ? 'text-accent fill-current' : 'text-stone-300'}`} />
           </button>
         ))}
       </div>
@@ -72,15 +72,15 @@ export function TourReviewForm({ tourBookingId, onSubmitted }) {
         onChange={(e) => setComment(e.target.value)}
         placeholder={t('tours.reviews.commentPlaceholder')}
         maxLength={2000}
-        className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
+        className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm"
       />
       <div>
         <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={pickFiles} />
         {previews.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
             {previews.map((p, i) => (
-              <div key={`${p.url}-${i}`} className="relative w-20 h-20 rounded-xl overflow-hidden border border-[#e8e4dd]">
-                <img src={p.url} alt="" className="w-full h-full object-cover" />
+              <div key={`${p.url}-${i}`} className="relative w-20 h-20 rounded-xl overflow-hidden border border-neutral-200">
+                <img src={p.url} alt={t('tours.reviews.photoAlt', { index: i + 1 })} className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}
@@ -97,7 +97,7 @@ export function TourReviewForm({ tourBookingId, onSubmitted }) {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#e8e4dd] text-sm font-medium text-[#45423d] hover:bg-[#faf8f5]"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-200 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
           >
             <ImagePlus className="w-4 h-4" />
             {t('tours.reviews.addPhotos', { count: MAX_IMAGES - files.length })}
@@ -108,7 +108,7 @@ export function TourReviewForm({ tourBookingId, onSubmitted }) {
       <button
         type="submit"
         disabled={mutation.isPending}
-        className="px-5 py-2.5 rounded-xl bg-[#1a1a1a] text-white text-sm font-medium hover:bg-[#2d2a28] disabled:opacity-60"
+        className="px-5 py-2.5 rounded-xl bg-neutral-900 text-white text-sm font-medium hover:bg-neutral-800 disabled:opacity-60"
       >
         {t('tours.reviews.submit')}
       </button>

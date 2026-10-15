@@ -2,13 +2,15 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
 import { Stepper } from '../components/Stepper';
+import { QuantityStepper } from '../components/QuantityStepper';
 import { TourPriceSummary } from '../components/TourPriceSummary';
 import { TourSlotCalendar } from '../components/TourSlotCalendar';
+import { addDaysISO, computeTourEnd, getMissingAvailableDays } from '../lib/tourSearch';
 import { cn } from '../lib/utils';
 
 export default function TourBookingWizard() {
@@ -82,6 +84,29 @@ export default function TourBookingWizard() {
     retry: false,
   });
   const breakdown = previewData?.data;
+  const expectedEnd = computeTourEnd(activeSlot, pricingMode, duration);
+
+  // Day-mode multi-day warning: every following day of the trip needs a free
+  // slot, otherwise the booking will fail at confirm time.
+  const rangeEnd = activeSlot && pricingMode === 'day' && Number(duration) > 1
+    ? addDaysISO(activeSlot.date, Number(duration) - 1)
+    : null;
+  const { data: rangeData } = useQuery({
+    queryKey: ['tour-availability', uuid, 'day-range', activeSlot?.date, rangeEnd],
+    queryFn: async () => {
+      const res = await api.get(`/tours/${uuid}/availability`, {
+        params: { from: activeSlot.date, to: rangeEnd },
+      });
+      if (!res.data?.success) throw new Error(res.data?.message || 'Failed');
+      return res.data;
+    },
+    enabled: !!uuid && !!activeSlot && !!rangeEnd,
+    staleTime: 30_000,
+    retry: false,
+  });
+  const missingDays = rangeEnd
+    ? getMissingAvailableDays(rangeData?.data, activeSlot.date, rangeEnd)
+    : [];
   const wizardSteps = [
     t('tours.wizard.steps.slot'),
     t('tours.wizard.steps.details'),
@@ -92,12 +117,12 @@ export default function TourBookingWizard() {
   if (!user) {
     return (
       <div className="py-12 max-w-md mx-auto text-center">
-        <div className="rounded-2xl border border-[#e8e4dd] bg-white p-8">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-8">
           <h2 className="text-xl font-semibold mb-2">{t('tours.wizard.loginRequired')}</h2>
-          <p className="text-[#5c5852] mb-6">{t('tours.wizard.loginRequiredHint')}</p>
+          <p className="text-neutral-600 mb-6">{t('tours.wizard.loginRequiredHint')}</p>
           <Link
             to={`/login?redirect=${encodeURIComponent(`/tours/book/${uuid}${initialSlotId ? `?slot_id=${initialSlotId}` : ''}`)}`}
-            className="inline-flex px-6 py-3 rounded-xl bg-[#b8860b] text-white font-medium hover:bg-[#996f09]"
+            className="inline-flex px-6 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent-600"
           >
             {t('auth.login.submit')}
           </Link>
@@ -109,7 +134,7 @@ export default function TourBookingWizard() {
   if (isLoading) {
     return (
       <div className="py-12 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#b8860b]" />
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
       </div>
     );
   }
@@ -146,35 +171,35 @@ export default function TourBookingWizard() {
     <div className="py-6 max-w-3xl mx-auto">
       <Link
         to={`/tours/${uuid}`}
-        className="inline-flex items-center gap-1.5 text-sm text-[#5c5852] hover:text-[#b8860b] mb-4"
+        className="inline-flex items-center gap-1.5 text-sm text-neutral-600 hover:text-accent mb-4"
       >
         <ArrowLeft className="w-4 h-4" /> {t('tours.wizard.backToTour')}
       </Link>
-      <h1 className="text-2xl sm:text-3xl font-bold text-[#1a1a1a] mb-1">{t('tours.wizard.title')}</h1>
-      <p className="text-[#5c5852] mb-4">{tour.title} · {tour.province?.name}</p>
+      <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-1">{t('tours.wizard.title')}</h1>
+      <p className="text-neutral-600 mb-4">{tour.title} · {tour.province?.name}</p>
       <Stepper steps={wizardSteps} current={activeSlot ? 1 : 0} ariaLabel={t('tours.wizard.stepsAria')} className="mb-6" />
 
       <div className="space-y-5">
-        <div className="rounded-2xl border border-[#e8e4dd] bg-white p-5">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
           <div className="flex items-center justify-between gap-2 mb-3">
-            <h2 className="font-semibold text-[#1a1a1a]">{t('tours.wizard.selectedSlot')}</h2>
+            <h2 className="font-semibold text-neutral-900">{t('tours.wizard.selectedSlot')}</h2>
             {activeSlot && (
               <button
                 type="button"
                 onClick={() => setCalendarOpen((o) => !o)}
-                className="text-sm font-medium text-[#b8860b] hover:underline"
+                className="text-sm font-medium text-accent hover:underline"
               >
                 {t('tours.wizard.changeSlot')}
               </button>
             )}
           </div>
           {activeSlot ? (
-            <p className="text-sm text-[#45423d]" data-testid="selected-slot">
-              <span className="font-semibold text-[#1a1a1a]">{activeSlot.date}</span>
+            <p className="text-sm text-neutral-700" data-testid="selected-slot">
+              <span className="font-semibold text-neutral-900">{activeSlot.date}</span>
               {' · '}{activeSlot.start_time}–{activeSlot.end_time}
             </p>
           ) : (
-            <p className="text-sm text-[#7a756d]">{t('tours.wizard.noSlotSelected')}</p>
+            <p className="text-sm text-neutral-500">{t('tours.wizard.noSlotSelected')}</p>
           )}
         </div>
 
@@ -189,8 +214,8 @@ export default function TourBookingWizard() {
           />
         )}
 
-        <div className="rounded-2xl border border-[#e8e4dd] bg-white p-5">
-          <h2 className="font-semibold text-[#1a1a1a] mb-3">{t('tours.wizard.duration')}</h2>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+          <h2 className="font-semibold text-neutral-900 mb-3">{t('tours.wizard.duration')}</h2>
           <div className="flex gap-2 mb-3">
             {['hour', 'day'].map((m) => (
               <button
@@ -202,57 +227,69 @@ export default function TourBookingWizard() {
                 }}
                 className={cn(
                   'px-4 py-2 rounded-xl border text-sm font-medium',
-                  pricingMode === m ? 'border-[#b8860b] bg-[#f9edd1]' : 'border-[#e8e4dd] hover:bg-[#faf8f5]'
+                  pricingMode === m ? 'border-accent bg-accent-100' : 'border-neutral-200 hover:bg-neutral-50'
                 )}
               >
                 {t(`tours.wizard.${m}`)}
               </button>
             ))}
           </div>
-          <input
-            type="number"
+          <QuantityStepper
+            value={Number(duration) || 1}
+            onChange={setDuration}
             min={1}
             max={pricingMode === 'hour' ? 12 : 30}
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            className="w-32 rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
+            ariaLabel={t('tours.wizard.durationValue')}
+            decreaseLabel={t('tours.wizard.decreaseDuration')}
+            increaseLabel={t('tours.wizard.increaseDuration')}
           />
+          {expectedEnd && (
+            <p className="text-sm text-neutral-700 mt-3" data-testid="expected-end">
+              {t('tours.wizard.expectedEnd')}: {expectedEnd.date} · {expectedEnd.time}
+            </p>
+          )}
+          {missingDays.length > 0 && (
+            <p role="alert" data-testid="day-range-warning" className="mt-3 flex gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+              <span>{t('tours.wizard.dayRangeWarning', { dates: missingDays.join(', ') })}</span>
+            </p>
+          )}
         </div>
 
-        <div className="rounded-2xl border border-[#e8e4dd] bg-white p-5 space-y-3">
-          <h2 className="font-semibold text-[#1a1a1a]">{t('tours.wizard.details')}</h2>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5 space-y-3">
+          <h2 className="font-semibold text-neutral-900">{t('tours.wizard.details')}</h2>
           <div>
-            <label className="block text-sm font-medium text-[#45423d] mb-1">{t('tours.wizard.coupon')}</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">{t('tours.wizard.coupon')}</label>
             <input
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
               placeholder={t('tours.wizard.couponPlaceholder')}
-              className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#45423d] mb-1">{t('tours.wizard.meetingPoint')}</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">{t('tours.wizard.meetingPoint')}</label>
             <input
               value={meetingPoint}
               onChange={(e) => setMeetingPoint(e.target.value)}
               placeholder={tour.meeting_point || t('tours.wizard.meetingPointPlaceholder')}
-              className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#45423d] mb-1">{t('tours.wizard.notes')}</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">{t('tours.wizard.notes')}</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm"
             />
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#e8e4dd] bg-white p-5">
-          <h2 className="font-semibold text-[#1a1a1a] mb-3">{t('tours.wizard.price')}</h2>
-          {previewLoading && <Loader2 className="w-5 h-5 animate-spin text-[#b8860b]" />}
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+          <h2 className="font-semibold text-neutral-900 mb-3">{t('tours.wizard.price')}</h2>
+          {previewLoading && <Loader2 className="w-5 h-5 animate-spin text-accent" />}
           {breakdown && !previewLoading && (
             <TourPriceSummary
               subtotal={breakdown.subtotal ?? 0}
@@ -265,7 +302,7 @@ export default function TourBookingWizard() {
             />
           )}
           {!breakdown && !previewLoading && (
-            <p className="text-sm text-[#7a756d]">{activeSlot ? t('tours.wizard.previewHint') : t('tours.detail.pickSlotHint')}</p>
+            <p className="text-sm text-neutral-500">{activeSlot ? t('tours.wizard.previewHint') : t('tours.detail.pickSlotHint')}</p>
           )}
         </div>
 
@@ -275,7 +312,7 @@ export default function TourBookingWizard() {
           type="button"
           onClick={confirmBooking}
           disabled={!breakdown || submitting}
-          className="w-full py-3 rounded-xl bg-[#b8860b] text-white font-semibold hover:bg-[#996f09] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-3 rounded-xl bg-accent text-white font-semibold hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {submitting && <Loader2 className="w-5 h-5 animate-spin" />}
           {t('tours.wizard.confirm')}

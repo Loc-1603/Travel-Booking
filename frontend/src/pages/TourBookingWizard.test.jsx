@@ -106,3 +106,32 @@ describe('TourBookingWizard (Phase 2)', () => {
     expect(backLink?.getAttribute('href')).toBe('/tours/uuid-1');
   });
 });
+
+describe('TourBookingWizard duration (FE-4.3)', () => {
+  it('uses a quantity stepper and shows the expected end', async () => {
+    renderWizard('/tours/book/uuid-1?slot_id=5');
+    await screen.findByTestId('selected-slot');
+    const input = screen.getByLabelText('tours.wizard.durationValue');
+    expect(input).toHaveValue(4);
+    expect(screen.getByTestId('expected-end')).toHaveTextContent('2026-10-15 · 13:00');
+    fireEvent.click(screen.getByLabelText('tours.wizard.increaseDuration'));
+    await waitFor(() => {
+      expect(screen.getByTestId('expected-end')).toHaveTextContent('2026-10-15 · 14:00');
+    });
+  });
+
+  it('warns when day mode spans days with no free slots', async () => {
+    renderWizard('/tours/book/uuid-1?slot_id=5');
+    await screen.findByTestId('selected-slot');
+    // Only 2026-10-15 has a free slot in the mocked availability.
+    fireEvent.click(screen.getByText('tours.wizard.day'));
+    expect(screen.getByTestId('expected-end')).toHaveTextContent('2026-10-16 · 09:00');
+    expect(screen.queryByTestId('day-range-warning')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('tours.wizard.increaseDuration'));
+    const warning = await screen.findByTestId('day-range-warning');
+    // t mock returns the key (no interpolation); date listing is unit-tested
+    // in tourSearch.test.js via getMissingAvailableDays.
+    expect(warning).toHaveAttribute('role', 'alert');
+    expect(warning).toHaveTextContent('tours.wizard.dayRangeWarning');
+  });
+});

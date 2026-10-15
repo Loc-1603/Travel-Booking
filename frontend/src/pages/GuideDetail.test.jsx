@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import GuideDetail from './GuideDetail';
@@ -9,12 +9,16 @@ const { apiGet, apiPost } = vi.hoisted(() => ({
   apiPost: vi.fn(),
 }));
 
+const { mockAuth } = vi.hoisted(() => ({
+  mockAuth: { user: { id: 1, email: 'c@test.com' } },
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key) => key }),
 }));
 
 vi.mock('../contexts/useAuth', () => ({
-  useAuth: () => ({ user: { id: 1, email: 'c@test.com' } }),
+  useAuth: () => ({ user: mockAuth.user }),
 }));
 
 vi.mock('../lib/api', () => ({
@@ -48,6 +52,7 @@ function renderGuide(initialEntry) {
 }
 
 beforeEach(() => {
+  mockAuth.user = { id: 1, email: 'c@test.com' };
   apiGet.mockReset();
   apiPost.mockReset();
   apiGet.mockImplementation((url) => {
@@ -97,5 +102,28 @@ describe('GuideDetail date editing (Phase 2)', () => {
         expect.objectContaining({ params: expect.objectContaining({ date: '2026-11-01' }) })
       );
     });
+  });
+});
+
+describe('GuideDetail sticky CTA (FE-5.2)', () => {
+  it('renders a mobile sticky CTA with the daily price', async () => {
+    renderGuide('/guides/g-1?province=hue&date=2026-10-15');
+    await screen.findByText('Guide A');
+    const sticky = screen.getByTestId('guide-sticky-cta');
+    expect(sticky).toHaveTextContent('tours.guides.priceFrom');
+    expect(sticky).toHaveTextContent('500.000');
+  });
+});
+
+describe('GuideDetail guest estimate (FE-4.4)', () => {
+  it('shows the price breakdown to guests and asks to log in only to book', async () => {
+    mockAuth.user = null;
+    renderGuide('/guides/g-1?province=hue&date=2026-10-15');
+    const estimate = await screen.findByTestId('guide-estimate');
+    // Subtotal and total both render 500.000 — wait for at least one.
+    const hits = await within(estimate).findAllByText(/500\.000/);
+    expect(hits.length).toBeGreaterThan(0);
+    expect(within(estimate).getByText('tours.guides.loginToBook')).toBeInTheDocument();
+    expect(screen.queryByText('tours.guides.loginToSeePrice')).not.toBeInTheDocument();
   });
 });

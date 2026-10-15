@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatPrice, getRatingLabel } from '../lib/utils';
-import { getTourPrice } from '../lib/tourSearch';
+import { getTourPriceParts } from '../lib/tourSearch';
 
 export function TourCard({ tour, to, currency = 'VND', imageOverlay, children }) {
   const { t } = useTranslation();
-  const price = getTourPrice(tour);
+  const parts = getTourPriceParts(tour);
   const img = tour.banner_image || tour.images?.[0];
   const rating = tour.average_rating != null ? Number(tour.average_rating) : null;
   const reviewCount = tour.review_count != null ? Number(tour.review_count) : 0;
@@ -14,7 +14,7 @@ export function TourCard({ tour, to, currency = 'VND', imageOverlay, children })
 
   const content = (
     <>
-      <div className="aspect-[4/3] bg-[#e8e4dd] relative overflow-hidden flex-shrink-0">
+      <div className="aspect-[4/3] bg-neutral-200 relative overflow-hidden flex-shrink-0">
         {img?.url ? (
           <img
             src={img.url}
@@ -22,7 +22,7 @@ export function TourCard({ tour, to, currency = 'VND', imageOverlay, children })
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#a39e94]">
+          <div className="w-full h-full flex items-center justify-center text-neutral-500">
             <MapPin className="w-12 h-12" />
           </div>
         )}
@@ -33,32 +33,42 @@ export function TourCard({ tour, to, currency = 'VND', imageOverlay, children })
         )}
       </div>
       <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-serif font-semibold text-lg text-[#1a1a1a] group-hover:text-[#b8860b] transition-colors truncate">
+        <h3 className="font-serif font-semibold text-lg text-neutral-900 group-hover:text-accent transition-colors truncate">
           {tour.title}
         </h3>
-        <p className="text-sm text-[#5c5852] mt-0.5">
-          {tour.province?.name || '—'}
+        <p className="text-sm text-neutral-600 mt-0.5">
+          {tour.province?.name || t('tours.list.unknownProvince')}
         </p>
         {tour.provider && (
-          <p className="text-sm text-[#7a756d] mt-0.5 truncate">
+          <p className="text-sm text-neutral-500 mt-0.5 truncate">
             {tour.provider.business_name}
           </p>
         )}
         {rating != null && rating > 0 && (
           <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-semibold text-[#1a1a1a]">{rating.toFixed(1)}</span>
-            <span className="text-[#5c5852] text-sm">{getRatingLabel(rating)}</span>
+            <span className="font-semibold text-neutral-900">{rating.toFixed(1)}</span>
+            <span className="text-neutral-600 text-sm">{getRatingLabel(rating)}</span>
             {reviewCount > 0 && (
-              <span className="text-[#7a756d] text-sm">
+              <span className="text-neutral-500 text-sm">
                 {t('tours.reviewCount', { count: reviewCount })}
               </span>
             )}
           </div>
         )}
-        {price != null && (
-          <div className="mt-2 flex items-baseline gap-2 flex-wrap">
-            <span className="font-semibold text-[#1a1a1a]">{formatPrice(price, currency)}</span>
-            <span className="text-[#7a756d] text-sm">from / hour</span>
+        {parts && (parts.hourly > 0 || parts.daily > 0) && (
+          <div className="mt-2 space-y-0.5" data-testid="tour-price">
+            {parts.hourly > 0 && (
+              <p className="text-sm text-neutral-900">
+                <span className="font-semibold">{formatPrice(parts.hourTotal, currency)}</span>{' '}
+                <span className="text-neutral-500">{t('tours.card.perHourUnit')}</span>
+              </p>
+            )}
+            {parts.daily > 0 && (
+              <p className="text-sm text-neutral-900">
+                <span className="font-semibold">{formatPrice(parts.dayTotal, currency)}</span>{' '}
+                <span className="text-neutral-500">{t('tours.card.perDayUnit')}</span>
+              </p>
+            )}
           </div>
         )}
         {children}
@@ -68,7 +78,7 @@ export function TourCard({ tour, to, currency = 'VND', imageOverlay, children })
 
   if (href.startsWith('http') || !href) {
     return (
-      <div className="group flex flex-col rounded-2xl overflow-hidden border border-[#e8e4dd] bg-white shadow-[0_4px_12px_rgb(26_26_26_/0.06)] hover:shadow-[0_12px_28px_rgb(26_26_26_/0.1)] hover:border-[#d4cec4] transition-all duration-300">
+      <div className="group flex flex-col rounded-2xl overflow-hidden border border-neutral-200 bg-white shadow-[0_4px_12px_rgb(26_26_26_/0.06)] hover:shadow-[0_12px_28px_rgb(26_26_26_/0.1)] hover:border-neutral-300 transition-all duration-300">
         {content}
       </div>
     );
@@ -77,7 +87,7 @@ export function TourCard({ tour, to, currency = 'VND', imageOverlay, children })
   return (
     <Link
       to={href}
-      className="group flex flex-col rounded-2xl overflow-hidden border border-[#e8e4dd] bg-white shadow-[0_4px_12px_rgb(26_26_26_/0.06)] hover:shadow-[0_12px_28px_rgb(26_26_26_/0.1)] hover:border-[#d4cec4] transition-all duration-300"
+      className="group flex flex-col rounded-2xl overflow-hidden border border-neutral-200 bg-white shadow-[0_4px_12px_rgb(26_26_26_/0.06)] hover:shadow-[0_12px_28px_rgb(26_26_26_/0.1)] hover:border-neutral-300 transition-all duration-300"
     >
       {content}
     </Link>

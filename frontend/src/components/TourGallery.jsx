@@ -1,11 +1,12 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
-import LazyImage from './LazyImage';
+import { LazyImage } from './LazyImage';
 
-const DEFAULT_ALT = 'Tour photo';
-
-export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) {
+export function TourGallery({ images = [], alt, className = '' }) {
+  const { t } = useTranslation();
+  const resolvedAlt = alt ?? t('tours.gallery.label');
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const lightboxRef = useRef(null);
@@ -15,11 +16,11 @@ export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) 
   const normalizedImages = useMemo(() => {
     return images.map((img, i) => {
       if (typeof img === 'string') {
-        return { url: img, alt: `${alt} ${i + 1}` };
+        return { url: img, alt: `${resolvedAlt} ${i + 1}` };
       }
-      return { url: img.url, alt: img.alt || `${alt} ${i + 1}` };
+      return { url: img.url, alt: img.alt || img.alt_text || `${resolvedAlt} ${i + 1}` };
     });
-  }, [images, alt]);
+  }, [images, resolvedAlt]);
 
   const handleOpen = (index) => {
     setLightboxIndex(index);
@@ -67,10 +68,11 @@ export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) 
   if (normalizedImages.length === 0) {
     return (
       <div
-        className={cn('flex h-48 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-400', className)}
-        aria-hidden="true"
+        className={cn('flex h-48 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-500', className)}
+        role="img"
+        aria-label={t('tours.gallery.empty')}
       >
-        No photos available
+        {t('tours.gallery.empty')}
       </div>
     );
   }
@@ -78,7 +80,7 @@ export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) 
   const mainImage = normalizedImages[lightboxIndex ?? 0];
 
   return (
-    <div className={cn('space-y-4', className)} aria-label="Tour gallery">
+    <div className={cn('space-y-4', className)} aria-label={t('tours.gallery.label')}>
       <div className="relative">
         <LazyImage
           src={mainImage.url}
@@ -93,7 +95,7 @@ export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) 
             type="button"
             onClick={handleNext}
             disabled={lightboxIndex >= normalizedImages.length - 1}
-            aria-label="Next photo"
+            aria-label={t('tours.gallery.next')}
             className={cn(
               'absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white',
               lightboxIndex >= normalizedImages.length - 1 && 'opacity-40'
@@ -105,23 +107,23 @@ export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) 
           <button
             type="button"
             onClick={() => handleOpen(0)}
-            aria-label="Open full-screen gallery"
+            aria-label={t('tours.gallery.open')}
             className={cn(
               'absolute bottom-4 left-4 rounded-full bg-black/60 p-3 text-white transition-colors hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-white'
             )}
           >
-            <X className="h-5 w-5" />
+            <Maximize2 className="h-5 w-5" />
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-4 gap-2" role="tablist" aria-label="Photo thumbnails">
+      <div className="grid grid-cols-4 gap-2" role="tablist" aria-label={t('tours.gallery.thumbnails')}>
         {normalizedImages.map((img, idx) => (
           <button
             key={idx}
             type="button"
             onClick={() => handleOpen(idx)}
-            aria-label={`View photo ${idx + 1}`}
+            aria-label={t('tours.gallery.viewPhoto', { index: idx + 1 })}
             aria-selected={lightboxIndex === idx}
             className={cn(
               'relative aspect-square overflow-hidden rounded-lg border-2 transition-all',
@@ -144,14 +146,14 @@ export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) 
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
           role="dialog"
           aria-modal="true"
-          aria-label={`Photo ${lightboxIndex + 1} of ${normalizedImages.length}`}
+          aria-label={t('tours.gallery.photoOf', { index: lightboxIndex + 1, count: normalizedImages.length })}
         >
           <div className="relative max-w-3xl w-full">
             <header className="absolute top-4 right-4">
               <button
                 type="button"
                 onClick={handleClose}
-                aria-label="Close gallery"
+                aria-label={t('tours.gallery.close')}
                 className="rounded-full p-2 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <X className="h-6 w-6" />
@@ -169,7 +171,7 @@ export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) 
                   type="button"
                   onClick={handlePrev}
                   disabled={lightboxIndex <= 0}
-                  aria-label="Previous photo"
+                  aria-label={t('tours.gallery.prev')}
                   className={cn(
                     'rounded-full bg-black/60 p-2 text-white transition-colors hover:bg-black/80 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-white'
                   )}
@@ -181,7 +183,7 @@ export function TourGallery({ images = [], alt = DEFAULT_ALT, className = '' }) 
                   type="button"
                   onClick={handleNext}
                   disabled={lightboxIndex >= normalizedImages.length - 1}
-                  aria-label="Next photo"
+                  aria-label={t('tours.gallery.next')}
                   className={cn(
                     'rounded-full bg-black/60 p-2 text-white transition-colors hover:bg-black/80 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-white'
                   )}

@@ -15,7 +15,9 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
+import { useToast } from '../contexts/useToast';
 import ErrorMessage from '../components/ErrorMessage';
+import { Modal } from '../components/Modal';
 import { TourChatBox } from '../components/TourChatBox';
 import { formatPrice, cn } from '../lib/utils';
 
@@ -44,14 +46,16 @@ function StatusBadge({ status }) {
 export default function MyTourBookings() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [chatUuid, setChatUuid] = useState(null);
+  const [cancelTargetUuid, setCancelTargetUuid] = useState(null);
   const [disputeModalUuid, setDisputeModalUuid] = useState(null);
   const [disputeNotes, setDisputeNotes] = useState('');
   const [disputeFormError, setDisputeFormError] = useState(null);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['tour-bookings', page],
     queryFn: async () => {
       const res = await api.get('/tour-bookings', { params: { page, per_page: 10 } });
@@ -62,7 +66,14 @@ export default function MyTourBookings() {
 
   const cancelMutation = useMutation({
     mutationFn: (uuid) => api.post(`/tour-bookings/${uuid}/cancel`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tour-bookings'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tour-bookings'] });
+      setCancelTargetUuid(null);
+      toast(t('tours.bookings.cancelSuccess'), { type: 'success' });
+    },
+    onError: (e) => {
+      toast(e?.response?.data?.message || t('tours.bookings.cancelError'), { type: 'error' });
+    },
   });
 
   const disputeMutation = useMutation({
@@ -72,6 +83,7 @@ export default function MyTourBookings() {
       setDisputeModalUuid(null);
       setDisputeNotes('');
       setDisputeFormError(null);
+      toast(t('tours.bookings.disputeSuccess'), { type: 'success' });
     },
   });
 
@@ -87,7 +99,7 @@ export default function MyTourBookings() {
       const url = URL.createObjectURL(new Blob([res.data], { type: 'text/html' }));
       window.open(url, '_blank', 'noopener');
     } catch (e) {
-      alert(e?.response?.data?.message || t('tours.bookings.invoiceError'));
+      toast(e?.response?.data?.message || t('tours.bookings.invoiceError'), { type: 'error' });
     }
   };
 
@@ -108,10 +120,10 @@ export default function MyTourBookings() {
   if (!user) {
     return (
       <div className="py-12">
-        <div className="rounded-2xl border border-[#e8e4dd] bg-white p-8 text-center max-w-md mx-auto">
-          <Calendar className="w-8 h-8 mx-auto mb-4 text-[#7a756d]" />
+        <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center max-w-md mx-auto">
+          <Calendar className="w-8 h-8 mx-auto mb-4 text-neutral-500" />
           <h2 className="text-xl font-semibold mb-2">{t('tours.bookings.loginRequired')}</h2>
-          <Link to="/login" className="inline-flex px-6 py-3 rounded-xl bg-[#b8860b] text-white font-medium hover:bg-[#996f09] mt-2">
+          <Link to="/login" className="inline-flex px-6 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent-600 mt-2">
             {t('auth.login.submit')}
           </Link>
         </div>
@@ -122,15 +134,30 @@ export default function MyTourBookings() {
   return (
     <div className="py-6 sm:py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#1a1a1a]">{t('tours.bookings.title')}</h1>
-        <p className="text-[#5c5852] mt-1 mb-8">{t('tours.bookings.subtitle')}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">{t('tours.bookings.title')}</h1>
+        <p className="text-neutral-600 mt-1 mb-8">{t('tours.bookings.subtitle')}</p>
 
-        {isLoading && <Loader2 className="w-8 h-8 animate-spin text-[#b8860b]" />}
-        {isError && <ErrorMessage message={error?.response?.data?.message || error?.message} />}
+        {isLoading && (
+          <div className="space-y-4" aria-busy="true" aria-label={t('tours.bookings.loading')}>
+            <span className="sr-only">{t('tours.bookings.loading')}</span>
+            {[0, 1, 2].map((i) => (
+              <div key={i} data-testid="booking-skeleton" className="rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6 animate-pulse">
+                <div className="h-5 w-2/3 rounded bg-stone-200 mb-3" />
+                <div className="h-4 w-1/2 rounded bg-stone-100 mb-2" />
+                <div className="h-6 w-1/4 rounded bg-stone-200 mt-3" />
+                <div className="mt-4 flex gap-2">
+                  <div className="h-10 w-24 rounded-xl bg-stone-100" />
+                  <div className="h-10 w-24 rounded-xl bg-stone-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {isError && <ErrorMessage message={error?.response?.data?.message || error?.message} onRetry={() => refetch()} />}
         {!isLoading && !isError && bookings.length === 0 && (
-          <div className="rounded-2xl border border-[#e8e4dd] bg-white p-12 text-center">
-            <p className="text-[#5c5852] mb-6">{t('tours.bookings.empty')}</p>
-            <Link to="/tours" className="inline-flex px-6 py-3 rounded-xl bg-[#1a1a1a] text-white font-medium hover:bg-[#2d2a28]">
+          <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+            <p className="text-neutral-600 mb-6">{t('tours.bookings.empty')}</p>
+            <Link to="/tours" className="inline-flex px-6 py-3 rounded-xl bg-neutral-900 text-white font-medium hover:bg-neutral-800">
               {t('tours.bookings.browse')}
             </Link>
           </div>
@@ -138,15 +165,15 @@ export default function MyTourBookings() {
 
         <div className="space-y-4">
           {bookings.map((b) => (
-            <article key={b.uuid} className="rounded-2xl border border-[#e8e4dd] bg-white overflow-hidden">
+            <article key={b.uuid} className="rounded-2xl border border-neutral-200 bg-white overflow-hidden">
               <div className="p-5 sm:p-6">
                 <div className="flex flex-col lg:flex-row lg:justify-between gap-4 lg:items-center">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-lg truncate">{b.tour?.title ?? 'Tour'}</h3>
+                      <h3 className="font-semibold text-lg truncate">{b.tour?.title ?? t('tours.bookings.unknownTour')}</h3>
                       <StatusBadge status={b.status} />
                     </div>
-                    <p className="text-sm text-[#5c5852]">
+                    <p className="text-sm text-neutral-600">
                       {b.slot?.date} · {b.slot?.start_time}–{b.slot?.end_time} · {b.pricing_mode} × {b.duration_value}
                     </p>
                     <p className="font-semibold text-lg mt-2">{formatPrice(b.total_price, b.currency)}</p>
@@ -156,21 +183,21 @@ export default function MyTourBookings() {
                     <div className="flex flex-nowrap items-center gap-2 overflow-x-auto max-w-full px-1 py-1">
                     <Link
                       to={`/tour-checkout/${b.uuid}`}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5] whitespace-nowrap shrink-0"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-200 text-sm font-medium hover:bg-neutral-50 whitespace-nowrap shrink-0"
                     >
                       <ExternalLink className="w-4 h-4" /> {t('tours.bookings.view')}
                     </Link>
                     <button
                       type="button"
                       onClick={() => openInvoice(b.uuid)}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5] whitespace-nowrap shrink-0"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-200 text-sm font-medium hover:bg-neutral-50 whitespace-nowrap shrink-0"
                     >
                       <FileDown className="w-4 h-4" /> {t('tours.bookings.invoice')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setChatUuid(chatUuid === b.uuid ? null : b.uuid)}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e8e4dd] text-sm font-medium hover:bg-[#faf8f5] whitespace-nowrap shrink-0"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-200 text-sm font-medium hover:bg-neutral-50 whitespace-nowrap shrink-0"
                     >
                       <MessageCircle className="w-4 h-4" /> {t('tours.bookings.message')}
                     </button>
@@ -194,14 +221,7 @@ export default function MyTourBookings() {
                     {CANCELLABLE_STATUSES.includes(b.status) && (
                       <button
                         type="button"
-                        onClick={async () => {
-                          if (!window.confirm(t('tours.bookings.confirmCancel'))) return;
-                          try {
-                            await cancelMutation.mutateAsync(b.uuid);
-                          } catch (e) {
-                            alert(e?.response?.data?.message);
-                          }
-                        }}
+                        onClick={() => setCancelTargetUuid(b.uuid)}
                         className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 text-sm font-medium text-red-700 hover:bg-red-50 whitespace-nowrap shrink-0"
                       >
                         {t('tours.bookings.cancel')}
@@ -216,7 +236,7 @@ export default function MyTourBookings() {
                   </div>
                 )}
                 {['confirmed', 'ongoing', 'completed'].includes(b.status) && !!b.has_review && (
-                  <p className="mt-4 text-sm text-[#7a756d]">{t('tours.bookings.reviewDone')}</p>
+                  <p className="mt-4 text-sm text-neutral-500">{t('tours.bookings.reviewDone')}</p>
                 )}
               </div>
             </article>
@@ -228,46 +248,88 @@ export default function MyTourBookings() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="inline-flex items-center gap-1 px-4 py-2.5 rounded-xl border border-[#e8e4dd] disabled:opacity-50 text-sm font-medium"
+              className="inline-flex items-center gap-1 px-4 py-2.5 rounded-xl border border-neutral-200 disabled:opacity-50 text-sm font-medium"
             >
               <ChevronLeft className="w-4 h-4" /> {t('common.previous')}
             </button>
             <button
               onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
               disabled={currentPage >= lastPage}
-              className="inline-flex items-center gap-1 px-4 py-2.5 rounded-xl border border-[#e8e4dd] disabled:opacity-50 text-sm font-medium"
+              className="inline-flex items-center gap-1 px-4 py-2.5 rounded-xl border border-neutral-200 disabled:opacity-50 text-sm font-medium"
             >
               {t('common.next')} <ChevronRight className="w-4 h-4" />
             </button>
           </nav>
         )}
 
-        {disputeModalUuid && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" role="dialog" aria-modal="true">
-            <div className="bg-white rounded-2xl max-w-lg w-full p-6">
-              <h2 className="text-lg font-semibold mb-2">{t('tours.bookings.disputeTitle')}</h2>
-              <form onSubmit={submitDispute} className="space-y-3">
-                <textarea
-                  required
-                  minLength={20}
-                  rows={5}
-                  value={disputeNotes}
-                  onChange={(e) => setDisputeNotes(e.target.value)}
-                  className="w-full rounded-xl border border-[#e8e4dd] px-3 py-2 text-sm"
-                />
-                {disputeFormError && <p className="text-sm text-red-600">{disputeFormError}</p>}
-                <div className="flex gap-2 justify-end">
-                  <button type="button" onClick={() => setDisputeModalUuid(null)} className="px-4 py-2 rounded-xl border text-sm font-medium">
-                    {t('common.close')}
-                  </button>
-                  <button type="submit" disabled={disputeMutation.isPending} className="px-4 py-2 rounded-xl bg-amber-600 text-white text-sm font-medium disabled:opacity-60">
-                    {t('common.submit')}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <Modal
+          open={cancelTargetUuid !== null}
+          onClose={() => setCancelTargetUuid(null)}
+          title={t('tours.bookings.cancelTitle')}
+          footer={
+            <>
+              <button
+                type="button"
+                onClick={() => setCancelTargetUuid(null)}
+                className="px-4 py-2 rounded-xl border text-sm font-medium"
+              >
+                {t('common.close')}
+              </button>
+              <button
+                type="button"
+                onClick={() => cancelTargetUuid && cancelMutation.mutate(cancelTargetUuid)}
+                disabled={cancelMutation.isPending}
+                className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium disabled:opacity-60 inline-flex items-center gap-2"
+              >
+                {cancelMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                {t('common.confirm')}
+              </button>
+            </>
+          }
+        >
+          <p className="text-sm text-neutral-600">{t('tours.bookings.cancelMessage')}</p>
+        </Modal>
+
+        <Modal
+          open={disputeModalUuid !== null}
+          onClose={() => setDisputeModalUuid(null)}
+          title={t('tours.bookings.disputeTitle')}
+          footer={
+            <>
+              <button
+                type="button"
+                onClick={() => setDisputeModalUuid(null)}
+                className="px-4 py-2 rounded-xl border text-sm font-medium"
+              >
+                {t('common.close')}
+              </button>
+              <button
+                type="submit"
+                form="tour-dispute-form"
+                disabled={disputeMutation.isPending}
+                className="px-4 py-2 rounded-xl bg-amber-600 text-white text-sm font-medium disabled:opacity-60"
+              >
+                {t('common.submit')}
+              </button>
+            </>
+          }
+        >
+          <form id="tour-dispute-form" onSubmit={submitDispute} className="space-y-3">
+            <label htmlFor="tour-dispute-notes" className="text-sm font-medium text-neutral-700">
+              {t('tours.bookings.disputeTitle')}
+            </label>
+            <textarea
+              id="tour-dispute-notes"
+              required
+              minLength={20}
+              rows={5}
+              value={disputeNotes}
+              onChange={(e) => setDisputeNotes(e.target.value)}
+              className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm"
+            />
+            {disputeFormError && <p className="text-sm text-red-600">{disputeFormError}</p>}
+          </form>
+        </Modal>
       </div>
     </div>
   );
