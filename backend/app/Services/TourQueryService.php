@@ -95,6 +95,8 @@ class TourQueryService
 
     /**
      * Vendor IDs serving a province (>=1 published tour there).
+     * A guide serves a province through their tours — the provider's own
+     * home province_id is optional and must NOT filter search results.
      *
      * @return array<int>
      */
@@ -102,7 +104,7 @@ class TourQueryService
     {
         return TourProduct::where('province_id', $provinceId)
             ->where('status', 'published')
-            ->whereHas('provider', fn ($q) => $q->where('status', 'approved')->where('province_id', $provinceId))
+            ->whereHas('provider', fn ($q) => $q->where('status', 'approved'))
             ->distinct()
             ->pluck('provider_id')
             ->all();
@@ -111,7 +113,8 @@ class TourQueryService
     /**
      * Vendor IDs free on a single travel_date (luồng 1 ngày khám phá tỉnh).
      * Một guide đạt nếu có >=1 slot available đúng ngày đó
-     * trên các tour published của họ trong tỉnh.
+     * trên các tour published của họ trong tỉnh (không yêu cầu
+     * provider.province_id — quê quán của guide là optional).
      *
      * @return array<int>
      */
@@ -127,7 +130,6 @@ class TourQueryService
             ->where('tour_products.status', 'published')
             ->where('tour_products.province_id', $provinceId)
             ->where('tour_providers.status', 'approved')
-            ->where('tour_providers.province_id', $provinceId)
             ->whereNotExists(function ($q) use ($day) {
                 $q->selectRaw(1)
                   ->from('tour_provider_blackouts')
@@ -182,7 +184,6 @@ class TourQueryService
             ->where('tour_products.status', 'published')
             ->where('tour_products.province_id', $provinceId)
             ->where('tour_providers.status', 'approved')
-            ->where('tour_providers.province_id', $provinceId)
             ->whereNotExists(function ($q) use ($start, $end) {
                 $q->selectRaw(1)
                   ->from('tour_provider_blackouts')
@@ -222,7 +223,7 @@ class TourQueryService
             ->join('tour_providers', 'tour_providers.id', '=', 'tour_products.provider_id')
             ->where('tour_providers.uuid', $providerUuid)
             ->where('tour_providers.status', 'approved')
-            ->when($provinceId !== null, fn ($q) => $q->where('tour_products.province_id', $provinceId)->where('tour_providers.province_id', $provinceId))
+            ->when($provinceId !== null, fn ($q) => $q->where('tour_products.province_id', $provinceId))
             ->where('tour_products.status', 'published')
             ->where('tour_availability_slots.status', 'available')
             ->whereDate('tour_availability_slots.date', '=', $day)

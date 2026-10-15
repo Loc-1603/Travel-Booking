@@ -24,6 +24,7 @@ class TourProductSeeder extends Seeder
         $provider = TourProvider::firstOrCreate(
             ['vendor_id' => $vendor->id],
             [
+                'province_id' => TourProvince::where('name', 'Hà Giang')->first()?->id,
                 'business_name' => $vendor->name,
                 'bio' => 'Guide 1vs1: đề xuất lịch trình, dẫn và chở riêng theo giờ của bạn.',
                 'languages' => ['vi', 'en'],

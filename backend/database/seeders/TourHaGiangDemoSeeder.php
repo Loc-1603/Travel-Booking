@@ -22,12 +22,79 @@ use Illuminate\Database\Seeder;
 class TourHaGiangDemoSeeder extends Seeder
 {
     /**
-     * @var array<int, array{name: string, email: string, bio: string, languages: array<int, string>, ratings: array<int, int>, fixed: int, hourly: int, daily: int, transport: int}>
+     * @var array<int, array{name: string, email: string, bio: string, bio_json?: array<string, mixed>, bio_html?: string, languages: array<int, string>, ratings: array<int, int>, fixed: int, hourly: int, daily: int, transport: int}>
      */
     protected array $guides = [
         [
             'name' => 'Giàng A Páo', 'email' => 'guide-hg-01@test.local',
             'bio' => 'Người Mông bản địa Đồng Văn, 8 năm chở khách loop Hà Giang bằng xe máy. Nhận chở tới: Đèo Mã Pí Lèng, Sông Nho Quế, Cột cờ Lũng Cú.',
+            // Mẫu "Mô tả chi tiết (đẹp mắt)": doc TipTap + HTML cho trang hồ sơ.
+            'bio_json' => [
+                'type' => 'doc',
+                'content' => [
+                    ['type' => 'heading', 'attrs' => ['level' => 2], 'content' => [
+                        ['type' => 'text', 'text' => 'Giàng A Páo — guide người Mông ở Đồng Văn'],
+                    ]],
+                    ['type' => 'paragraph', 'content' => [
+                        ['type' => 'text', 'text' => 'Mình là '],
+                        ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Giàng A Páo'],
+                        ['type' => 'text', 'text' => ', người Mông bản địa tại '],
+                        ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Đồng Văn'],
+                        ['type' => 'text', 'text' => ', đã '],
+                        ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => '8 năm'],
+                        ['type' => 'text', 'text' => ' chở khách đi loop Hà Giang bằng xe máy. Rành từng khúc đèo, biết chỗ ngắm cảnh đẹp và chỗ ăn ngon trên đường.'],
+                    ]],
+                    ['type' => 'heading', 'attrs' => ['level' => 3], 'content' => [
+                        ['type' => 'text', 'text' => 'Mình có thể đưa bạn đi đâu'],
+                    ]],
+                    ['type' => 'bulletList', 'content' => [
+                        ['type' => 'listItem', 'content' => [['type' => 'paragraph', 'content' => [
+                            ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Đèo Mã Pí Lèng'],
+                            ['type' => 'text', 'text' => ' — ngắm Sông Nho Quế từ trên mây'],
+                        ]]]],
+                        ['type' => 'listItem', 'content' => [['type' => 'paragraph', 'content' => [
+                            ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Cột cờ Lũng Cú'],
+                            ['type' => 'text', 'text' => ' — địa đầu Tổ quốc'],
+                        ]]]],
+                        ['type' => 'listItem', 'content' => [['type' => 'paragraph', 'content' => [
+                            ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Chợ phiên Đồng Văn, Mèo Vạc'],
+                            ['type' => 'text', 'text' => ' — ẩm thực và văn hóa người Mông'],
+                        ]]]],
+                    ]],
+                    ['type' => 'heading', 'attrs' => ['level' => 3], 'content' => [
+                        ['type' => 'text', 'text' => 'Lịch trình gợi ý 1 ngày'],
+                    ]],
+                    ['type' => 'orderedList', 'content' => [
+                        ['type' => 'listItem', 'content' => [['type' => 'paragraph', 'content' => [
+                            ['type' => 'text', 'text' => '08:00 — đón bạn tại khách sạn, kiểm tra xe và đồ bảo hộ'],
+                        ]]]],
+                        ['type' => 'listItem', 'content' => [['type' => 'paragraph', 'content' => [
+                            ['type' => 'text', 'text' => '12:00 — ăn trưa đặc sản (thắng cố, bánh đá) trên đường'],
+                        ]]]],
+                        ['type' => 'listItem', 'content' => [['type' => 'paragraph', 'content' => [
+                            ['type' => 'text', 'text' => '17:00 — trả bạn về khách sạn, khép lại ngày đi'],
+                        ]]]],
+                    ]],
+                    ['type' => 'blockquote', 'content' => [['type' => 'paragraph', 'content' => [
+                        ['type' => 'text', 'text' => 'Đi riêng 1 kèm 1, không ghép đoàn — lịch trình do bạn quyết, mình lo đường đi, an toàn và ảnh đẹp mang về.'],
+                    ]]]],
+                    ['type' => 'paragraph', 'content' => [
+                        ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'Nhắn tin cho mình trước 1 ngày để kịp chuẩn bị xe và lịch trình nhé!'],
+                    ]],
+                ],
+            ],
+            'bio_html' => '<h2>Giàng A Páo — guide người Mông ở Đồng Văn</h2>'
+                .'<p>Mình là <strong>Giàng A Páo</strong>, người Mông bản địa tại <strong>Đồng Văn</strong>, đã <strong>8 năm</strong> chở khách đi loop Hà Giang bằng xe máy. Rành từng khúc đèo, biết chỗ ngắm cảnh đẹp và chỗ ăn ngon trên đường.</p>'
+                .'<h3>Mình có thể đưa bạn đi đâu</h3>'
+                .'<ul><li><strong>Đèo Mã Pí Lèng</strong> — ngắm Sông Nho Quế từ trên mây</li>'
+                .'<li><strong>Cột cờ Lũng Cú</strong> — địa đầu Tổ quốc</li>'
+                .'<li><strong>Chợ phiên Đồng Văn, Mèo Vạc</strong> — ẩm thực và văn hóa người Mông</li></ul>'
+                .'<h3>Lịch trình gợi ý 1 ngày</h3>'
+                .'<ol><li>08:00 — đón bạn tại khách sạn, kiểm tra xe và đồ bảo hộ</li>'
+                .'<li>12:00 — ăn trưa đặc sản (thắng cố, bánh đá) trên đường</li>'
+                .'<li>17:00 — trả bạn về khách sạn, khép lại ngày đi</li></ol>'
+                .'<blockquote><p>Đi riêng 1 kèm 1, không ghép đoàn — lịch trình do bạn quyết, mình lo đường đi, an toàn và ảnh đẹp mang về.</p></blockquote>'
+                .'<p><em>Nhắn tin cho mình trước 1 ngày để kịp chuẩn bị xe và lịch trình nhé!</em></p>',
             'languages' => ['vi', 'en'], 'ratings' => [5, 5, 5],
             'fixed' => 400000, 'hourly' => 180000, 'daily' => 1400000, 'transport' => 250000,
         ],
@@ -117,12 +184,21 @@ class TourHaGiangDemoSeeder extends Seeder
             $provider = TourProvider::firstOrCreate(
                 ['vendor_id' => $user->id],
                 [
+                    'province_id' => $province->id,
                     'business_name' => $g['name'],
                     'bio' => $g['bio'],
                     'languages' => $g['languages'],
                     'status' => 'approved',
                 ]
             );
+
+            // Phần giới thiệu là dữ liệu mặc định của demo: chạy db:seed luôn
+            // khôi phục về mặc định (chỉnh sửa trên web trước đó sẽ bị thay).
+            $provider->forceFill([
+                'bio' => $g['bio'],
+                'bio_json' => $g['bio_json'] ?? null,
+                'bio_html' => $g['bio_html'] ?? null,
+            ])->save();
 
             $tour = TourProduct::firstOrCreate(
                 ['provider_id' => $provider->id, 'title' => 'Hà Giang 1vs1 cùng '.$g['name']],
@@ -152,15 +228,33 @@ class TourHaGiangDemoSeeder extends Seeder
             for ($d = 1; $d <= 14; $d++) {
                 $date = Carbon::tomorrow()->addDays($d - 1)->toDateString();
                 foreach ([['08:00:00', '12:00:00'], ['13:30:00', '17:30:00']] as [$start, $end]) {
-                    TourAvailabilitySlot::firstOrCreate(
-                        ['tour_id' => $tour->id, 'date' => $date, 'start_time' => $start],
-                        ['tour_id' => $tour->id, 'date' => $date, 'start_time' => $start, 'end_time' => $end, 'status' => 'available']
-                    );
+                    $this->firstOrCreateSlot($tour, $date, $start, $end, 'available');
                 }
             }
 
             $this->seedReviews($provider, $tour, $province->id, $customers, $g['ratings'], $i);
         }
+    }
+
+    /**
+     * firstOrCreate theo (tour_id, date, start_time) — cast 'date' lưu kèm
+     * 00:00:00 nên where() thông thường không khớp khi chạy seeder lần 2
+     * (vi phạm unique constraint trên sqlite). whereDate so sánh đúng ngày.
+     */
+    protected function firstOrCreateSlot(TourProduct $tour, string $date, string $start, string $end, string $status): TourAvailabilitySlot
+    {
+        return TourAvailabilitySlot::query()
+            ->where('tour_id', $tour->id)
+            ->whereDate('date', $date)
+            ->where('start_time', $start)
+            ->first()
+            ?? TourAvailabilitySlot::create([
+                'tour_id' => $tour->id,
+                'date' => $date,
+                'start_time' => $start,
+                'end_time' => $end,
+                'status' => $status,
+            ]);
     }
 
     /**
@@ -199,10 +293,7 @@ class TourHaGiangDemoSeeder extends Seeder
         foreach ($ratings as $k => $rating) {
             // Slot quá khứ riêng cho booking đánh giá (không ảnh hưởng lịch trống).
             $date = Carbon::today()->subDays(20 + $seedIndex * 4 + $k)->toDateString();
-            $slot = TourAvailabilitySlot::firstOrCreate(
-                ['tour_id' => $tour->id, 'date' => $date, 'start_time' => '09:00:00'],
-                ['tour_id' => $tour->id, 'date' => $date, 'start_time' => '09:00:00', 'end_time' => '12:00:00', 'status' => 'booked']
-            );
+            $slot = $this->firstOrCreateSlot($tour, $date, '09:00:00', '12:00:00', 'booked');
 
             $booking = TourBooking::firstOrCreate(
                 ['slot_id' => $slot->id],
