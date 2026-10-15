@@ -86,9 +86,8 @@ body {
   background-color: var(--color-bg, #faf8f5);
 }
 
-/* Serif headings for luxury feel */
 h1, h2, h3, .font-serif {
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Touch targets: kept in components layer so utilities (flex, flex-col,
