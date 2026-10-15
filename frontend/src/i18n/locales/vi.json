@@ -129,8 +129,7 @@
     "settings": "Cài đặt",
     "support": "Hỗ trợ",
     "tours": "Tour",
-    "myTourBookings": "Tour đã đặt",
-    "savedTours": "Tour đã lưu"
+    "myTourBookings": "Tour đã đặt"
   },
   "home": {
     "heroTitleLine1": "Tìm chỗ nghỉ",
@@ -505,17 +504,22 @@
       "saving": "Đang lưu…"
     }
   },
-  "wishlist": {
-    "title": "Yêu thích của tôi",
-    "subtitle": "{{count}} {{count === 1 ? 'khách sạn' : 'khách sạn'}} đã lưu",
+  "favorites": {
+    "title": "Danh sách yêu thích",
+    "subtitle": "{{count}} mục đã lưu",
+    "badges": {
+      "hotel": "Khách sạn",
+      "guide": "Guide"
+    },
     "empty": {
-      "title": "Danh sách yêu thích trống",
-      "description": "Duyệt khách sạn và nhấn biểu tượng tim để lưu yêu thích. Chúng sẽ xuất hiện ở đây để dễ dàng truy cập.",
-      "searchHotels": "Tìm khách sạn"
+      "title": "Chưa có mục yêu thích nào",
+      "description": "Nhấn biểu tượng tim ở khách sạn hoặc guide để lưu. Các mục đã lưu sẽ xuất hiện ở đây để dễ dàng truy cập.",
+      "searchHotels": "Tìm khách sạn",
+      "browseTours": "Khám phá tour"
     },
     "guests": {
       "signInToView": "Đăng nhập để xem yêu thích",
-      "signInToSave": "Lưu khách sạn yêu thích và truy cập bất cứ lúc nào."
+      "signInToSave": "Lưu khách sạn và guide yêu thích và truy cập bất cứ lúc nào."
     },
     "actions": {
       "discoverMore": "Khám phá thêm",
@@ -1148,7 +1152,12 @@
       "backToProvince": "Về trang tỉnh",
       "noTours": "Hướng dẫn viên chưa có tour nào ở tỉnh này.",
       "myBooking": "Đặt tour của bạn với hướng dẫn viên này",
-      "viewAllBookings": "Xem tất cả tour đã đặt"
+      "viewAllBookings": "Xem tất cả tour đã đặt",
+      "wishlist": {
+        "add": "Lưu vào yêu thích",
+        "remove": "Gỡ khỏi yêu thích",
+        "loginToSave": "Đăng nhập để lưu yêu thích"
+      }
     },
     "status": {
       "pending_payment": "Chờ thanh toán",

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\HotelAvailabilityController;
 use App\Http\Controllers\Api\V1\HotelSearchController;
 use App\Http\Controllers\Api\V1\LocationController;
 use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\SavedGuideController;
 use App\Http\Controllers\Api\V1\SavedTourController;
 use App\Http\Controllers\Api\V1\TourMessageController;
 use App\Http\Controllers\Api\V1\TourProviderController;
@@ -132,6 +133,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('/saved-tours', [SavedTourController::class, 'index'])->name('saved-tours.index');
         Route::post('/saved-tours', [SavedTourController::class, 'store'])->name('saved-tours.store');
         Route::delete('/saved-tours/{tourId}', [SavedTourController::class, 'destroy'])->name('saved-tours.destroy');
+        Route::get('/saved-guides', [SavedGuideController::class, 'index'])->name('saved-guides.index');
+        Route::post('/saved-guides', [SavedGuideController::class, 'store'])->name('saved-guides.store');
+        Route::delete('/saved-guides/{providerUuid}', [SavedGuideController::class, 'destroy'])->name('saved-guides.destroy');
         Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
         Route::post('/tour-reviews', [TourReviewController::class, 'store'])->name('tour-reviews.store');
         Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');

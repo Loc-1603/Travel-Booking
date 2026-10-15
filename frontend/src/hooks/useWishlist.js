@@ -26,7 +26,7 @@ function mapItems(cached, fn) {
 export function useWishlist(enabled = true) {
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: WISHLIST_KEY,
     queryFn: async () => {
       const res = await api.get('/wishlist');
@@ -95,5 +95,8 @@ export function useWishlist(enabled = true) {
     addPending: addMutation.isPending,
     removePending: removeMutation.isPending,
     isLoading,
+    isError,
+    error,
+    refetch,
   };
 }

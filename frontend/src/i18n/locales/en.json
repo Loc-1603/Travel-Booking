@@ -129,8 +129,7 @@
     "settings": "Settings",
     "support": "Support",
     "tours": "Tours",
-    "myTourBookings": "My tour bookings",
-    "savedTours": "Saved tours"
+    "myTourBookings": "My tour bookings"
   },
   "home": {
     "heroTitleLine1": "Find your perfect",
@@ -506,25 +505,30 @@
       "saving": "Saving…"
     }
   },
-  "wishlist": {
-    "title": "My Wishlist",
-    "subtitle": "{{count}} {{count === 1 ? 'hotel' : 'hotels'}} saved",
+  "favorites": {
+    "title": "My Favorites",
+    "subtitle": "{{count}} saved items",
+    "badges": {
+      "hotel": "Hotel",
+      "guide": "Guide"
+    },
     "empty": {
-      "title": "Your wishlist is empty",
-      "description": "Browse hotels and tap the heart icon to save your favorites. They'll appear here for easy access.",
-      "searchHotels": "Search hotels"
+      "title": "No favorites yet",
+      "description": "Tap the heart icon on a hotel or guide to save it. Saved items will appear here for easy access.",
+      "searchHotels": "Search hotels",
+      "browseTours": "Explore tours"
     },
     "guests": {
-      "signInToView": "Sign in to view your wishlist",
-      "signInToSave": "Save your favorite hotels and access them anytime."
+      "signInToView": "Sign in to view your favorites",
+      "signInToSave": "Save your favorite hotels and guides and access them anytime."
     },
     "actions": {
       "discoverMore": "Discover more",
-      "remove": "Remove from wishlist",
+      "remove": "Remove from favorites",
       "viewDetails": "View details →"
     },
     "errors": {
-      "couldNotLoad": "Could not load wishlist"
+      "couldNotLoad": "Could not load your favorites"
     }
   },
   "reviews": {
@@ -1158,7 +1162,12 @@
       "backToProvince": "Back to province",
       "noTours": "This guide has no tours in this province yet.",
       "myBooking": "Your booking with this guide",
-      "viewAllBookings": "View all my tour bookings"
+      "viewAllBookings": "View all my tour bookings",
+      "wishlist": {
+        "add": "Save to favorites",
+        "remove": "Remove from favorites",
+        "loginToSave": "Sign in to save to favorites"
+      }
     },
     "status": {
       "pending_payment": "Pending payment",

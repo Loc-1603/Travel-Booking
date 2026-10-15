@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ChevronDown, User, Headphones, LogOut, CalendarCheck, Home } from 'lucide-react';
+import { ChevronDown, User, Headphones, LogOut, CalendarCheck, Home, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/useAuth';
 import { useWebsiteSettings } from '../contexts/useWebsiteSettings';
@@ -69,12 +69,6 @@ export default function Header() {
           </Link>
           {user ? (
             <>
-              <Link
-                to="/wishlist"
-                className="inline-flex items-center px-4 py-2.5 rounded-lg text-[#5c5852] hover:text-[#1a1a1a] hover:bg-[#f5f2ed] font-medium text-sm transition-colors hidden md:block"
-              >
-                {t('header.wishlist')}
-              </Link>
               <LanguageSwitcher />
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -107,12 +101,12 @@ export default function Header() {
                       {t('header.myTourBookings')}
                     </Link>
                     <Link
-                      to="/saved-tours"
+                      to="/favorites"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#45423d] hover:bg-[#faf8f5] transition-colors"
                     >
-                      <CalendarCheck className="w-4 h-4 text-[#b8860b]" />
-                      {t('header.savedTours')}
+                      <Heart className="w-4 h-4 text-[#b8860b]" />
+                      {t('header.wishlist')}
                     </Link>
                     <Link
                       to="/support"

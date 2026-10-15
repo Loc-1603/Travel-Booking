@@ -18,6 +18,7 @@ class SavedHotelResource extends JsonResource
             'check_in' => $this->check_in?->format('Y-m-d'),
             'check_out' => $this->check_out?->format('Y-m-d'),
             'hotel' => new HotelResource($this->whenLoaded('hotel')),
+            'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
 }

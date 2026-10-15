@@ -6,6 +6,7 @@ import { ArrowLeft, CalendarDays, Loader2, Star } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
+import { useSavedGuides } from '../hooks/useSavedGuides';
 import GuideAvatar from '../components/GuideAvatar';
 import { HotelDetailSkeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
@@ -13,6 +14,48 @@ import { TourReviewList } from '../components/TourReviewList';
 import { TourPriceSummary } from '../components/TourPriceSummary';
 import { formatPrice, getRatingLabel } from '../lib/utils';
 import { getGuideScore } from '../lib/guideSearch';
+
+function GuideWishlistHeart({ providerUuid }) {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { isSaved, saveGuide, unsaveGuide, addPending, removePending } = useSavedGuides(!!user);
+  if (!user) {
+    return (
+      <Link to="/login" className="p-2 rounded-full border border-neutral-200 hover:bg-neutral-50 inline-flex" aria-label={t('tours.guides.wishlist.loginToSave')}>
+        <HeartIcon filled={false} />
+      </Link>
+    );
+  }
+  const saved = isSaved(providerUuid);
+  const pending = addPending || removePending;
+  const handleClick = async () => {
+    if (pending) return;
+    try {
+      if (saved) await unsaveGuide(providerUuid);
+      else await saveGuide(providerUuid);
+    } catch { /* rollback handled by the optimistic update in useSavedGuides */ }
+  };
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={pending}
+      aria-pressed={saved}
+      className="p-2 rounded-full border border-neutral-200 hover:bg-neutral-50 disabled:opacity-60 inline-flex"
+      aria-label={saved ? t('tours.guides.wishlist.remove') : t('tours.guides.wishlist.add')}
+    >
+      <HeartIcon filled={saved} />
+    </button>
+  );
+}
+
+function HeartIcon({ filled }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={filled ? '#b8860b' : 'none'} stroke="#b8860b" strokeWidth="2" className="w-5 h-5">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    </svg>
+  );
+}
 
 /**
  * Guide profile — luồng đặt 1 ngày khám phá tỉnh:
@@ -189,7 +232,10 @@ export default function GuideDetail() {
           <GuideAvatar name={guide.business_name} avatarUrl={guide.avatar} size={96} />
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-neutral-900">{guide.business_name}</h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-neutral-900">{guide.business_name}</h1>
+            <span className="shrink-0"><GuideWishlistHeart providerUuid={guide.uuid} /></span>
+          </div>
           {guide.languages?.length > 0 && (
             <p className="text-sm text-neutral-500 mt-1">
               {t('tours.detail.languages')}: {guide.languages.join(', ')}

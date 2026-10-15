@@ -1,6 +1,6 @@
 // Main App component with routing configuration
 import { lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { WebsiteSettingsProvider } from './contexts/WebsiteSettingsContext';
@@ -19,7 +19,7 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const VnpayReturn = lazy(() => import('./pages/VnpayReturn'));
 const Profile = lazy(() => import('./pages/Profile'));
 const MyBookings = lazy(() => import('./pages/MyBookings'));
-const Wishlist = lazy(() => import('./pages/Wishlist'));
+const Favorites = lazy(() => import('./pages/Favorites'));
 const Support = lazy(() => import('./pages/Support'));
 const SupportTicketNew = lazy(() => import('./pages/SupportTicketNew'));
 const SupportTicketDetail = lazy(() => import('./pages/SupportTicketDetail'));
@@ -34,7 +34,6 @@ const TourBookingWizard = lazy(() => import('./pages/TourBookingWizard'));
 const TourCheckout = lazy(() => import('./pages/TourCheckout'));
 const MyTourBookings = lazy(() => import('./pages/MyTourBookings'));
 const TourBookingReview = lazy(() => import('./pages/TourBookingReview'));
-const SavedTours = lazy(() => import('./pages/SavedTours'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,7 +60,8 @@ export default function App() {
               <Route path="vnpay-return" element={<VnpayReturn />} />
               <Route path="profile" element={<Profile />} />
               <Route path="bookings" element={<MyBookings />} />
-              <Route path="wishlist" element={<Wishlist />} />
+              <Route path="favorites" element={<Favorites />} />
+              <Route path="wishlist" element={<Navigate to="/favorites" replace />} />
               <Route path="support" element={<Support />} />
               <Route path="support/new" element={<SupportTicketNew />} />
               <Route path="support/:id" element={<SupportTicketDetail />} />
@@ -73,7 +73,7 @@ export default function App() {
               <Route path="tour-checkout/:uuid" element={<TourCheckout />} />
               <Route path="tour-bookings" element={<MyTourBookings />} />
               <Route path="tour-bookings/:uuid/review" element={<TourBookingReview />} />
-              <Route path="saved-tours" element={<SavedTours />} />
+              <Route path="saved-tours" element={<Navigate to="/favorites" replace />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
               <Route path="verify-email" element={<VerifyEmail />} />

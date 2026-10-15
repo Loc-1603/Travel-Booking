@@ -32,7 +32,7 @@ vi.mock('../components/TourReviewList', () => ({
   TourReviewList: () => <div data-testid="review-list" />,
 }));
 
-const guide = { business_name: 'Guide A', languages: ['vi'], price_from: 500000 };
+const guide = { uuid: 'g-1', business_name: 'Guide A', languages: ['vi'], price_from: 500000 };
 const slots = [{ id: 1, tour: { meeting_point: 'Gate' } }];
 const breakdown = { subtotal: 500000, total: 500000, currency: 'VND' };
 
@@ -58,6 +58,9 @@ beforeEach(() => {
   apiGet.mockImplementation((url) => {
     if (url.includes('/availability')) {
       return Promise.resolve({ data: { success: true, data: slots } });
+    }
+    if (url === '/saved-guides') {
+      return Promise.resolve({ data: { success: true, data: { data: [] } } });
     }
     return Promise.resolve({ data: { success: true, data: guide } });
   });
@@ -125,5 +128,25 @@ describe('GuideDetail guest estimate (FE-4.4)', () => {
     expect(hits.length).toBeGreaterThan(0);
     expect(within(estimate).getByText('tours.guides.loginToBook')).toBeInTheDocument();
     expect(screen.queryByText('tours.guides.loginToSeePrice')).not.toBeInTheDocument();
+  });
+});
+
+describe('GuideDetail wishlist heart', () => {
+  it('saves the guide to favorites when the heart is clicked', async () => {
+    renderGuide('/guides/g-1?province=hue&date=2026-10-15');
+    await screen.findByText('Guide A');
+    fireEvent.click(screen.getByRole('button', { name: 'tours.guides.wishlist.add' }));
+    await waitFor(() => {
+      expect(apiPost).toHaveBeenCalledWith('/saved-guides', { provider_uuid: 'g-1' });
+    });
+  });
+
+  it('shows a login link for guests instead of the toggle', async () => {
+    mockAuth.user = null;
+    renderGuide('/guides/g-1?province=hue&date=2026-10-15');
+    await screen.findByText('Guide A');
+    const link = screen.getByRole('link', { name: 'tours.guides.wishlist.loginToSave' });
+    expect(link).toHaveAttribute('href', '/login');
+    expect(screen.queryByRole('button', { name: 'tours.guides.wishlist.add' })).not.toBeInTheDocument();
   });
 });

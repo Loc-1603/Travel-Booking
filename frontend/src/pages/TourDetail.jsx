@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { MapPin, Loader2, MessageCircle } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
-import { useSavedTours } from '../hooks/useSavedTours';
 import { HotelDetailSkeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
 import { TourSlotCalendar } from '../components/TourSlotCalendar';
@@ -16,7 +15,7 @@ import { TourChatBox } from '../components/TourChatBox';
 import { TourReviewForm } from '../components/TourReviewForm';
 import { TourReviewList } from '../components/TourReviewList';
 import GuideAvatar from '../components/GuideAvatar';
-import { formatPrice, getRatingLabel, cn } from '../lib/utils';
+import { formatPrice, getRatingLabel } from '../lib/utils';
 
 export default function TourDetail() {
   const { t } = useTranslation();
@@ -24,7 +23,6 @@ export default function TourDetail() {
   const navigate = useNavigate();
   const { uuid } = useParams();
   const [slot, setSlot] = useState(null);
-  const { isSaved, saveTour, unsaveTour } = useSavedTours(!!user);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['tour', uuid],
@@ -90,7 +88,6 @@ export default function TourDetail() {
 
   const images = tour.images ?? [];
   const rating = tour.average_rating != null ? Number(tour.average_rating) : null;
-  const saved = isSaved(tour.id);
   const rateParts = getTourPriceParts(tour);
   const fromPrice = getTourFromPrice(tour);
 
@@ -101,13 +98,6 @@ export default function TourDetail() {
     }
     if (!slot) return;
     navigate(`/tours/book/${uuid}?slot_id=${slot.id}`);
-  };
-
-  const toggleSave = async () => {
-    try {
-      if (saved) await unsaveTour(tour.id);
-      else await saveTour(tour.id);
-    } catch { /* non-fatal: ignore */ }
   };
 
   return (
@@ -149,18 +139,6 @@ export default function TourDetail() {
                 </p>
               )}
             </div>
-            {user && (
-              <button
-                type="button"
-                onClick={toggleSave}
-                className={cn(
-                  'shrink-0 px-4 py-2 rounded-xl border text-sm font-medium transition-colors',
-                  saved ? 'border-accent bg-accent-100' : 'border-neutral-200 hover:bg-neutral-50'
-                )}
-              >
-                {saved ? t('tours.save.saved') : t('tours.save.save')}
-              </button>
-            )}
           </div>
 
           {tour.description && <p className="mt-4 text-neutral-700 leading-relaxed">{tour.description}</p>}
