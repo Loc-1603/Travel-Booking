@@ -28,7 +28,7 @@ class DashboardController extends Controller
     public function index(): View|RedirectResponse
     {
         $user = auth()->user();
-        if ($user->role === Role::VENDOR) {
+        if (in_array($user->role, [Role::VENDOR, Role::GUIDE], true)) {
             return redirect()->route('admin.vendor.dashboard');
         }
         $isSuperAdmin = $user->role === Role::SUPER_ADMIN;

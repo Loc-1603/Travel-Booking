@@ -1595,7 +1595,7 @@ return [
                 'business_name' => 'Tên doanh nghiệp',
                 'bio' => 'Giới thiệu ngắn',
                 'bio_hint' => 'Hiển thị khi mô tả chi tiết chưa có. Tối đa 2000 ký tự.',
-                'bio_rich' => 'Mô tả chi tiết (đẹp mắt)',
+                'bio_rich' => 'Mô tả chi tiết',
                 'bio_rich_hint' => 'Soạn thảo với tiêu đề, in đậm, danh sách, trích dẫn, liên kết và hình ảnh. Nội dung hiển thị nổi bật trên trang profile.',
                 'bio_rich_offline' => 'Không tải được trình soạn thảo (cần mạng). Hãy dùng ô giới thiệu ngắn bên dưới.',
                 'avatar' => 'Ảnh đại diện',

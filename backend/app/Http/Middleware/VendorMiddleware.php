@@ -17,7 +17,7 @@ class VendorMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! Auth::check() || Auth::user()?->role !== Role::VENDOR) {
+        if (! Auth::check() || ! in_array(Auth::user()?->role, [Role::VENDOR, Role::GUIDE], true)) {
             abort(403);
         }
 

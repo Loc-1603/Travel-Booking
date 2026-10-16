@@ -23,7 +23,8 @@ test('vendor registration from the blade form does not create an account until v
         'business_name' => 'Acme Hotels Ltd',
     ]);
 
-    $response->assertRedirect(route('login', absolute: false));
+    $response->assertRedirect(route('register.verify', ['portal' => 'vendor'], absolute: false));
+    $response->assertSessionHas('verify_email', 'vendor@acme.test');
     $this->assertGuest();
 
     $this->assertDatabaseMissing('users', ['email' => 'vendor@acme.test']);
@@ -48,12 +49,22 @@ test('verifying a pending vendor registration creates the vendor account', funct
         ['id' => 'pending:'.$pending->uuid, 'hash' => sha1($pending->email)]
     );
 
-    $this->get($verificationUrl);
+    $response = $this->get($verificationUrl);
+
+    $response->assertRedirect(route('register.verify', ['portal' => 'vendor', 'verified' => 1]));
 
     $user = User::where('email', 'vendor@acme.test')->firstOrFail();
     expect($user->hasVerifiedEmail())->toBeTrue()
         ->and($user->role)->toBe(\App\Enums\Role::VENDOR)
         ->and($user->vendorProfile()->exists())->toBeTrue();
+});
+
+test('the verify notice page defaults to the vendor portal', function () {
+    $this->get(route('register.verify'))
+        ->assertOk()
+        ->assertSee(route('login'), false)
+        ->assertDontSee(route('login.guide'), false)
+        ->assertDontSee('id="resend-verification"', false);
 });
 
 test('unverified vendors cannot access the vendor dashboard', function () {

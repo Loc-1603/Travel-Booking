@@ -19,7 +19,7 @@ class TourPolicy
             return true;
         }
 
-        if ($user->role === Role::VENDOR) {
+        if ($user->role === Role::GUIDE) {
             return (int) $tour->provider?->vendor_id === (int) $user->id;
         }
 
@@ -28,7 +28,7 @@ class TourPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN, Role::VENDOR], true);
+        return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN, Role::GUIDE], true);
     }
 
     public function update(User $user, TourProduct $tour): bool
@@ -37,7 +37,7 @@ class TourPolicy
             return true;
         }
 
-        return $user->role === Role::VENDOR
+        return $user->role === Role::GUIDE
             && (int) $tour->provider?->vendor_id === (int) $user->id;
     }
 }

@@ -11,15 +11,51 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
+    Route::get('login/choose', function () {
+        if (auth()->check()) {
+            return redirect()->to(auth()->user()->dashboardRoute());
+        }
+
+        return view('auth.choose-role');
+    })->name('login.choose');
+
     Route::get('register/vendor', [\App\Http\Controllers\Auth\VendorRegisteredUserController::class, 'create'])
         ->name('register.vendor');
 
     Route::post('register/vendor', [\App\Http\Controllers\Auth\VendorRegisteredUserController::class, 'store']);
 
+    Route::get('register/guide', [\App\Http\Controllers\Auth\GuideRegisteredUserController::class, 'create'])
+        ->name('register.guide');
+
+    Route::post('register/guide', [\App\Http\Controllers\Auth\GuideRegisteredUserController::class, 'store']);
+
+    Route::get('register/verify', [\App\Http\Controllers\Auth\RegisterVerificationController::class, 'show'])
+        ->name('register.verify');
+
+    Route::post('register/verify/resend', [\App\Http\Controllers\Auth\RegisterVerificationController::class, 'resend'])
+        ->middleware('throttle:6,1')
+        ->name('register.verify.resend');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
+        ->defaults('portal', 'vendor')
         ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
+        ->defaults('portal', 'vendor');
+
+    Route::get('login/admin', [AuthenticatedSessionController::class, 'create'])
+        ->defaults('portal', 'admin')
+        ->name('login.admin');
+
+    Route::post('login/admin', [AuthenticatedSessionController::class, 'store'])
+        ->defaults('portal', 'admin');
+
+    Route::get('login/guide', [AuthenticatedSessionController::class, 'create'])
+        ->defaults('portal', 'guide')
+        ->name('login.guide');
+
+    Route::post('login/guide', [AuthenticatedSessionController::class, 'store'])
+        ->defaults('portal', 'guide');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

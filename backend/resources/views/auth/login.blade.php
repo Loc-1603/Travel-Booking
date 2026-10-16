@@ -1,6 +1,10 @@
 @php
     $authPageTitle = __('auth.login.title');
     $authHotelBackground = asset('images/auth/login-bg.jpg');
+    $portal = $portal ?? 'vendor';
+    $loginAction = $portal === 'admin' ? route('login.admin') : ($portal === 'guide' ? route('login.guide') : route('login'));
+    $loginWelcome = 'auth.login.' . $portal . '_welcome';
+    $loginSubtitle = 'auth.login.' . $portal . '_subtitle';
 @endphp
 @include('admin.layouts.css')
 @include('auth.partials.auth-hotel-bg-styles')
@@ -18,22 +22,10 @@
                                 </div>
                                 <div class="auth-content my-auto">
                                     <div class="text-center">
-                                        <h5 class="mb-0">{{ __('auth.login.welcome_back') }}</h5>
-                                        <p class="text-muted mt-2">{{ __('auth.login.sign_in_continue') }}</p>
+                                        <h5 class="mb-0">{{ __($loginWelcome) }}</h5>
+                                        <p class="text-muted mt-2">{{ __($loginSubtitle) }}</p>
                                     </div>
-                                    @if (session('status') == 'verification-sent' || session('info'))
-                                        <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
-                                            {{ session('info') ?? __('auth.registration.check_email') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-                                    @if (session('status') == 'verified')
-                                        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                                            {{ __('auth.verify_email.verified') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-                                    <form class="mt-4 pt-2" method="POST" action="{{ route('login') }}">
+                                    <form class="mt-4 pt-2" method="POST" action="{{ $loginAction }}">
                                         @csrf
 
                                         <!-- Username / Email -->
@@ -104,9 +96,19 @@
 
 
 
-                                    <div class="mt-5 text-center">
-                                        <p class="text-muted mb-0">{{ __('auth.login.register_vendor') }} <a href="{{ route('register.vendor') }}" class="text-primary fw-semibold">{{ __('auth.login.register_vendor') }}</a></p>
-                                    </div>
+                                    @if($portal !== 'admin')
+                                        <div class="mt-5 text-center">
+                                            <p class="text-muted mb-0">
+                                                @if($portal === 'guide')
+                                                    {{ __('auth.login.no_account') }}
+                                                    <a href="{{ route('register.guide') }}" class="text-primary fw-semibold">{{ __('auth.register_guide.register_guide') }}</a>
+                                                @else
+                                                    {{ __('auth.login.register_vendor_label') }}
+                                                    <a href="{{ route('register.vendor') }}" class="text-primary fw-semibold">{{ __('auth.login.register_vendor_link_text') }}</a>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    @endif
                                 </div>
 
                             </div>

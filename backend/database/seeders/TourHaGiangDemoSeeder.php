@@ -175,10 +175,14 @@ class TourHaGiangDemoSeeder extends Seeder
         foreach ($this->guides as $i => $g) {
             $user = User::firstOrCreate(
                 ['email' => $g['email']],
-                ['name' => $g['name'], 'password' => bcrypt('12345678'), 'role' => Role::VENDOR, 'status' => 'active', 'email_verified_at' => now()]
+                ['name' => $g['name'], 'password' => bcrypt('12345678'), 'role' => Role::GUIDE, 'status' => 'active', 'email_verified_at' => now()]
             );
-            if (! $user->hasRole('vendor')) {
-                $user->assignRole('vendor');
+            $user->update(['role' => Role::GUIDE]);
+            if (! $user->hasRole('guide')) {
+                $user->assignRole('guide');
+            }
+            if ($user->hasRole('vendor')) {
+                $user->removeRole('vendor');
             }
 
             $provider = TourProvider::firstOrCreate(

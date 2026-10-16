@@ -26,11 +26,8 @@ class DashboardController extends Controller
         $hotelIds = Hotel::where('vendor_id', $userId)->pluck('id');
         $providerIds = TourProvider::where('vendor_id', $userId)->pluck('id');
 
-        $segment = $request->query('segment');
-        if (! in_array($segment, ['hotel', 'tour'], true)) {
-            // Auto: show tour when vendor has no hotels but has tour providers.
-            $segment = ($hotelIds->isEmpty() && $providerIds->isNotEmpty()) ? 'tour' : 'hotel';
-        }
+        // Strict split: guides only see tour stats, vendors only hotel stats.
+        $segment = auth()->user()->role === \App\Enums\Role::GUIDE ? 'tour' : 'hotel';
 
         if ($segment === 'tour') {
             $revenue = (float) TourBooking::whereIn('provider_id', $providerIds)
@@ -61,7 +58,10 @@ class DashboardController extends Controller
             $bookingsTrendChart = $this->bookingsTrendChartData($hotelIds);
             $topHotelsChart = $this->topHotelsByRevenueData($hotelIds);
         }
-        $vendorApproved = auth()->user()->isVendorApproved();
+        // Guides have no VendorProfile — never show the vendor pending-approval warning.
+        $vendorApproved = auth()->user()->role === \App\Enums\Role::GUIDE
+            ? true
+            : auth()->user()->isVendorApproved();
 
         return view('admin.vendor.dashboard', compact(
             'revenue', 'bookingCount', 'commissionAmount', 'net', 'revenueChart', 'bookingsByStatus', 'bookingsTrendChart', 'topHotelsChart', 'vendorApproved', 'segment'

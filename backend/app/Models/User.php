@@ -83,7 +83,53 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
         $profile = $this->vendorProfile;
-        return $profile && $profile->isApproved();
+
+        return (bool) ($profile && $profile->isApproved());
+    }
+
+    /**
+     * URL to redirect to after login, based on role.
+     */
+    public function dashboardRoute(): string
+    {
+        return match ($this->role) {
+            Role::SUPER_ADMIN, Role::ADMIN => route('admin.dashboard'),
+            Role::VENDOR, Role::GUIDE => route('admin.vendor.dashboard'),
+            default => (string) config('app.frontend_url'),
+        };
+    }
+
+    /**
+     * Staff = vendor (hotel) or guide (tour). Used for shared vendor-area access.
+     */
+    public function isStaff(): bool
+    {
+        return in_array($this->role, [Role::VENDOR, Role::GUIDE], true);
+    }
+
+    /**
+     * Auth portal slug for this user: admin|vendor|guide.
+     * Customers fall back to vendor (default Blade portal).
+     */
+    public function portal(): string
+    {
+        return match ($this->role) {
+            Role::SUPER_ADMIN, Role::ADMIN => 'admin',
+            Role::GUIDE => 'guide',
+            default => 'vendor',
+        };
+    }
+
+    /**
+     * Route name of the login page for this user's portal.
+     */
+    public function portalLoginRoute(): string
+    {
+        return match ($this->portal()) {
+            'admin' => 'login.admin',
+            'guide' => 'login.guide',
+            default => 'login',
+        };
     }
 
     /** Public URL for stored avatar, or null if none. */

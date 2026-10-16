@@ -95,11 +95,14 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::post('/profile/bank-accounts', [\App\Http\Controllers\Admin\Vendor\ProfileController::class, 'storeBankAccount'])->name('profile.bank-accounts.store');
             Route::put('/profile/bank-accounts/{bankAccount}', [\App\Http\Controllers\Admin\Vendor\ProfileController::class, 'updateBankAccount'])->name('profile.bank-accounts.update');
             Route::delete('/profile/bank-accounts/{bankAccount}', [\App\Http\Controllers\Admin\Vendor\ProfileController::class, 'destroyBankAccount'])->name('profile.bank-accounts.destroy');
-            Route::get('/reports', [\App\Http\Controllers\Admin\Vendor\ReportController::class, 'index'])->name('reports.index');
-            Route::get('/reports/export', [\App\Http\Controllers\Admin\Vendor\ReportController::class, 'export'])->name('reports.export');
+            // Reports are hotel-only (query by hotel_id): vendor staff only.
+            Route::middleware('role:vendor')->group(function () {
+                Route::get('/reports', [\App\Http\Controllers\Admin\Vendor\ReportController::class, 'index'])->name('reports.index');
+                Route::get('/reports/export', [\App\Http\Controllers\Admin\Vendor\ReportController::class, 'export'])->name('reports.export');
+            });
 
-            // Hotel cluster: locked until the vendor is approved by an admin.
-            Route::middleware('vendor.approved')->group(function () {
+            // Hotel cluster: vendor staff only, locked until the vendor is approved by an admin.
+            Route::middleware(['vendor.approved', 'role:vendor'])->group(function () {
                 Route::resource('hotels', \App\Http\Controllers\Admin\Vendor\HotelController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
                 Route::resource('rooms', \App\Http\Controllers\Admin\Vendor\RoomController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
                 Route::get('rooms/{room}/availability', [\App\Http\Controllers\Admin\Vendor\RoomController::class, 'availability'])->name('rooms.availability');
@@ -132,24 +135,26 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::post('/support-tickets', [\App\Http\Controllers\Admin\Vendor\SupportTicketController::class, 'store'])->name('support-tickets.store');
             Route::get('/support-tickets/{supportTicket}', [\App\Http\Controllers\Admin\Vendor\SupportTicketController::class, 'show'])->name('support-tickets.show');
 
-            // Tours (vendor owns via TourProvider) - removed per guide-only flow
-            Route::get('/tour-bookings', [\App\Http\Controllers\Admin\Vendor\TourBookingController::class, 'index'])->name('tour-bookings.index');
-            Route::get('/tour-bookings/{uuid}/invoice', [\App\Http\Controllers\Admin\Vendor\TourBookingController::class, 'invoice'])->name('tour-bookings.invoice');
-            Route::get('/tour-messages', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'index'])->name('tour-messages.index');
-            Route::get('/tour-messages/{uuid}', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'show'])->name('tour-messages.show');
-            Route::post('/tour-messages/{uuid}/reply', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'reply'])->name('tour-messages.reply');
-            Route::post('/tour-messages/{uuid}/read', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'read'])->name('tour-messages.read');
-            Route::get('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'index'])->name('guide-profile.index');
-            Route::get('/guide-profile/create', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'create'])->name('guide-profile.create');
-            Route::post('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'store'])->name('guide-profile.store');
-            Route::get('/guide-profile/{provider}/edit', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'edit'])->name('guide-profile.edit');
-            Route::put('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update'])->name('guide-profile.update');
-            Route::patch('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update']);
-            Route::delete('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'destroy'])->name('guide-profile.destroy');
-            Route::post('/guide-profile/{provider}/content-image', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'storeContentImage'])->name('guide-profile.content-image');
-            Route::get('/guide-profile/{provider}/settings', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'index'])->name('guide-profile.settings.index');
-            Route::put('/guide-profile/{provider}/settings', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'updateProvider'])->name('guide-profile.settings.update');
-            Route::post('/guide-profile/{provider}/settings/blackouts', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'store'])->name('guide-profile.settings.blackouts.store');
-            Route::delete('/guide-profile/{provider}/settings/blackouts/{blackout}', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'destroy'])->name('guide-profile.settings.blackouts.destroy');
+            // Tour cluster: guide staff only (strict split — vendors get 403 here).
+            Route::middleware('role:guide')->group(function () {
+                Route::get('/tour-bookings', [\App\Http\Controllers\Admin\Vendor\TourBookingController::class, 'index'])->name('tour-bookings.index');
+                Route::get('/tour-bookings/{uuid}/invoice', [\App\Http\Controllers\Admin\Vendor\TourBookingController::class, 'invoice'])->name('tour-bookings.invoice');
+                Route::get('/tour-messages', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'index'])->name('tour-messages.index');
+                Route::get('/tour-messages/{uuid}', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'show'])->name('tour-messages.show');
+                Route::post('/tour-messages/{uuid}/reply', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'reply'])->name('tour-messages.reply');
+                Route::post('/tour-messages/{uuid}/read', [\App\Http\Controllers\Admin\Vendor\TourMessageController::class, 'read'])->name('tour-messages.read');
+                Route::get('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'index'])->name('guide-profile.index');
+                Route::get('/guide-profile/create', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'create'])->name('guide-profile.create');
+                Route::post('/guide-profile', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'store'])->name('guide-profile.store');
+                Route::get('/guide-profile/{provider}/edit', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'edit'])->name('guide-profile.edit');
+                Route::put('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update'])->name('guide-profile.update');
+                Route::patch('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'update']);
+                Route::delete('/guide-profile/{provider}', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'destroy'])->name('guide-profile.destroy');
+                Route::post('/guide-profile/{provider}/content-image', [\App\Http\Controllers\Admin\Vendor\GuideProfileController::class, 'storeContentImage'])->name('guide-profile.content-image');
+                Route::get('/guide-profile/{provider}/settings', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'index'])->name('guide-profile.settings.index');
+                Route::put('/guide-profile/{provider}/settings', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'updateProvider'])->name('guide-profile.settings.update');
+                Route::post('/guide-profile/{provider}/settings/blackouts', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'store'])->name('guide-profile.settings.blackouts.store');
+                Route::delete('/guide-profile/{provider}/settings/blackouts/{blackout}', [\App\Http\Controllers\Admin\Vendor\ProviderBlackoutController::class, 'destroy'])->name('guide-profile.settings.blackouts.destroy');
+            });
         });
     });

@@ -8,17 +8,18 @@ use App\Models\User;
 use Database\Seeders\TourHaGiangDemoSeeder;
 
 beforeEach(function (): void {
-    foreach (['super-admin', 'admin', 'vendor', 'customer'] as $role) {
+    foreach (['super-admin', 'admin', 'vendor', 'guide', 'customer'] as $role) {
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
     }
 
+    // Strict split: tour flows belong to guides (vendors get 403 on guide-profile).
     $this->vendor = User::create([
         'name' => 'Price Vendor', 'email' => 'guide-price-vendor@test.local',
-        'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
+        'password' => bcrypt('password'), 'role' => 'guide', 'status' => 'active',
     ]);
     // email_verified_at không nằm trong $fillable của User.
     $this->vendor->forceFill(['email_verified_at' => now()])->save();
-    $this->vendor->assignRole('vendor');
+    $this->vendor->assignRole('guide');
 
     $country = Country::create(['name' => 'Vietnam', 'code' => 'VN', 'tax_rate' => 0.08, 'tax_name' => 'VAT']);
     $this->province = TourProvince::create([

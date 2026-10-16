@@ -53,9 +53,13 @@ test('approved vendor can access hotel pages', function () {
         ->assertOk();
 });
 
-test('guide-profile stays unlocked for a pending vendor', function () {
+test('guide-profile is forbidden for vendors under the strict split', function () {
+    // Tour cluster is guide-only: vendors (pending or approved) get 403.
     $this->actingAs($this->pendingVendor)
         ->get('/admin/vendor/guide-profile')
-        ->assertOk()
-        ->assertSee(__('admin.vendor.guide_profiles.my_title'), false);
+        ->assertForbidden();
+
+    $this->actingAs($this->approvedVendor)
+        ->get('/admin/vendor/guide-profile')
+        ->assertForbidden();
 });

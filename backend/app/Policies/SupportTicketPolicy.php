@@ -10,7 +10,7 @@ class SupportTicketPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN, Role::VENDOR, Role::CUSTOMER], true);
+        return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN, Role::VENDOR, Role::GUIDE, Role::CUSTOMER], true);
     }
 
     public function view(User $user, SupportTicket $ticket): bool
@@ -23,7 +23,7 @@ class SupportTicketPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, [Role::VENDOR, Role::CUSTOMER], true);
+        return in_array($user->role, [Role::VENDOR, Role::GUIDE, Role::CUSTOMER], true);
     }
 
     public function update(User $user, SupportTicket $ticket): bool

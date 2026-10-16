@@ -13,7 +13,7 @@
         <div class="d-flex">
             <!-- LOGO -->
             <div class="navbar-brand-box">
-                <a href="{{ auth()->user()->role === \App\Enums\Role::VENDOR ? route('admin.vendor.dashboard') : route('admin.dashboard') }}" class="logo logo-dark">
+                <a href="{{ $authUser->isStaff() ? route('admin.vendor.dashboard') : route('admin.dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
                         @if($siteLogo)
                             <img src="{{ $siteLogo }}" alt="{{ $siteName }}" height="24">
@@ -31,7 +31,7 @@
                     </span>
                 </a>
 
-                <a href="{{ auth()->user()->role === \App\Enums\Role::VENDOR ? route('admin.vendor.dashboard') : route('admin.dashboard') }}" class="logo logo-light">
+                <a href="{{ $authUser->isStaff() ? route('admin.vendor.dashboard') : route('admin.dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
                         @if($siteLogo)
                             <img src="{{ $siteLogo }}" alt="{{ $siteName }}" height="24">

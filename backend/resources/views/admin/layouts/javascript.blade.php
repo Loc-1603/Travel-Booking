@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 @auth
-@if(auth()->user()->role === \App\Enums\Role::VENDOR)
+@if(in_array(auth()->user()->role, [\App\Enums\Role::VENDOR, \App\Enums\Role::GUIDE]))
 @php
     $liveBookingUuid = request()->routeIs('admin.vendor.tour-messages.show') ? request()->route('uuid') : null;
     $liveConfig = [

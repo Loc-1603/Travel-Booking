@@ -4,14 +4,15 @@ use App\Models\TourProvider;
 use App\Models\User;
 
 beforeEach(function () {
-    foreach (['super-admin', 'admin', 'vendor', 'customer'] as $role) {
+    foreach (['super-admin', 'admin', 'vendor', 'guide', 'customer'] as $role) {
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
     }
+    // Strict split: tour flows belong to guides (vendors get 403 on guide-profile).
     $this->vendor = User::factory()->create([
         'name' => 'Tour Vendor', 'email' => 'guide-create@test.local',
-        'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
+        'password' => bcrypt('password'), 'role' => 'guide', 'status' => 'active',
     ]);
-    $this->vendor->assignRole('vendor');
+    $this->vendor->assignRole('guide');
 });
 
 test('a pending vendor can open the guide-profile create form', function () {

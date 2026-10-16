@@ -68,3 +68,10 @@ Thumbs.db
 
 # Build / dependencies (root level if any)
 node_modules/
+
+
+# Codebase-memory
+install.ps1
+
+# File Plan
+docs/

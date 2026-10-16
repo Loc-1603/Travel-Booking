@@ -10,6 +10,7 @@ use App\Models\VendorProfile;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VerifyEmailController extends Controller
 {
@@ -50,27 +51,34 @@ class VerifyEmailController extends Controller
             return $this->redirectWithError('email_taken');
         }
 
-        $user = User::create([
-            'name' => $pending->name,
-            'email' => $pending->email,
-            'password' => $pending->password,
-            'role' => $pending->role,
-            'status' => 'active',
-        ]);
-        $user->markEmailAsVerified();
-
-        $user->assignRole($pending->role);
-
-        if ($pending->role === Role::VENDOR->value) {
-            VendorProfile::create([
-                'user_id' => $user->id,
-                'status' => VendorProfile::STATUS_PENDING,
-                'business_name' => $pending->business_name,
-                'business_details' => $pending->business_details,
+        // All-or-nothing: if anything fails (e.g. the spatie role is not
+        // seeded yet), the pending registration survives so the user can
+        // retry the same link once the system is configured correctly.
+        $user = DB::transaction(function () use ($pending) {
+            $user = User::create([
+                'name' => $pending->name,
+                'email' => $pending->email,
+                'password' => $pending->password,
+                'role' => $pending->role,
+                'status' => 'active',
             ]);
-        }
+            $user->markEmailAsVerified();
 
-        $pending->delete();
+            $user->assignRole($pending->role);
+
+            if ($pending->role === Role::VENDOR->value) {
+                VendorProfile::create([
+                    'user_id' => $user->id,
+                    'status' => VendorProfile::STATUS_PENDING,
+                    'business_name' => $pending->business_name,
+                    'business_details' => $pending->business_details,
+                ]);
+            }
+
+            $pending->delete();
+
+            return $user;
+        });
 
         return $this->redirectVerified($user);
     }
@@ -92,8 +100,13 @@ class VerifyEmailController extends Controller
 
     protected function redirectVerified(User $user): RedirectResponse
     {
-        if ($user->role === Role::VENDOR) {
-            return redirect()->route('login')->with('status', 'verified');
+        if (in_array($user->role, [Role::VENDOR, Role::GUIDE], true)) {
+            return redirect()
+                ->route('register.verify', [
+                    'portal' => $user->role === Role::GUIDE ? 'guide' : 'vendor',
+                    'verified' => 1,
+                ])
+                ->with('verify_email', $user->email);
         }
 
         return redirect()->to(config('app.frontend_url').'/verify-email?verified=1');

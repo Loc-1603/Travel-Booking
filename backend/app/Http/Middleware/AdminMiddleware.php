@@ -15,7 +15,7 @@ class AdminMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (!auth()->check() || !auth()->user()->hasRole('admin|super-admin|vendor')) {
+        if (!auth()->check() || !auth()->user()->hasRole('admin|super-admin|vendor|guide')) {
             abort(403);
         }
         return $next($request);

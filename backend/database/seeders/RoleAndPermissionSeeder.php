@@ -54,6 +54,9 @@ class RoleAndPermissionSeeder extends Seeder
         $vendor = Role::firstOrCreate(['name' => 'vendor', 'guard_name' => $guard]);
         $vendor->syncPermissions([]);
 
+        $guide = Role::firstOrCreate(['name' => 'guide', 'guard_name' => $guard]);
+        $guide->syncPermissions([]);
+
         $customer = Role::firstOrCreate(['name' => 'customer', 'guard_name' => $guard]);
         $customer->syncPermissions([]);
     }

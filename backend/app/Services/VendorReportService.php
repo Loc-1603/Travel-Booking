@@ -45,6 +45,8 @@ class VendorReportService
             }
         }
 
+        $overlapNights = $this->overlapNightsExpression('bookings.check_out', 'bookings.check_in');
+
         $bookedNights = (int) DB::table('booking_rooms')
             ->join('bookings', 'booking_rooms.booking_id', '=', 'bookings.id')
             ->whereIn('bookings.hotel_id', $hotelIds)
@@ -52,14 +54,7 @@ class VendorReportService
             ->whereNull('bookings.deleted_at')
             ->where('bookings.check_in', '<', $to->copy()->addDay()->toDateString())
             ->where('bookings.check_out', '>', $from->toDateString())
-            ->selectRaw('SUM(
-                booking_rooms.quantity * (
-                    DATEDIFF(
-                        LEAST(bookings.check_out, ?),
-                        GREATEST(bookings.check_in, ?)
-                    )
-                )
-            ) as total', [$to->toDateString(), $from->toDateString()])
+            ->selectRaw("SUM(booking_rooms.quantity * ({$overlapNights})) as total", [$to->toDateString(), $from->toDateString()])
             ->value('total');
 
         $occupancy = $availableNights > 0 ? round(($bookedNights / $availableNights) * 100, 1) : 0.0;
@@ -98,8 +93,10 @@ class VendorReportService
             $query->whereDate('bookings.check_out', '<=', $to);
         }
 
+        $nights = $this->dateDiffExpression('bookings.check_out', 'bookings.check_in');
+
         return $query
-            ->selectRaw('rooms.id as room_id, rooms.name as room_name, SUM(booking_rooms.quantity * booking_rooms.unit_price * DATEDIFF(bookings.check_out, bookings.check_in)) as revenue, COUNT(DISTINCT bookings.id) as bookings')
+            ->selectRaw("rooms.id as room_id, rooms.name as room_name, SUM(booking_rooms.quantity * booking_rooms.unit_price * {$nights}) as revenue, COUNT(DISTINCT bookings.id) as bookings")
             ->groupBy('rooms.id', 'rooms.name')
             ->orderByDesc('revenue')
             ->get()
@@ -166,7 +163,7 @@ class VendorReportService
             ->where('status', 'completed')
             ->whereNull('deleted_at')
             ->where('check_in', '>=', now()->subMonths($months)->startOfMonth())
-            ->selectRaw("DATE_FORMAT(check_in, '%Y-%m') as month, SUM(total_price) as total")
+            ->selectRaw($this->monthExpression('check_in').' as month, SUM(total_price) as total')
             ->groupBy('month')
             ->orderBy('month')
             ->pluck('total', 'month');
@@ -219,6 +216,37 @@ class VendorReportService
         }
 
         return $rows;
+    }
+
+    /**
+     * MySQL uses DATE_FORMAT, SQLite (tests) uses strftime.
+     */
+    private function monthExpression(string $column): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', {$column})"
+            : "DATE_FORMAT({$column}, '%Y-%m')";
+    }
+
+    /**
+     * Whole days between two date columns (end - start).
+     */
+    private function dateDiffExpression(string $end, string $start): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite'
+            ? "CAST(julianday({$end}) - julianday({$start}) AS INTEGER)"
+            : "DATEDIFF({$end}, {$start})";
+    }
+
+    /**
+     * Overlap nights between a row's stay and two bound dates (? = range end, ? = range start).
+     * MySQL uses DATEDIFF/LEAST/GREATEST, SQLite uses julianday/MIN/MAX.
+     */
+    private function overlapNightsExpression(string $checkOut, string $checkIn): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite'
+            ? "CAST(julianday(MIN({$checkOut}, ?)) - julianday(MAX({$checkIn}, ?)) AS INTEGER)"
+            : "DATEDIFF(LEAST({$checkOut}, ?), GREATEST({$checkIn}, ?))";
     }
 
     /**

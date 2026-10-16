@@ -27,7 +27,7 @@ beforeEach(function (): void {
 
     $this->vendor = User::create([
         'name' => 'Tour Vendor', 'email' => 'tour-vendor@test.local',
-        'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
+        'password' => bcrypt('password'), 'role' => 'guide', 'status' => 'active',
     ]);
     $this->customer = User::create([
         'name' => 'Tour Customer', 'email' => 'tour-customer@test.local',
@@ -224,9 +224,9 @@ test('customer and vendor can chat in booking thread, stranger cannot', function
 });
 
 test('messages track read/unread status on both sides', function (): void {
-    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'vendor', 'guard_name' => 'web']);
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'guide', 'guard_name' => 'web']);
     $this->vendor->forceFill(['email_verified_at' => now()])->save();
-    $this->vendor->assignRole('vendor');
+    $this->vendor->assignRole('guide');
 
     $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
         'tour_id' => $this->tour->id, 'slot_id' => $this->slot->id,
@@ -350,9 +350,9 @@ test('vendor tour-messages channel authorizes only the owning vendor', function 
 });
 
 test('tour message realtime events are dispatched on store, read and reply', function (): void {
-    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'vendor', 'guard_name' => 'web']);
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'guide', 'guard_name' => 'web']);
     $this->vendor->forceFill(['email_verified_at' => now()])->save();
-    $this->vendor->assignRole('vendor');
+    $this->vendor->assignRole('guide');
 
     $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
         'tour_id' => $this->tour->id, 'slot_id' => $this->slot->id,

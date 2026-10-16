@@ -9,17 +9,24 @@
     @php
         $segment = $segment ?? 'hotel';
     @endphp
+    @php
+        $isGuide = auth()->user()->role === \App\Enums\Role::GUIDE;
+    @endphp
     <ul class="nav nav-pills mb-3 gap-2">
+        @if(!$isGuide)
         <li class="nav-item">
             <a href="{{ route('admin.vendor.dashboard', ['segment' => 'hotel']) }}" class="nav-link {{ $segment === 'hotel' ? 'active' : '' }}">
                 <i class="mdi mdi-office-building me-1"></i>{{ __('admin.segment_hotel') }}
             </a>
         </li>
+        @endif
+        @if($isGuide)
         <li class="nav-item">
             <a href="{{ route('admin.vendor.dashboard', ['segment' => 'tour']) }}" class="nav-link {{ $segment === 'tour' ? 'active' : '' }}">
                 <i class="mdi mdi-map-marker-path me-1"></i>{{ __('admin.segment_tour') }}
             </a>
         </li>
+        @endif
     </ul>
 
     @php
@@ -175,10 +182,10 @@
                     <a href="{{ route('admin.vendor.bookings.index') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-calendar-multiple me-2"></i>{{ __('admin.sidebar.bookings') }}
                     </a>
-                    @endif
                     <a href="{{ route('admin.vendor.reports.index') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-chart-box-outline me-2"></i>{{ __('admin.sidebar.reports') }}
                     </a>
+                    @endif
                     <a href="{{ route('admin.vendor.payouts.index') }}" class="btn btn-outline-primary btn-sm text-start">
                         <i class="mdi mdi-bank-transfer me-2"></i>{{ __('admin.sidebar.payouts') }}
                     </a>

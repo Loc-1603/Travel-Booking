@@ -127,7 +127,9 @@ test('verifying a pending vendor registration creates the vendor account and pro
         ['id' => 'pending:'.$pending->uuid, 'hash' => sha1($pending->email)]
     );
 
-    $this->get($verificationUrl);
+    $response = $this->get($verificationUrl);
+
+    $response->assertRedirect(route('register.verify', ['portal' => 'vendor', 'verified' => 1]));
 
     $user = User::where('email', 'vendor@acme.test')->firstOrFail();
     expect($user->hasVerifiedEmail())->toBeTrue()

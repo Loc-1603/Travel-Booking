@@ -51,8 +51,7 @@ class VendorRegisteredUserController extends Controller
         Notification::route('mail', $pending->email)
             ->notify(new VerifyEmailNotification('pending:'.$pending->uuid, $pending->email));
 
-        return Redirect::route('login')
-            ->with('status', 'verification-sent')
-            ->with('info', __('auth.registration.check_email'));
+        return Redirect::route('register.verify', ['portal' => 'vendor'])
+            ->with('verify_email', $pending->email);
     }
 }

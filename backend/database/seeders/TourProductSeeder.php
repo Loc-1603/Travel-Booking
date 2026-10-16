@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Role;
 use App\Models\TourAvailabilitySlot;
 use App\Models\TourImage;
 use App\Models\TourProduct;
@@ -15,17 +16,20 @@ class TourProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $vendor = User::where('role', 'vendor')->first()
-            ?? User::where('email', 'like', '%vendor%')->first();
-        if (! $vendor) {
-            return;
+        $guide = User::where('role', Role::GUIDE->value)->first()
+            ?? User::firstOrCreate(
+                ['email' => 'guide-demo@test.com'],
+                ['name' => 'Demo Guide', 'password' => bcrypt('12345678'), 'role' => Role::GUIDE, 'status' => 'active', 'email_verified_at' => now()]
+            );
+        if (! $guide->hasRole('guide')) {
+            $guide->assignRole('guide');
         }
 
         $provider = TourProvider::firstOrCreate(
-            ['vendor_id' => $vendor->id],
+            ['vendor_id' => $guide->id],
             [
                 'province_id' => TourProvince::where('name', 'Hà Giang')->first()?->id,
-                'business_name' => $vendor->name,
+                'business_name' => $guide->name,
                 'bio' => 'Guide 1vs1: đề xuất lịch trình, dẫn và chở riêng theo giờ của bạn.',
                 'languages' => ['vi', 'en'],
                 'status' => 'approved',

@@ -11,10 +11,12 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 |--------------------------------------------------------------------------
 | Vendor inbox channel (tour messages)
 |--------------------------------------------------------------------------
-| Only the vendor who owns the given id may join to receive inbox updates.
+| Only the staff member (vendor or guide) who owns the given id may join
+| to receive inbox updates. Vendor is kept so live sessions don't break
+| before the M-1 data migration re-points tour providers to guides.
 */
 Broadcast::channel('vendor.{id}.tour-messages', function ($user, $id) {
-    return $user->role === Role::VENDOR && (int) $user->id === (int) $id;
+    return in_array($user->role, [Role::VENDOR, Role::GUIDE], true) && (int) $user->id === (int) $id;
 });
 
 /*

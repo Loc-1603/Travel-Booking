@@ -9,7 +9,7 @@ use App\Models\TourProvider;
 use App\Models\User;
 
 beforeEach(function (): void {
-    foreach (['super-admin', 'admin', 'vendor', 'customer'] as $role) {
+    foreach (['super-admin', 'admin', 'vendor', 'guide', 'customer'] as $role) {
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
     }
     $this->superAdmin = User::factory()->create([
@@ -17,11 +17,13 @@ beforeEach(function (): void {
         'password' => bcrypt('password'), 'role' => 'super_admin', 'status' => 'active',
     ]);
     $this->superAdmin->assignRole('super-admin');
+    // Strict split: the old "tour-only vendor" account is a guide; its
+    // providers are keyed by user id so ownership still resolves.
     $this->vendor = User::factory()->create([
         'name' => 'Tour Only Vendor', 'email' => 'dash-tour-vendor@test.local',
-        'password' => bcrypt('password'), 'role' => 'vendor', 'status' => 'active',
+        'password' => bcrypt('password'), 'role' => 'guide', 'status' => 'active',
     ]);
-    $this->vendor->assignRole('vendor');
+    $this->vendor->assignRole('guide');
     $this->customer = User::factory()->create([
         'name' => 'Cust', 'email' => 'dash-cust@test.local',
         'password' => bcrypt('password'), 'role' => 'customer', 'status' => 'active',
@@ -78,21 +80,21 @@ beforeEach(function (): void {
     ]);
 });
 
-test('vendor with no hotels auto-sees tour segment', function (): void {
-    // No ?segment: auto => tour (vendor has provider, no hotels)
+test('guide always sees the tour segment (strict split)', function (): void {
+    // No ?segment: forced tour for guides
     $this->actingAs($this->vendor)->get('/admin/vendor/dashboard')
         ->assertOk()
         ->assertSee(__('admin.total_tour_bookings'), false)
         ->assertSee('segment=tour', false);
 });
 
-test('vendor explicit hotel segment still works', function (): void {
+test('guide cannot switch to the hotel segment', function (): void {
     $this->actingAs($this->vendor)->get('/admin/vendor/dashboard?segment=hotel')
         ->assertOk()
-        ->assertSee(__('admin.total_bookings'), false);
+        ->assertSee(__('admin.total_tour_bookings'), false);
 });
 
-test('vendor tour segment shows only own tour revenue', function (): void {
+test('guide tour segment shows only own tour revenue', function (): void {
     $this->actingAs($this->vendor)->get('/admin/vendor/dashboard?segment=tour')
         ->assertOk()
         ->assertSee('400.000', false); // only completed 400k; confirmed/pending/cancelled excluded

@@ -7,10 +7,7 @@
                 <li class="menu-title" data-key="t-menu">{{ __('admin.sidebar.menu') }}</li>
 
                 @if(auth()->user()->role === \App\Enums\Role::VENDOR)
-                {{-- Vendor menu: Overview → Profile → Inventory → Operations → Finance → Support --}}
-                @php
-                    $unreadTourMessages = \App\Models\TourMessage::unreadForVendor(auth()->id());
-                @endphp
+                {{-- Vendor menu: Overview → Profile → Hotels → Finance → Support --}}
                 <li>
                     <a href="{{ route('admin.vendor.dashboard') }}">
                         <i data-feather="home"></i>
@@ -25,7 +22,6 @@
                 </li>
                 @php
                     $hotelActive = request()->routeIs('admin.vendor.hotels.*','admin.vendor.rooms.*','admin.vendor.bookings.*');
-                    $tourActive = request()->routeIs('admin.vendor.tours.*','admin.vendor.guide-profile.*','admin.vendor.tour-bookings.*','admin.vendor.tour-messages.*');
                 @endphp
                 <li class="{{ $hotelActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow {{ $hotelActive ? 'mm-active' : '' }}">
@@ -38,6 +34,36 @@
                         <li><a href="{{ route('admin.vendor.bookings.index') }}" class="{{ request()->routeIs('admin.vendor.bookings.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.bookings') }}</span></a></li>
                     </ul>
                 </li>
+                <li>
+                    <a href="{{ route('admin.vendor.reports.index') }}">
+                        <i data-feather="bar-chart-2"></i>
+                        <span>{{ __('admin.sidebar.reports') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.vendor.payouts.index') }}">
+                        <i data-feather="dollar-sign"></i>
+                        <span>{{ __('admin.sidebar.payouts') }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.vendor.support-tickets.index') }}">
+                        <i data-feather="help-circle"></i>
+                        <span>{{ __('admin.sidebar.support') }}</span>
+                    </a>
+                </li>
+                @elseif(auth()->user()->role === \App\Enums\Role::GUIDE)
+                {{-- Guide menu: Overview → Tour management → Finance → Support --}}
+                @php
+                    $tourActive = request()->routeIs('admin.vendor.guide-profile.*','admin.vendor.tour-bookings.*','admin.vendor.tour-messages.*');
+                    $unreadTourMessages = \App\Models\TourMessage::unreadForVendor(auth()->id());
+                @endphp
+                <li>
+                    <a href="{{ route('admin.vendor.dashboard') }}">
+                        <i data-feather="home"></i>
+                        <span>{{ __('admin.sidebar.dashboard') }}</span>
+                    </a>
+                </li>
                 <li class="{{ $tourActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow {{ $tourActive ? 'mm-active' : '' }}">
                         <i data-feather="map"></i>
@@ -49,12 +75,6 @@
                         <li><a href="{{ route('admin.vendor.tour-bookings.index') }}" class="{{ request()->routeIs('admin.vendor.tour-bookings.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_bookings') }}</span></a></li>
                         <li><a href="{{ route('admin.vendor.tour-messages.index') }}" class="{{ request()->routeIs('admin.vendor.tour-messages.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_messages') }}</span></a></li>
                     </ul>
-                </li>
-                <li>
-                    <a href="{{ route('admin.vendor.reports.index') }}">
-                        <i data-feather="bar-chart-2"></i>
-                        <span>{{ __('admin.sidebar.reports') }}</span>
-                    </a>
                 </li>
                 <li>
                     <a href="{{ route('admin.vendor.payouts.index') }}">

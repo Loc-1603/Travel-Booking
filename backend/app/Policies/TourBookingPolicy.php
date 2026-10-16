@@ -10,7 +10,7 @@ class TourBookingPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN, Role::VENDOR, Role::CUSTOMER], true);
+        return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN, Role::GUIDE, Role::CUSTOMER], true);
     }
 
     public function view(User $user, TourBooking $booking): bool
@@ -19,7 +19,7 @@ class TourBookingPolicy
             return true;
         }
 
-        if ($user->role === Role::VENDOR) {
+        if ($user->role === Role::GUIDE) {
             return (int) $booking->provider?->vendor_id === (int) $user->id;
         }
 
@@ -32,8 +32,8 @@ class TourBookingPolicy
 
     public function create(User $user): bool
     {
-        // Tour requires login (no guest flow). Vendors/admins may also book for testing.
-        return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN, Role::VENDOR, Role::CUSTOMER], true);
+        // Tour requires login (no guest flow). Guides/admins may also book for testing.
+        return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN, Role::GUIDE, Role::CUSTOMER], true);
     }
 
     public function cancel(User $user, TourBooking $booking): bool
