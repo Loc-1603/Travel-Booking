@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Enums\BookingStatus;
 use App\Models\Booking;
-use App\Models\BookingRoom;
+use App\Repositories\Contracts\BookingRepositoryInterface;
+use App\Repositories\Contracts\BookingRoomRepositoryInterface;
+use App\Repositories\Contracts\RoomRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class BookingService
@@ -12,6 +14,9 @@ class BookingService
     public function __construct(
         protected AvailabilityService $availabilityService,
         protected PricingService $pricingService,
+        protected BookingRepositoryInterface $bookings,
+        protected BookingRoomRepositoryInterface $bookingRooms,
+        protected RoomRepositoryInterface $rooms,
     ) {}
 
     /**
@@ -59,9 +64,6 @@ class BookingService
         }
 
         return DB::transaction(function () use ($customerId, $hotelId, $roomQuantities, $checkIn, $checkOut, $couponCode, $guestEmail, $guestName, $lateCheckout) {
-            foreach (array_keys($roomQuantities) as $roomId) {
-                $this->availabilityService->ensureAvailabilityRows($roomId, $checkIn, $checkOut);
-            }
             foreach ($roomQuantities as $roomId => $quantity) {
                 $this->availabilityService->ensureAvailabilityRows($roomId, $checkIn, $checkOut);
                 $min = $this->availabilityService->getMinimumAvailability($roomId, $checkIn, $checkOut);
@@ -85,7 +87,7 @@ class BookingService
             }
 
             try {
-                $booking = Booking::create([
+                $booking = $this->bookings->create([
                     'customer_id' => $customerId,
                     'guest_email' => $customerId === null ? $guestEmail : null,
                     'guest_name' => $customerId === null ? $guestName : null,
@@ -102,12 +104,12 @@ class BookingService
                     'tax_amount' => $breakdown->tax,
                 ]);
 
-                $room = \App\Models\Room::find(array_key_first($roomQuantities));
+                $room = $this->rooms->findById((int) array_key_first($roomQuantities));
                 $unitPrice = $room ? $room->base_price : $breakdown->total / max(1, array_sum($roomQuantities));
                 foreach ($roomQuantities as $roomId => $quantity) {
-                    $r = \App\Models\Room::find($roomId);
+                    $r = $this->rooms->findById((int) $roomId);
                     $up = $r ? $r->base_price : $unitPrice;
-                    BookingRoom::create([
+                    $this->bookingRooms->create([
                         'booking_id' => $booking->id,
                         'room_id' => $roomId,
                         'quantity' => $quantity,
@@ -135,7 +137,7 @@ class BookingService
             throw new \RuntimeException('Only confirmed bookings can be marked as completed.');
         }
 
-        $booking->update(['status' => BookingStatus::COMPLETED->value]);
+        $this->bookings->update($booking, ['status' => BookingStatus::COMPLETED->value]);
     }
 
     /**
@@ -154,7 +156,7 @@ class BookingService
             $checkOutStr = $booking->check_out instanceof \Carbon\Carbon
                 ? $booking->check_out->format('Y-m-d')
                 : $booking->check_out;
-            $booking->bookingRooms->each(function (BookingRoom $br) use ($checkInStr, $checkOutStr) {
+            $booking->bookingRooms->each(function ($br) use ($checkInStr, $checkOutStr) {
                 $this->availabilityService->releaseInventory(
                     $br->room_id,
                     $br->quantity,
@@ -162,7 +164,7 @@ class BookingService
                     $checkOutStr
                 );
             });
-            $booking->update(['status' => BookingStatus::CANCELLED->value]);
+            $this->bookings->update($booking, ['status' => BookingStatus::CANCELLED->value]);
         });
     }
 }

@@ -7,7 +7,7 @@ use App\Jobs\ProcessTourIpn;
 use App\Jobs\ProcessVnpayIpn;
 use App\Models\Payment;
 use App\Models\TourPayment;
-use App\Models\WebhookEvent;
+use App\Repositories\Contracts\WebhookEventRepositoryInterface;
 use App\Services\TourVnpayAdapter;
 use App\Services\VnpayService;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -33,6 +33,7 @@ class UnifiedVnpayIpnController extends BaseApiController
     public function __construct(
         protected VnpayService $vnpay,
         protected TourVnpayAdapter $tours,
+        protected WebhookEventRepositoryInterface $events,
     ) {}
 
     public function __invoke(Request $request): JsonResponse
@@ -70,7 +71,7 @@ class UnifiedVnpayIpnController extends BaseApiController
         $prefix = $isTour ? 'tour:vnpay:' : 'vnpay:';
         $eventId = $prefix.($input['vnp_TxnRef'] ?? '').':'.($input['vnp_TransactionNo'] ?? '');
         try {
-            WebhookEvent::create([
+            $this->events->create([
                 'provider' => 'vnpay',
                 'event_id' => $eventId,
             ]);

@@ -7,12 +7,16 @@ use App\Enums\PaymentStatus;
 use App\Events\PaymentConfirmed;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Repositories\Contracts\BookingRepositoryInterface;
+use App\Repositories\Contracts\PaymentRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class PaymentService
 {
     public function __construct(
         protected VnpayService $vnpay,
+        protected PaymentRepositoryInterface $payments,
+        protected BookingRepositoryInterface $bookings,
     ) {}
 
     /**
@@ -42,10 +46,10 @@ class PaymentService
         }
 
         DB::transaction(function () use ($payment) {
-            $payment->update(['status' => PaymentStatus::COMPLETED->value]);
+            $this->payments->update($payment, ['status' => PaymentStatus::COMPLETED->value]);
             $booking = $payment->booking;
             if ($booking && $booking->status !== BookingStatus::CONFIRMED->value) {
-                $booking->update(['status' => BookingStatus::CONFIRMED->value]);
+                $this->bookings->update($booking, ['status' => BookingStatus::CONFIRMED->value]);
             }
         });
 
@@ -66,7 +70,7 @@ class PaymentService
         if ($note !== null) {
             $payload['failure_note'] = $note;
         }
-        $payment->update(['status' => PaymentStatus::FAILED->value, 'payload' => $payload]);
+        $this->payments->update($payment, ['status' => PaymentStatus::FAILED->value, 'payload' => $payload]);
     }
 
     /**

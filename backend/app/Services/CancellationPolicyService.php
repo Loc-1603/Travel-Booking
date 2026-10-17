@@ -9,6 +9,10 @@ use Illuminate\Support\Carbon;
 /**
  * Computes refund amount and human-readable summary from hotel/room cancellation policies.
  *
+ * S-6 review: no repository needed — this service never queries the DB.
+ * It only reads relations already loaded on the Booking passed in
+ * (`loadMissing` reuses loaded relations, no new query when present).
+ *
  * Policy JSON shape (on hotel or room):
  * - type: "non_refundable" | "free_until_hours" | "rules"
  * - hours: int (for free_until_hours: cancel at least this many hours before check-in for 100% refund)

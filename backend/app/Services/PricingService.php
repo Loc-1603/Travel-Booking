@@ -3,15 +3,18 @@
 namespace App\Services;
 
 use App\DTOs\PriceBreakdown;
-use App\Models\Hotel;
-use App\Models\Room;
-use App\Models\RoomAvailability;
+use App\Repositories\Contracts\HotelRepositoryInterface;
+use App\Repositories\Contracts\RoomAvailabilityRepositoryInterface;
+use App\Repositories\Contracts\RoomRepositoryInterface;
 use Carbon\CarbonPeriod;
 
 class PricingService
 {
     public function __construct(
         protected CouponService $couponService,
+        protected RoomRepositoryInterface $rooms,
+        protected RoomAvailabilityRepositoryInterface $availability,
+        protected HotelRepositoryInterface $hotels,
     ) {}
 
     /**
@@ -34,11 +37,11 @@ class PricingService
         $period = CarbonPeriod::create($checkIn, $checkOut)->excludeEndDate();
 
         foreach ($roomQuantities as $roomId => $quantity) {
-            $room = Room::findOrFail($roomId);
+            $room = $this->rooms->findOrFail($roomId);
+            $rows = $this->availability->mapForRangeByDate($roomId, $checkIn, $checkOut);
             foreach ($period as $date) {
-                $av = RoomAvailability::where('room_id', $roomId)
-                    ->whereDate('date', $date)
-                    ->first();
+                $key = $date->format('Y-m-d');
+                $av = $rows[$key] ?? null;
                 $pricePerNight = $av && $av->price_override !== null
                     ? (float) $av->price_override
                     : (float) $room->base_price;
@@ -49,7 +52,7 @@ class PricingService
         $nights = $period->count();
         [$discount, $coupon] = $this->applyDiscounts($subtotal, $checkIn, $checkOut, $nights, $couponCode, $hotelId, $roomQuantities, $userId);
 
-        $hotel = Hotel::with('countryRelation')->find($hotelId);
+        $hotel = $this->hotels->findById($hotelId, ['countryRelation']);
         $addOnAmount = 0.0;
         if ($lateCheckout && $hotel && $hotel->late_checkout_price !== null) {
             $addOnAmount = (float) $hotel->late_checkout_price;
@@ -117,13 +120,14 @@ class PricingService
 
     protected function getTaxRateForHotel(int $hotelId): float
     {
-        $hotel = Hotel::with('countryRelation')->find($hotelId);
+        $hotel = $this->hotels->findById($hotelId, ['countryRelation']);
         if ($hotel && $hotel->tax_rate !== null) {
             return (float) $hotel->tax_rate;
         }
         if ($hotel?->countryRelation && $hotel->countryRelation->tax_rate !== null) {
             return (float) $hotel->countryRelation->tax_rate;
         }
+
         return (float) config('booking.default_tax_rate', 0);
     }
 }

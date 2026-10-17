@@ -2,27 +2,30 @@
 
 namespace App\Services;
 
-use App\Models\Room;
-use App\Models\RoomAvailability;
+use App\Repositories\Contracts\RoomAvailabilityRepositoryInterface;
+use App\Repositories\Contracts\RoomRepositoryInterface;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 
 class AvailabilityService
 {
+    public function __construct(
+        protected RoomRepositoryInterface $rooms,
+        protected RoomAvailabilityRepositoryInterface $availability,
+    ) {}
+
     /**
      * Get minimum available room count for a room over a date range.
      * Uses room_availability; missing dates fall back to room.total_rooms.
      */
     public function getMinimumAvailability(int $roomId, string $checkIn, string $checkOut): int
     {
-        $room = Room::findOrFail($roomId);
+        $room = $this->rooms->findOrFail($roomId);
         $period = CarbonPeriod::create($checkIn, $checkOut)->excludeEndDate();
         $min = PHP_INT_MAX;
 
         foreach ($period as $date) {
-            $av = RoomAvailability::where('room_id', $roomId)
-                ->whereDate('date', $date)
-                ->first();
+            $av = $this->availability->findForDate($roomId, $date->format('Y-m-d'));
             $min = min($min, $av ? (int) $av->available_rooms : $room->total_rooms);
         }
 
@@ -34,11 +37,8 @@ class AvailabilityService
      */
     public function getAvailabilityForRange(int $roomId, string $checkIn, string $checkOut): array
     {
-        $room = Room::findOrFail($roomId);
-        $rows = RoomAvailability::where('room_id', $roomId)
-            ->whereBetween('date', [$checkIn, $checkOut])
-            ->get()
-            ->keyBy(fn ($r) => $r->date->format('Y-m-d'));
+        $room = $this->rooms->findOrFail($roomId);
+        $rows = $this->availability->mapForRangeByDate($roomId, $checkIn, $checkOut);
 
         $result = [];
         $period = CarbonPeriod::create($checkIn, $checkOut)->excludeEndDate();
@@ -46,6 +46,7 @@ class AvailabilityService
             $key = $date->format('Y-m-d');
             $result[$key] = isset($rows[$key]) ? (int) $rows[$key]->available_rooms : $room->total_rooms;
         }
+
         return $result;
     }
 
@@ -54,12 +55,13 @@ class AvailabilityService
      */
     public function ensureAvailabilityRows(int $roomId, string $checkIn, string $checkOut): void
     {
-        $room = Room::findOrFail($roomId);
+        $room = $this->rooms->findOrFail($roomId);
         $period = CarbonPeriod::create($checkIn, $checkOut)->excludeEndDate();
 
         foreach ($period as $date) {
-            RoomAvailability::firstOrCreate(
-                ['room_id' => $roomId, 'date' => $date->format('Y-m-d')],
+            $this->availability->firstOrCreateForDate(
+                $roomId,
+                $date->format('Y-m-d'),
                 ['available_rooms' => $room->total_rooms]
             );
         }
@@ -73,15 +75,13 @@ class AvailabilityService
     {
         $period = CarbonPeriod::create($checkIn, $checkOut)->excludeEndDate();
         foreach ($period as $date) {
-            $av = RoomAvailability::where('room_id', $roomId)
-                ->whereDate('date', $date)
-                ->lockForUpdate()
-                ->first();
+            $day = $date->format('Y-m-d');
+            $av = $this->availability->findForDateLocked($roomId, $day);
             if (! $av) {
-                throw new \RuntimeException("No availability row for room {$roomId} on {$date->format('Y-m-d')}. Call ensureAvailabilityRows first.");
+                throw new \RuntimeException("No availability row for room {$roomId} on {$day}. Call ensureAvailabilityRows first.");
             }
             if ($av->available_rooms < $quantity) {
-                throw new \RuntimeException("Insufficient availability for room {$roomId} on {$date->format('Y-m-d')}.");
+                throw new \RuntimeException("Insufficient availability for room {$roomId} on {$day}.");
             }
             $av->decrement('available_rooms', $quantity);
         }
@@ -94,9 +94,7 @@ class AvailabilityService
     {
         $period = CarbonPeriod::create($checkIn, $checkOut)->excludeEndDate();
         foreach ($period as $date) {
-            RoomAvailability::where('room_id', $roomId)
-                ->whereDate('date', $date)
-                ->increment('available_rooms', $quantity);
+            $this->availability->incrementAvailable($roomId, $date->format('Y-m-d'), $quantity);
         }
     }
 
@@ -113,13 +111,11 @@ class AvailabilityService
             return [];
         }
 
-        $rows = RoomAvailability::whereBetween('date', [min($dates), max($dates)])
-            ->get()
-            ->groupBy('room_id');
+        $rows = $this->availability->listForDateRange(min($dates), max($dates))->groupBy('room_id');
 
-        $roomIds = Room::pluck('total_rooms', 'id');
+        $roomTotals = $this->rooms->totalRoomsById();
         $result = [];
-        foreach ($roomIds as $roomId => $totalRooms) {
+        foreach ($roomTotals as $roomId => $totalRooms) {
             $avail = $rows->get($roomId);
             $min = PHP_INT_MAX;
             foreach ($dates as $date) {
@@ -130,6 +126,7 @@ class AvailabilityService
                 $result[] = $roomId;
             }
         }
+
         return $result;
     }
 }

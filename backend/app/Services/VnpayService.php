@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Repositories\Contracts\PaymentRepositoryInterface;
 use Illuminate\Support\Str;
 
 /**
@@ -16,6 +17,9 @@ use Illuminate\Support\Str;
  */
 class VnpayService
 {
+    public function __construct(
+        protected PaymentRepositoryInterface $payments,
+    ) {}
     public function isConfigured(): bool
     {
         return $this->tmnCode() !== '' && $this->hashSecret() !== '';
@@ -56,7 +60,7 @@ class VnpayService
         // suffix, so two attempts within the same second never share a TxnRef.
         $txnRef = $booking->id.'_'.now()->format('YmdHis').'_'.Str::upper(Str::random(4));
 
-        $payment = Payment::create([
+        $payment = $this->payments->create([
             'booking_id' => $booking->id,
             'amount' => $amountVnd,
             'currency' => 'VND',
@@ -122,9 +126,7 @@ class VnpayService
             return null;
         }
 
-        return Payment::where('provider', 'vnpay')
-            ->where('external_id', $txnRef)
-            ->first();
+        return $this->payments->findByTxnRef($txnRef, 'vnpay');
     }
 
     /**
@@ -149,7 +151,7 @@ class VnpayService
 
         $payload = $payment->payload ?? [];
         $payload['vnp_transaction_no'] = $transactionNo;
-        $payment->update(['payload' => $payload]);
+        $this->payments->update($payment, ['payload' => $payload]);
     }
 
     protected function returnUrl(Booking $booking): string

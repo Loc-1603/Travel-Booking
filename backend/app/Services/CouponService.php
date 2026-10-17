@@ -3,9 +3,14 @@
 namespace App\Services;
 
 use App\Models\Coupon;
+use App\Repositories\Contracts\CouponRepositoryInterface;
 
 class CouponService
 {
+    public function __construct(
+        protected CouponRepositoryInterface $coupons,
+    ) {}
+
     /**
      * Validate coupon and return discount amount for given context.
      * Returns [discountAmount, coupon] or [0, null] if invalid.
@@ -22,7 +27,7 @@ class CouponService
         int $nights,
         ?int $userId = null,
     ): array {
-        $coupon = Coupon::where('code', strtoupper($code))->where('is_active', true)->first();
+        $coupon = $this->coupons->findActiveByCode($code);
         if (! $coupon) {
             return [0.0, null];
         }
@@ -54,17 +59,18 @@ class CouponService
         }
 
         if ($coupon->usage_limit_total !== null) {
-            if ($coupon->redemptionCount() >= $coupon->usage_limit_total) {
+            if ($this->coupons->redemptionCount($coupon) >= $coupon->usage_limit_total) {
                 return [0.0, null];
             }
         }
         if ($userId !== null && $coupon->usage_limit_per_user !== null) {
-            if ($coupon->redemptionCountForUser($userId) >= $coupon->usage_limit_per_user) {
+            if ($this->coupons->redemptionCountForUser($coupon, $userId) >= $coupon->usage_limit_per_user) {
                 return [0.0, null];
             }
         }
 
         $discount = $this->computeDiscount($coupon, $subtotal);
+
         return [$discount, $coupon];
     }
 
@@ -73,8 +79,10 @@ class CouponService
         $value = (float) $coupon->value;
         if ($coupon->type === Coupon::TYPE_PERCENTAGE) {
             $value = min(100, max(0, $value));
+
             return round($subtotal * ($value / 100), 2);
         }
+
         return round(min($value, $subtotal), 2);
     }
 }

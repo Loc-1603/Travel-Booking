@@ -8,6 +8,22 @@ use App\Events\SupportTicketReplyCreated;
 use App\Listeners\SendBookingConfirmationNotification;
 use App\Listeners\SendBookingDisputeAdminNotification;
 use App\Listeners\SendSupportTicketReplyNotification;
+use App\Repositories\Contracts\BookingRepositoryInterface;
+use App\Repositories\Contracts\BookingRoomRepositoryInterface;
+use App\Repositories\Contracts\CouponRepositoryInterface;
+use App\Repositories\Contracts\HotelRepositoryInterface;
+use App\Repositories\Contracts\PaymentRepositoryInterface;
+use App\Repositories\Contracts\RoomAvailabilityRepositoryInterface;
+use App\Repositories\Contracts\RoomRepositoryInterface;
+use App\Repositories\Contracts\WebhookEventRepositoryInterface;
+use App\Repositories\Eloquent\EloquentBookingRepository;
+use App\Repositories\Eloquent\EloquentBookingRoomRepository;
+use App\Repositories\Eloquent\EloquentCouponRepository;
+use App\Repositories\Eloquent\EloquentHotelRepository;
+use App\Repositories\Eloquent\EloquentPaymentRepository;
+use App\Repositories\Eloquent\EloquentRoomAvailabilityRepository;
+use App\Repositories\Eloquent\EloquentRoomRepository;
+use App\Repositories\Eloquent\EloquentWebhookEventRepository;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
@@ -21,7 +37,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(BookingRepositoryInterface::class, EloquentBookingRepository::class);
+        $this->app->bind(BookingRoomRepositoryInterface::class, EloquentBookingRoomRepository::class);
+        $this->app->bind(RoomRepositoryInterface::class, EloquentRoomRepository::class);
+        $this->app->bind(RoomAvailabilityRepositoryInterface::class, EloquentRoomAvailabilityRepository::class);
+        $this->app->bind(HotelRepositoryInterface::class, EloquentHotelRepository::class);
+        $this->app->bind(CouponRepositoryInterface::class, EloquentCouponRepository::class);
+        $this->app->bind(PaymentRepositoryInterface::class, EloquentPaymentRepository::class);
+        $this->app->bind(WebhookEventRepositoryInterface::class, EloquentWebhookEventRepository::class);
     }
 
     /**
