@@ -194,9 +194,7 @@
     </p>
 
     @php
-        $viewBookingUrl = $booking->isGuest()
-            ? \Illuminate\Support\Facades\URL::temporarySignedRoute('api.v1.bookings.guest-view', now()->addDays(30), ['uuid' => $booking->uuid])
-            : rtrim(config('app.frontend_url', config('app.url')), '/') . '/checkout/' . $booking->uuid;
+        $viewBookingUrl = rtrim(config('app.frontend_url', config('app.url')), '/') . '/checkout/' . $booking->uuid;
         $qrCodeDataUri = qrCodeDataUri($viewBookingUrl, 120);
     @endphp
     <div style="margin-top: 24px; padding: 16px; border: 1px solid #e7e5e4; border-radius: 8px; display: inline-block;">

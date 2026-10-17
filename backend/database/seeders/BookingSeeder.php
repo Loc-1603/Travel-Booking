@@ -45,7 +45,7 @@ class BookingSeeder extends Seeder
                     'email_verified_at' => now(),
                 ]
             );
-            if (!$customer->hasRole('customer')) {
+            if (! $customer->hasRole('customer')) {
                 $customer->assignRole('customer');
             }
         }
@@ -65,7 +65,7 @@ class BookingSeeder extends Seeder
             $room = $hotel->rooms->random();
             $customer = $allCustomers->random();
 
-            if (!$room) {
+            if (! $room) {
                 continue;
             }
 
@@ -120,7 +120,6 @@ class BookingSeeder extends Seeder
                         'Would definitely stay again.',
                         'Good value for money.',
                     ])],
-                    'approved' => (bool) rand(0, 1),
                 ]);
             }
         }
@@ -131,7 +130,7 @@ class BookingSeeder extends Seeder
             $room = $hotel->rooms->random();
             $customer = $allCustomers->random();
 
-            if (!$room) {
+            if (! $room) {
                 continue;
             }
 
@@ -174,7 +173,7 @@ class BookingSeeder extends Seeder
             $room = $hotel->rooms->random();
             $customer = $allCustomers->random();
 
-            if (!$room) {
+            if (! $room) {
                 continue;
             }
 
@@ -207,7 +206,7 @@ class BookingSeeder extends Seeder
             $room = $hotel->rooms->random();
             $customer = $allCustomers->random();
 
-            if (!$room) {
+            if (! $room) {
                 continue;
             }
 

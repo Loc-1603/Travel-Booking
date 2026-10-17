@@ -24,7 +24,7 @@ import { HotelCard } from '../components/HotelCard';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useTranslation } from 'react-i18next';
 
-function LocationCard({ to, name, subtext, image, className = '' }) {
+function LocationCard({ to, name, subtext, image, cta = 'View stays', className = '' }) {
   return (
     <Link
       to={to}
@@ -57,7 +57,7 @@ function LocationCard({ to, name, subtext, image, className = '' }) {
           </span>
           <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-white/90 group-hover:text-[#f9edd1] transition-colors">
             <span className="h-px w-8 bg-[#b8860b] group-hover:w-10 transition-all" />
-            View stays
+            {cta}
             <ArrowRight className="w-4 h-4 text-[#c9a227] group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
@@ -166,6 +166,16 @@ export default function Home() {
     },
   });
 
+  const { data: tourProvincesData, isLoading: tourProvincesLoading } = useQuery({
+    queryKey: ['tour-provinces'],
+    queryFn: async () => {
+      const res = await api.get('/tour-provinces');
+      if (!res.data?.success) throw new Error('Failed to load');
+      return res.data;
+    },
+    staleTime: 5 * 60_000,
+  });
+
   const { data: hotelsData, isLoading: hotelsLoading } = useQuery({
     queryKey: ['hotels', 'home'],
     queryFn: async () => {
@@ -188,6 +198,10 @@ export default function Home() {
   const cities = useMemo(() => (Array.isArray(citiesData) ? citiesData : []), [citiesData]);
   const countries = useMemo(() => (Array.isArray(countriesData) ? countriesData : []), [countriesData]);
   const hotels = Array.isArray(hotelsData) ? hotelsData : [];
+  const tourProvinces = useMemo(
+    () => (Array.isArray(tourProvincesData?.data) ? tourProvincesData.data : []),
+    [tourProvincesData]
+  );
   const recItems = Array.isArray(recPayload?.data) ? recPayload.data : [];
   const recTagline = recPayload?.tagline;
 
@@ -398,6 +412,52 @@ export default function Home() {
                   name={c.name}
                   subtext={c.country_name}
                   image={c.image}
+                />
+              ))
+            )}
+          </div>
+        </section>
+
+        {/* Popular Tour Provinces */}
+        <section aria-labelledby="popular-tour-provinces-heading" className="relative">
+          <div className="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#b8860b]/40 to-transparent" aria-hidden />
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 sm:mb-12">
+            <div className="max-w-2xl">
+              <p className="text-[#b8860b] text-xs font-semibold tracking-[0.22em] uppercase mb-3">
+                {t('home.tourProvinces.label')}
+              </p>
+              <h2
+                id="popular-tour-provinces-heading"
+                className="font-serif text-3xl sm:text-4xl font-semibold text-[#1a1a1a] tracking-tight mb-3"
+              >
+                {t('home.tourProvinces.title')}
+              </h2>
+              <p className="text-[#5c5852] text-base sm:text-lg leading-relaxed">
+                {t('home.tourProvinces.description')}
+              </p>
+            </div>
+            <Link
+              to="/tours"
+              className="inline-flex items-center gap-2 self-start lg:self-auto shrink-0 px-5 py-3 rounded-xl border border-[#e8e4dd] bg-white text-[#1a1a1a] text-sm font-semibold hover:border-[#b8860b]/50 hover:bg-[#faf8f5] transition-all shadow-[0_2px_8px_rgb(26_26_26_/0.04)]"
+            >
+              {t('home.tourProvinces.browseAll')}
+              <ArrowRight className="w-4 h-4 text-[#b8860b]" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+            {tourProvincesLoading || tourProvinces.length === 0 ? (
+              [...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="aspect-[4/5] sm:aspect-[3/4] rounded-3xl" />
+              ))
+            ) : (
+              tourProvinces.slice(0, 8).map((p) => (
+                <LocationCard
+                  key={p.id}
+                  to={`/tours/province/${p.slug}`}
+                  name={p.name}
+                  subtext={`${p.tours_count ?? 0} ${t('tours.provinces.tours')}`}
+                  image={p.image}
+                  cta={t('home.tourProvinces.cta')}
                 />
               ))
             )}

@@ -3,20 +3,20 @@
 namespace Database\Seeders;
 
 use App\Enums\Role;
+use App\Models\Review;
 use App\Models\TourAvailabilitySlot;
 use App\Models\TourBooking;
 use App\Models\TourImage;
 use App\Models\TourProduct;
 use App\Models\TourProvider;
 use App\Models\TourProvince;
-use App\Models\TourReview;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 /**
  * Demo data for Hà Giang 1vs1 tours: 10 guides, each with tours,
- * 14 days of free slots and at least 2 approved reviews.
+ * 14 days of free slots and at least 2 visible reviews.
  * Idempotent: safe to re-run (top-ups only, no duplicates).
  */
 class TourHaGiangDemoSeeder extends Seeder
@@ -287,10 +287,10 @@ class TourHaGiangDemoSeeder extends Seeder
      */
     protected function seedReviews(TourProvider $provider, TourProduct $tour, int $provinceId, array $customers, array $ratings, int $seedIndex): void
     {
-        $approvedCount = TourReview::where('approved', true)->where('hidden', false)
-            ->whereHas('booking', fn ($q) => $q->where('provider_id', $provider->id))
+        $visibleCount = Review::where('hidden', false)
+            ->whereHas('tourBooking', fn ($q) => $q->where('provider_id', $provider->id))
             ->count();
-        if ($approvedCount >= count($ratings)) {
+        if ($visibleCount >= count($ratings)) {
             return;
         }
 
@@ -322,13 +322,12 @@ class TourHaGiangDemoSeeder extends Seeder
             );
 
             $comments = $this->reviewComments[$rating] ?? ['Ổn.'];
-            TourReview::firstOrCreate(
+            Review::firstOrCreate(
                 ['tour_booking_id' => $booking->id],
                 [
                     'tour_booking_id' => $booking->id,
                     'rating' => $rating,
                     'comment' => $comments[($seedIndex + $k) % count($comments)],
-                    'approved' => true,
                     'hidden' => false,
                 ]
             );
