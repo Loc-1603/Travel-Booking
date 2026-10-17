@@ -169,6 +169,13 @@
       "description": "Từ Hà Nội, Đà Nẵng đến TP.HCM và Phú Quốc — những thành phố được tuyển chọn nơi du khách yêu thích lưu trú.",
       "browseAll": "Xem tất cả thành phố"
     },
+    "tourProvinces": {
+      "label": "Tour 1 kèm 1",
+      "title": "Tỉnh thành tour phổ biến",
+      "description": "Tour riêng 1 kèm 1 khắp các tỉnh thành Việt Nam — chọn điểm đến và gặp hướng dẫn viên địa phương.",
+      "browseAll": "Xem tất cả tour",
+      "cta": "Xem tour"
+    },
     "trust": {
       "label": "Mong đợi",
       "title": "Tiêu chuẩn phía sau chuyến lưu trú của bạn",
@@ -372,7 +379,6 @@
     },
     "step2": {
       "title": "Thông tin khách",
-      "guestNote": "Đặt phòng làm khách — không cần tài khoản. Chúng tôi sẽ gửi xác nhận và liên kết xem đặt phòng qua email.",
       "name": "Tên của bạn",
       "namePlaceholder": "Ví dụ: Nguyễn Văn An",
       "email": "Email",
@@ -869,7 +875,9 @@
       "view": "Xem",
       "invoice": "Hóa đơn",
       "reportIssue": "Báo cáo vấn đề",
-      "cancel": "Hủy"
+      "cancel": "Hủy",
+      "writeReview": "Viết đánh giá",
+      "reviewed": "Đã đánh giá"
     },
     "dispute": {
       "title": "Báo cáo vấn đề",

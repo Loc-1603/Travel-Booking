@@ -2,12 +2,12 @@
 
 use App\Enums\TourBookingStatus;
 use App\Models\Country;
+use App\Models\Review;
 use App\Models\TourAvailabilitySlot;
 use App\Models\TourBooking;
 use App\Models\TourProduct;
-use App\Models\TourProvince;
 use App\Models\TourProvider;
-use App\Models\TourReview;
+use App\Models\TourProvince;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -74,7 +74,7 @@ test('review requires confirmed state and is one per booking', function (): void
     ])->assertNotFound();
 });
 
-test('review accepts up to 5 images and exposes them in the list', function (): void {
+test('review accepts up to 5 images and exposes them in the list immediately', function (): void {
     \Illuminate\Support\Facades\Storage::fake('public');
 
     $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
@@ -114,13 +114,12 @@ test('review accepts up to 5 images and exposes them in the list', function (): 
     $tooMany['tour_booking_id'] = $booking2->id;
     $this->actingAs($this->customer)->post('/api/v1/tour-reviews', $tooMany)->assertStatus(422);
 
-    // List công khai kèm images sau khi duyệt.
-    TourReview::where('tour_booking_id', $booking->id)->update(['approved' => true]);
+    // List công khai kèm images ngay sau khi gửi (không cần duyệt).
     $list = $this->getJson('/api/v1/tour-reviews?tour_uuid='.$this->tour->uuid)->assertOk();
     expect($list->json('data.data.0.images'))->toHaveCount(2);
 });
 
-test('public review list only shows approved and visible', function (): void {
+test('review is published immediately and only hidden reviews are excluded', function (): void {
     $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings', [
         'tour_id' => $this->tour->id, 'slot_id' => $this->slot->id,
         'pricing_mode' => 'hour', 'duration_value' => 2,
@@ -129,24 +128,27 @@ test('public review list only shows approved and visible', function (): void {
     $booking->update(['status' => TourBookingStatus::COMPLETED->value]);
 
     $this->actingAs($this->customer)->postJson('/api/v1/tour-reviews', [
-        'tour_booking_id' => $booking->id, 'rating' => 5, 'comment' => 'Pending moderation',
+        'tour_booking_id' => $booking->id, 'rating' => 5, 'comment' => 'Published immediately',
     ])->assertCreated();
 
-    // Not approved yet -> public list empty
-    $this->getJson('/api/v1/tour-reviews?tour_uuid='.$this->tour->uuid)
-        ->assertOk()
-        ->assertJsonPath('data.meta.total', 0);
-
-    TourReview::where('tour_booking_id', $booking->id)->update(['approved' => true]);
-
+    // Hiển thị ngay, không cần duyệt.
     $this->getJson('/api/v1/tour-reviews?tour_uuid='.$this->tour->uuid)
         ->assertOk()
         ->assertJsonPath('data.meta.total', 1)
         ->assertJsonPath('data.data.0.rating', 5);
 
-    // Hidden -> excluded again
-    TourReview::where('tour_booking_id', $booking->id)->update(['hidden' => true]);
+    // Stats/min_rating của tour cũng tính ngay.
+    $this->getJson('/api/v1/tours?province_slug=hoi-an-review&min_rating=5')
+        ->assertOk()
+        ->assertJsonPath('data.meta.total', 1);
+
+    // Admin ẩn -> loại khỏi danh sách công khai.
+    Review::where('tour_booking_id', $booking->id)->update(['hidden' => true]);
     $this->getJson('/api/v1/tour-reviews?tour_uuid='.$this->tour->uuid)
+        ->assertOk()
+        ->assertJsonPath('data.meta.total', 0);
+
+    $this->getJson('/api/v1/tours?province_slug=hoi-an-review&min_rating=5')
         ->assertOk()
         ->assertJsonPath('data.meta.total', 0);
 });

@@ -12,8 +12,8 @@ import { TourGallery } from '../components/TourGallery';
 import { TourPriceSummary } from '../components/TourPriceSummary';
 import { getTourFromPrice, getTourPriceParts } from '../lib/tourSearch';
 import { TourChatBox } from '../components/TourChatBox';
-import { TourReviewForm } from '../components/TourReviewForm';
-import { TourReviewList } from '../components/TourReviewList';
+import { ReviewForm } from '../components/ReviewForm';
+import { ReviewList } from '../components/ReviewList';
 import GuideAvatar from '../components/GuideAvatar';
 import { formatPrice, getRatingLabel } from '../lib/utils';
 
@@ -203,9 +203,9 @@ export default function TourDetail() {
           {/* Reviews */}
           <div className="mt-6 space-y-4">
             <h2 className="font-semibold text-neutral-900">{t('tours.reviews.title')}</h2>
-            <TourReviewList tourUuid={uuid} />
-            {myBooking && ['confirmed', 'ongoing', 'completed'].includes(myBooking.status) && (
-              <TourReviewForm tourBookingId={myBooking.id} />
+            <ReviewList tourUuid={uuid} />
+            {myBooking && ['confirmed', 'ongoing', 'completed'].includes(myBooking.status) && !myBooking.has_review && (
+              <ReviewForm tourBookingId={myBooking.id} />
             )}
           </div>
         </div>

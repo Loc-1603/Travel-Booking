@@ -125,7 +125,7 @@ class DownloadCityImages extends Command
         ]);
 
         $response = Http::timeout(15)
-            ->withHeaders(['User-Agent' => 'HotelBooking/1.0 (https://github.com/hotelbooking; contact@example.com)'])
+            ->withHeaders(['User-Agent' => 'TravelBooking/1.0 (https://github.com/travelbooking; contact@example.com)'])
             ->get($url);
         if (!$response->successful()) {
             return null;
@@ -186,7 +186,7 @@ class DownloadCityImages extends Command
             $opts = [
                 'http' => [
                     'timeout' => 30,
-                    'user_agent' => 'HotelBooking/1.0 (Hotel booking; +https://example.com) PHP/' . PHP_VERSION,
+                    'user_agent' => 'TravelBooking/1.0 (Hotel booking; +https://example.com) PHP/' . PHP_VERSION,
                     'header' => "Accept: image/*\r\n",
                 ],
                 'ssl' => ['verify_peer' => true],

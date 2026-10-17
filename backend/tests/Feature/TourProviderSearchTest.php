@@ -1,13 +1,13 @@
 <?php
 
 use App\Models\Country;
+use App\Models\Review;
 use App\Models\TourAttraction;
 use App\Models\TourAvailabilitySlot;
 use App\Models\TourBooking;
 use App\Models\TourProduct;
 use App\Models\TourProvider;
 use App\Models\TourProvince;
-use App\Models\TourReview;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -83,9 +83,9 @@ beforeEach(function (): void {
                 'start_at' => $dates[$i].' 18:00:00', 'end_at' => $dates[$i].' 19:00:00',
                 'total_price' => 100000, 'status' => 'completed',
             ]);
-            TourReview::create([
+            Review::create([
                 'tour_booking_id' => $booking->id, 'rating' => $rating,
-                'comment' => 'ok', 'approved' => true, 'hidden' => false,
+                'comment' => 'ok', 'hidden' => false,
             ]);
         }
     };
@@ -149,6 +149,20 @@ test('guide list filters by single travel_date (1-day flow)', function (): void 
     // travel_date cũng yêu cầu tỉnh.
     $this->getJson("/api/v1/tour-providers?travel_date={$this->day1}")
         ->assertStatus(422);
+});
+
+test('guide list min_rating filters on average rating', function (): void {
+    // A = 4.5, B = 5.
+    $res = $this->getJson('/api/v1/tour-providers?province_slug=ha-giang-guides&min_rating=5')->assertOk();
+    expect($res->json('data.meta.total'))->toBe(1)
+        ->and($res->json('data.data.0.business_name'))->toBe('Local Expert B');
+
+    $res2 = $this->getJson('/api/v1/tour-providers?province_slug=ha-giang-guides&min_rating=4.5')->assertOk();
+    expect($res2->json('data.meta.total'))->toBe(2);
+
+    $res3 = $this->getJson('/api/v1/tour-providers?province_slug=ha-giang-guides&min_rating=4.6')->assertOk();
+    expect($res3->json('data.meta.total'))->toBe(1)
+        ->and($res3->json('data.data.0.business_name'))->toBe('Local Expert B');
 });
 
 test('guide profile shows bio tours and rating', function (): void {

@@ -6,7 +6,11 @@ import { api } from '../lib/api';
 
 const MAX_IMAGES = 5;
 
-export function TourReviewForm({ tourBookingId, onSubmitted }) {
+/**
+ * Form đánh giá dùng chung: truyền bookingId (hotel) hoặc tourBookingId (tour/guide).
+ * Backend hợp nhất: POST /reviews, review hiển thị ngay sau khi gửi.
+ */
+export function ReviewForm({ bookingId, tourBookingId, onSubmitted }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const fileRef = useRef(null);
@@ -18,11 +22,13 @@ export function TourReviewForm({ tourBookingId, onSubmitted }) {
   const previews = files.map((f) => ({ file: f, url: URL.createObjectURL(f) }));
 
   const mutation = useMutation({
-    mutationFn: (formData) => api.post('/tour-reviews', formData),
+    mutationFn: (formData) => api.post('/reviews', formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tour-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['tour-bookings-mine'] });
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['tour-booking'] });
       queryClient.invalidateQueries({ queryKey: ['tour-bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['tour-bookings-mine'] });
       previews.forEach((p) => URL.revokeObjectURL(p.url));
       setComment('');
       setFiles([]);
@@ -42,7 +48,8 @@ export function TourReviewForm({ tourBookingId, onSubmitted }) {
     e.preventDefault();
     setError(null);
     const formData = new FormData();
-    formData.append('tour_booking_id', tourBookingId);
+    if (bookingId) formData.append('booking_id', bookingId);
+    else formData.append('tour_booking_id', tourBookingId);
     formData.append('rating', String(rating));
     if (comment.trim()) formData.append('comment', comment.trim());
     files.forEach((f) => formData.append('images[]', f));

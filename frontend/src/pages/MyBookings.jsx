@@ -10,10 +10,13 @@ import {
   ChevronRight,
   ExternalLink,
   AlertTriangle,
+  Star,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
+import { Modal } from '../components/Modal';
+import { ReviewForm } from '../components/ReviewForm';
 import { formatPrice, formatDate } from '../lib/utils';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +38,7 @@ const STATUS_STYLES = {
 };
 
 const CANCELLABLE_STATUSES = ['pending', 'pending_payment', 'confirmed'];
+const REVIEWABLE_STATUSES = ['confirmed', 'completed'];
 
 function StatusBadge({ status }) {
   const { t } = useTranslation();
@@ -83,6 +87,7 @@ export default function MyBookings() {
   const [disputeContactEmail, setDisputeContactEmail] = useState('');
   const [disputeContactPhone, setDisputeContactPhone] = useState('');
   const [disputeFormError, setDisputeFormError] = useState(null);
+  const [reviewModalBooking, setReviewModalBooking] = useState(null);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['bookings', page],
@@ -296,6 +301,23 @@ export default function MyBookings() {
                           <FileDown className="w-4 h-4" />
                           {t('myBookings.actions.invoice')}
                         </button>
+                        {REVIEWABLE_STATUSES.includes(b.status) && (
+                          b.review ? (
+                            <span className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-stone-100 text-sm font-medium text-stone-600 min-h-[44px]">
+                              <Star className="w-4 h-4 text-amber-500 fill-current" />
+                              {t('myBookings.actions.reviewed')}
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setReviewModalBooking(b)}
+                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-amber-200 bg-amber-50/80 hover:bg-amber-100 text-sm font-medium text-amber-900 transition-colors min-h-[44px]"
+                            >
+                              <Star className="w-4 h-4 shrink-0" />
+                              {t('myBookings.actions.writeReview')}
+                            </button>
+                          )
+                        )}
                         {b.can_open_dispute && (
                           <button
                             type="button"
@@ -430,6 +452,17 @@ export default function MyBookings() {
             </div>
           </div>
         )}
+
+        <Modal
+          open={!!reviewModalBooking}
+          onClose={() => setReviewModalBooking(null)}
+          title={reviewModalBooking?.hotel?.name ?? t('tours.reviews.writeTitle')}
+          size="lg"
+        >
+          {reviewModalBooking && (
+            <ReviewForm bookingId={reviewModalBooking.id} onSubmitted={() => setReviewModalBooking(null)} />
+          )}
+        </Modal>
       </div>
     </div>
   );

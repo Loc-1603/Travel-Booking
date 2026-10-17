@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TourReviewImage extends Model
+class ReviewImage extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'tour_review_id',
+        'review_id',
         'path',
         'sort_order',
     ];
@@ -33,6 +33,6 @@ class TourReviewImage extends Model
 
     public function review()
     {
-        return $this->belongsTo(TourReview::class, 'tour_review_id');
+        return $this->belongsTo(Review::class, 'review_id');
     }
 }

@@ -5,7 +5,7 @@ import { ArrowLeft, Calendar, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
-import { TourReviewForm } from '../components/TourReviewForm';
+import { ReviewForm } from '../components/ReviewForm';
 import { formatPrice } from '../lib/utils';
 
 const REVIEWABLE_STATUSES = ['confirmed', 'ongoing', 'completed'];
@@ -78,7 +78,7 @@ export default function TourBookingReview() {
               </p>
               <p className="font-semibold text-lg mt-2">{formatPrice(booking.total_price, booking.currency)}</p>
             </div>
-            <TourReviewForm tourBookingId={booking.id} onSubmitted={() => navigate('/tour-bookings')} />
+            <ReviewForm tourBookingId={booking.id} onSubmitted={() => navigate('/tour-bookings')} />
           </div>
         )}
       </div>

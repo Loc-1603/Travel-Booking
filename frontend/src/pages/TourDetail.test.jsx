@@ -25,11 +25,11 @@ vi.mock('../lib/api', () => ({
   },
 }));
 
-vi.mock('../components/TourReviewList', () => ({
-  TourReviewList: () => <div data-testid="review-list" />,
+vi.mock('../components/ReviewList', () => ({
+  ReviewList: () => <div data-testid="review-list" />,
 }));
-vi.mock('../components/TourReviewForm', () => ({
-  TourReviewForm: () => <div data-testid="review-form" />,
+vi.mock('../components/ReviewForm', () => ({
+  ReviewForm: () => <div data-testid="review-form" />,
 }));
 vi.mock('../components/TourChatBox', () => ({
   TourChatBox: () => <div data-testid="chat-stub" />,

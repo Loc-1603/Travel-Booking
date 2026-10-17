@@ -28,8 +28,8 @@ vi.mock('../lib/api', () => ({
   },
 }));
 
-vi.mock('../components/TourReviewList', () => ({
-  TourReviewList: () => <div data-testid="review-list" />,
+vi.mock('../components/ReviewList', () => ({
+  ReviewList: () => <div data-testid="review-list" />,
 }));
 
 const guide = { uuid: 'g-1', business_name: 'Guide A', languages: ['vi'], price_from: 500000 };

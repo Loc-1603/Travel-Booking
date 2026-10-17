@@ -12,7 +12,6 @@ use App\Http\Controllers\Api\V1\SavedGuideController;
 use App\Http\Controllers\Api\V1\SavedTourController;
 use App\Http\Controllers\Api\V1\TourMessageController;
 use App\Http\Controllers\Api\V1\TourProviderController;
-use App\Http\Controllers\Api\V1\TourReviewController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\TourAvailabilityController;
 use App\Http\Controllers\Api\V1\TourBookingController;
@@ -86,9 +85,9 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     // Amenities for filters (no auth)
     Route::get('/amenities', [AmenityController::class, 'index'])->name('amenities.index');
 
-    // Reviews list (no auth) – approved only
+    // Reviews list (no auth) – visible only (hotel + tour/guide chung một loại).
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
-    Route::get('/tour-reviews', [TourReviewController::class, 'index'])->name('tour-reviews.index');
+    Route::get('/tour-reviews', [ReviewController::class, 'index'])->name('tour-reviews.index');
 
     // Tour 1vs1 discovery (public, login only required at booking time)
     Route::get('/tour-provinces', [TourProvinceController::class, 'index'])->name('tour-provinces.index');
@@ -137,7 +136,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('/saved-guides', [SavedGuideController::class, 'store'])->name('saved-guides.store');
         Route::delete('/saved-guides/{providerUuid}', [SavedGuideController::class, 'destroy'])->name('saved-guides.destroy');
         Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-        Route::post('/tour-reviews', [TourReviewController::class, 'store'])->name('tour-reviews.store');
+        Route::post('/tour-reviews', [ReviewController::class, 'store'])->name('tour-reviews.store');
         Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
         Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
         Route::delete('/wishlist/{hotelId}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');

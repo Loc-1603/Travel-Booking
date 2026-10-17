@@ -27,7 +27,11 @@ class ReviewPolicy
         }
 
         if ($user->role === Role::CUSTOMER) {
-            return isset($review->booking) && $review->booking->customer_id === $user->id;
+            if ($review->booking_id !== null) {
+                return $review->booking?->customer_id === $user->id;
+            }
+
+            return $review->tourBooking?->customer_id === $user->id;
         }
 
         return false;
@@ -48,4 +52,3 @@ class ReviewPolicy
         return in_array($user->role, [Role::SUPER_ADMIN, Role::ADMIN], true);
     }
 }
-

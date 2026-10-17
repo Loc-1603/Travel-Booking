@@ -95,9 +95,9 @@ class AiBookingService
             return null;
         }
 
-        return Cache::remember('hotel_review_sentiment.'.$hotelId, 86400, function () use ($hotel, $hotelId, $request) {
+        return Cache::remember('hotel_review_sentiment.v2.'.$hotelId, 86400, function () use ($hotel, $hotelId, $request) {
             $stats = Review::query()
-                ->where('approved', true)
+                ->visible()
                 ->whereHas('booking', fn ($q) => $q->where('hotel_id', $hotelId))
                 ->selectRaw('AVG(rating) as avg_r, COUNT(*) as c')
                 ->first();
@@ -105,7 +105,7 @@ class AiBookingService
             $count = $stats ? (int) $stats->c : 0;
 
             $comments = Review::query()
-                ->where('approved', true)
+                ->visible()
                 ->whereHas('booking', fn ($q) => $q->where('hotel_id', $hotelId))
                 ->whereNotNull('comment')
                 ->where('comment', '!=', '')
@@ -211,7 +211,7 @@ class AiBookingService
             $top = Hotel::query()
                 ->where('status', 'active')
                 ->whereHas('vendor', fn ($q) => $q->whereHas('vendorProfile', fn ($q2) => $q2->where('status', 'approved')))
-                ->selectRaw('hotels.id, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as ar')
+                ->selectRaw('hotels.id, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.hidden = 0) as ar')
                 ->orderByDesc('ar')
                 ->limit(20)
                 ->pluck('id')
@@ -236,7 +236,7 @@ class AiBookingService
             ->whereIn('id', $ids)
             ->where('status', 'active')
             ->whereHas('vendor', fn ($q) => $q->whereHas('vendorProfile', fn ($q2) => $q2->where('status', 'approved')))
-            ->selectRaw('hotels.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as review_count, (SELECT MIN(rooms.base_price) FROM rooms WHERE rooms.hotel_id = hotels.id AND rooms.deleted_at IS NULL) as min_room_price')
+            ->selectRaw('hotels.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.hidden = 0) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.hidden = 0) as review_count, (SELECT MIN(rooms.base_price) FROM rooms WHERE rooms.hotel_id = hotels.id AND rooms.deleted_at IS NULL) as min_room_price')
             ->with(['rooms', 'rooms.images', 'images', 'amenities'])
             ->get()
             ->sortByDesc(fn ($h) => (float) ($h->average_rating ?? 0))

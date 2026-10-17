@@ -8,53 +8,56 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Hậu kiểm review dùng chung (hotel + tour/guide): review hiển thị ngay,
+ * admin chỉ ẩn/bỏ ẩn.
+ */
 class ReviewModerationController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Review::with(['booking.hotel', 'booking.customer', 'moderatedBy']);
+        $query = Review::with([
+            'booking.hotel',
+            'booking.customer',
+            'tourBooking.tour',
+            'tourBooking.customer',
+            'moderatedBy',
+        ]);
         if ($request->filled('filter')) {
             match ($request->filter) {
-                'pending' => $query->where('approved', false)->where('hidden', false),
-                'approved' => $query->where('approved', true)->where('hidden', false),
-                'rejected' => $query->where('approved', false),
+                'visible' => $query->where('hidden', false),
                 'hidden' => $query->where('hidden', true),
                 default => null,
             };
         }
         $reviews = $query->latest()->paginate(15)->withQueryString();
+
         return view('admin.reviews.index', compact('reviews'));
     }
 
     public function show(Review $review): View
     {
-        $review->load(['booking.hotel', 'booking.customer', 'moderatedBy']);
+        $review->load([
+            'booking.hotel',
+            'booking.customer',
+            'tourBooking.tour',
+            'tourBooking.customer',
+            'moderatedBy',
+            'images',
+        ]);
+
         return view('admin.reviews.show', compact('review'));
     }
 
     public function update(Request $request, Review $review): RedirectResponse
     {
         $validated = $request->validate([
-            'action' => 'required|in:approve,reject,hide,unhide',
+            'action' => 'required|in:hide,unhide',
         ]);
         $data = ['moderated_at' => now(), 'moderated_by' => auth()->id()];
-        switch ($validated['action']) {
-            case 'approve':
-                $data['approved'] = true;
-                $data['hidden'] = false;
-                break;
-            case 'reject':
-                $data['approved'] = false;
-                $data['hidden'] = false;
-                break;
-            case 'hide':
-                $data['hidden'] = true;
-                break;
-            case 'unhide':
-                $data['hidden'] = false;
-                break;
-        }
+        $data['hidden'] = $validated['action'] === 'hide';
         $review->update($data);
+
         return redirect()->route('admin.reviews.show', $review)->with('success', __('admin.vendor.reviews.flash.updated'));
     }
 }

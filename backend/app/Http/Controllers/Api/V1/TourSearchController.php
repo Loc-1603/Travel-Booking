@@ -8,6 +8,7 @@ use App\Models\TourAttraction;
 use App\Models\TourProvince;
 use App\Services\TourQueryService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class TourSearchController extends BaseApiController
 {
@@ -59,7 +60,13 @@ class TourSearchController extends BaseApiController
         $query = $this->tours->withRatingStats($query);
 
         if ($request->filled('min_rating')) {
-            $query->having('average_rating', '>=', (float) $request->min_rating);
+            $ratedIds = DB::table('reviews')
+                ->join('tour_bookings', 'reviews.tour_booking_id', '=', 'tour_bookings.id')
+                ->where('reviews.hidden', false)
+                ->groupBy('tour_bookings.tour_id')
+                ->havingRaw('AVG(reviews.rating) >= CAST(? AS DECIMAL(4,2))', [$request->min_rating])
+                ->pluck('tour_bookings.tour_id');
+            $query->whereIn('tour_products.id', $ratedIds);
         }
 
         $this->tours->applySort($query, $request->input('sort'));

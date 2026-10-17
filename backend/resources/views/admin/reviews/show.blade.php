@@ -1,19 +1,35 @@
 @extends('admin.layouts.app')
-@section('title', 'Review')
+@section('title', __('admin.vendor.reviews.detail.title', ['id' => $review->id]))
 @section('content')
+@php($isTour = $review->tour_booking_id !== null)
 <div class="container-fluid">
-    <x-page-title title="Review #{{ $review->id }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.reviews.title'), 'url' => route('admin.reviews.index')], ['label' => __('admin.vendor.common.view')]]" />
+    <x-page-title title="{{ __('admin.vendor.reviews.detail.title', ['id' => $review->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.reviews.title'), 'url' => route('admin.reviews.index')], ['label' => __('admin.vendor.common.view')]]" />
     <x-alert />
     <div class="row">
         <div class="col-md-6">
             <div class="card mb-3">
                 <div class="card-header"><h5 class="mb-0">{{ __('admin.vendor.reviews.detail.title', ['id' => $review->id]) }}</h5></div>
                 <div class="card-body">
-                    <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.rating') }}:</strong> {{ $review->rating }}</p>
+                    <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.type') }}:</strong> {{ $isTour ? __('admin.vendor.reviews.type.tour') : __('admin.vendor.reviews.type.hotel') }}</p>
+                    @if($isTour)
+                    <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.tour') }}:</strong> {{ $review->tourBooking->tour->title ?? '-' }}</p>
+                    @else
+                    <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.hotel') }}:</strong> {{ $review->booking->hotel->name ?? '-' }}</p>
+                    @endif
+                    <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.customer') }}:</strong> {{ $review->booking?->customer?->name ?? $review->tourBooking?->customer?->name ?? '-' }}</p>
+                    <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.rating') }}:</strong> {{ $review->rating }}/5</p>
                     <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.comment') }}:</strong></p>
                     <p class="mb-2">{{ $review->comment ?: '-' }}</p>
-                    <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.hotel') }}:</strong> {{ $review->booking->hotel->name ?? '-' }}</p>
-                    <p class="mb-0"><strong>{{ __('admin.vendor.reviews.detail.customer') }}:</strong> {{ $review->booking->customer->name ?? $review->booking->customer->email ?? '-' }}</p>
+                    @if($review->images->isNotEmpty())
+                    <p class="mb-1"><strong>{{ __('admin.vendor.reviews.detail.images') }}:</strong></p>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach($review->images as $image)
+                        <a href="{{ $image->url }}" target="_blank" rel="noopener">
+                            <img src="{{ $image->url }}" alt="" style="width: 80px; height: 80px; object-fit: cover;" class="rounded border">
+                        </a>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -21,19 +37,7 @@
             <div class="card mb-3">
                 <div class="card-header"><h5 class="mb-0">{{ __('admin.vendor.reviews.detail.moderate') }}</h5></div>
                 <div class="card-body">
-                    <p class="mb-2">Status: {{ $review->approved ? __('admin.vendor.reviews.detail.status_approved') : __('admin.vendor.reviews.detail.status_not_approved') }} | Hidden: {{ $review->hidden ? __('admin.vendor.reviews.yes') : __('admin.vendor.reviews.no') }}</p>
-                    <form action="{{ route('admin.reviews.update', $review) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="action" value="approve">
-                        <button type="submit" class="btn btn-success btn-sm">{{ __('admin.vendor.reviews.detail.actions.approve') }}</button>
-                    </form>
-                    <form action="{{ route('admin.reviews.update', $review) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="action" value="reject">
-                        <button type="submit" class="btn btn-warning btn-sm">{{ __('admin.vendor.reviews.detail.actions.reject') }}</button>
-                    </form>
+                    <p class="mb-2">{{ __('admin.vendor.reviews.detail.hidden') }}: {{ $review->hidden ? __('admin.vendor.reviews.yes') : __('admin.vendor.reviews.no') }}</p>
                     @if($review->hidden)
                     <form action="{{ route('admin.reviews.update', $review) }}" method="POST" class="d-inline">
                         @csrf

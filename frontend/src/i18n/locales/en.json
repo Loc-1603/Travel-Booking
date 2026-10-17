@@ -169,6 +169,13 @@
       "description": "From Hanoi and Da Nang to Ho Chi Minh City and Phu Quoc — curated cities where travelers love to stay.",
       "browseAll": "Browse all cities"
     },
+    "tourProvinces": {
+      "label": "1vs1 tours",
+      "title": "Popular tour provinces",
+      "description": "Private 1vs1 tours across Vietnam's provinces — pick a destination and meet your local guide.",
+      "browseAll": "Browse all tours",
+      "cta": "View tours"
+    },
     "trust": {
       "label": "Expectations",
       "title": "The standard behind your stay",
@@ -373,7 +380,6 @@
     },
     "step2": {
       "title": "Guest details",
-      "guestNote": "Book as guest — no account needed. We'll email your confirmation and a link to view the booking.",
       "name": "Your name",
       "namePlaceholder": "e.g. Jane Smith",
       "email": "Email",
@@ -878,7 +884,9 @@
       "view": "View",
       "invoice": "Invoice",
       "reportIssue": "Report issue",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "writeReview": "Write a review",
+      "reviewed": "Reviewed"
     },
     "dispute": {
       "title": "Report an issue",

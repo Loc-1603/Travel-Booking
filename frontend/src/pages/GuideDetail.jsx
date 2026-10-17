@@ -10,7 +10,7 @@ import { useSavedGuides } from '../hooks/useSavedGuides';
 import GuideAvatar from '../components/GuideAvatar';
 import { HotelDetailSkeleton } from '../components/Skeleton';
 import ErrorMessage from '../components/ErrorMessage';
-import { TourReviewList } from '../components/TourReviewList';
+import { ReviewList } from '../components/ReviewList';
 import { TourPriceSummary } from '../components/TourPriceSummary';
 import { formatPrice, getRatingLabel } from '../lib/utils';
 import { getGuideScore } from '../lib/guideSearch';
@@ -423,7 +423,7 @@ export default function GuideDetail() {
       {/* Đánh giá read-only — viết review ở trang tour-bookings sau khi đi tour */}
       <div className="mt-6 space-y-4">
         <h2 className="font-semibold text-neutral-900">{t('tours.reviews.title')}</h2>
-        <TourReviewList providerUuid={uuid} />
+        <ReviewList providerUuid={uuid} />
       </div>
 
       {/* Spacer so the mobile sticky CTA never covers content */}

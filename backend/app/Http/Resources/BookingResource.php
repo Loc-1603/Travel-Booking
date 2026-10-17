@@ -31,7 +31,10 @@ class BookingResource extends JsonResource
             'is_guest' => $this->isGuest(),
             'hotel' => new HotelResource($this->whenLoaded('hotel')),
             'booking_rooms' => BookingRoomResource::collection($this->whenLoaded('bookingRooms')),
-            'review' => new ReviewResource($this->whenLoaded('review')),
+            'review' => $this->when(
+                $this->relationLoaded('review'),
+                fn () => $this->review ? new ReviewResource($this->review) : null
+            ),
             'dispute' => $this->when(
                 $this->relationLoaded('dispute'),
                 fn () => $this->dispute ? new BookingDisputeResource($this->dispute) : null

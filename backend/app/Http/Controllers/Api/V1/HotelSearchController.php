@@ -75,9 +75,9 @@ class HotelSearchController extends BaseApiController
         if ($request->filled('min_rating')) {
             $hotelIds = DB::table('reviews')
                 ->join('bookings', 'reviews.booking_id', '=', 'bookings.id')
-                ->where('reviews.approved', true)
+                ->where('reviews.hidden', false)
                 ->groupBy('bookings.hotel_id')
-                ->havingRaw('AVG(reviews.rating) >= ?', [$request->min_rating])
+                ->havingRaw('AVG(reviews.rating) >= CAST(? AS DECIMAL(4,2))', [$request->min_rating])
                 ->pluck('bookings.hotel_id');
             $query->whereIn('id', $hotelIds);
         }
@@ -95,7 +95,7 @@ class HotelSearchController extends BaseApiController
             }, '>=', count($slugs));
         }
 
-        $query->selectRaw('hotels.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as review_count, (SELECT MIN(rooms.base_price) FROM rooms WHERE rooms.hotel_id = hotels.id AND rooms.deleted_at IS NULL) as min_room_price');
+        $query->selectRaw('hotels.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.hidden = 0) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.hidden = 0) as review_count, (SELECT MIN(rooms.base_price) FROM rooms WHERE rooms.hotel_id = hotels.id AND rooms.deleted_at IS NULL) as min_room_price');
 
         if ($request->filled('sort')) {
             match ($request->sort) {
@@ -130,7 +130,7 @@ class HotelSearchController extends BaseApiController
             ->where('id', $id)
             ->where('status', 'active')
             ->whereHas('vendor', fn ($q) => $q->whereHas('vendorProfile', fn ($q2) => $q2->where('status', 'approved')))
-            ->selectRaw('hotels.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.approved = 1) as review_count')
+            ->selectRaw('hotels.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.hidden = 0) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN bookings b ON r.booking_id = b.id WHERE b.hotel_id = hotels.id AND r.hidden = 0) as review_count')
             ->with(['rooms.hotel', 'rooms.images', 'rooms.amenities', 'rooms.roomType', 'images', 'amenities'])
             ->firstOrFail();
 

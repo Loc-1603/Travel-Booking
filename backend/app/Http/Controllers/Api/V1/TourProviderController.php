@@ -8,6 +8,7 @@ use App\Models\TourProvince;
 use App\Services\TourQueryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TourProviderController extends BaseApiController
 {
@@ -18,7 +19,7 @@ class TourProviderController extends BaseApiController
     /**
      * List approved 1vs1 vendors (guides), ranked by score.
      *
-     * score = AVG(rating 1..5) * COUNT(approved, visible reviews).
+     * score = AVG(rating 1..5) * COUNT(visible reviews).
      * Luồng mới: lọc theo 1 ngày đi (travel_date).
      * Giữ tương thích ngược: filter khoảng [from, to] cũ (free EVERY day).
      */
@@ -61,7 +62,14 @@ class TourProviderController extends BaseApiController
         }
 
         if ($request->filled('min_rating')) {
-            $query->having('average_rating', '>=', (float) $request->input('min_rating'));
+            $ratedIds = DB::table('reviews')
+                ->join('tour_bookings', 'reviews.tour_booking_id', '=', 'tour_bookings.id')
+                ->where('reviews.hidden', false)
+                ->when($provinceId !== null, fn ($q) => $q->where('tour_bookings.province_id', $provinceId))
+                ->groupBy('tour_bookings.provider_id')
+                ->havingRaw('AVG(reviews.rating) >= CAST(? AS DECIMAL(4,2))', [$request->input('min_rating')])
+                ->pluck('tour_bookings.provider_id');
+            $query->whereIn('tour_providers.id', $ratedIds);
         }
 
         $this->tours->applyProviderSort($query, $request->input('sort', 'score'));

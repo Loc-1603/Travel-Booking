@@ -81,7 +81,7 @@ class TourBooking extends Model
 
     public function review()
     {
-        return $this->hasOne(TourReview::class, 'tour_booking_id');
+        return $this->hasOne(Review::class, 'tour_booking_id');
     }
 
     public function dispute()

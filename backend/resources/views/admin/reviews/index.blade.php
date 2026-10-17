@@ -11,9 +11,7 @@
                     <label class="form-label mb-0">{{ __('admin.vendor.reviews.filter.label') }}</label>
                     <select name="filter" class="form-select form-select-sm">
                         <option value="">{{ __('admin.vendor.reviews.filter.all') }}</option>
-                        <option value="pending" {{ request('filter') === 'pending' ? 'selected' : '' }}>{{ __('admin.vendor.reviews.filter.pending') }}</option>
-                        <option value="approved" {{ request('filter') === 'approved' ? 'selected' : '' }}>{{ __('admin.vendor.reviews.filter.approved') }}</option>
-                        <option value="rejected" {{ request('filter') === 'rejected' ? 'selected' : '' }}>{{ __('admin.vendor.reviews.filter.rejected') }}</option>
+                        <option value="visible" {{ request('filter') === 'visible' ? 'selected' : '' }}>{{ __('admin.vendor.reviews.filter.visible') }}</option>
                         <option value="hidden" {{ request('filter') === 'hidden' ? 'selected' : '' }}>{{ __('admin.vendor.reviews.filter.hidden') }}</option>
                     </select>
                 </div>
@@ -27,10 +25,10 @@
                 <thead>
                     <tr>
                         <th>{{ __('admin.vendor.reviews.table.id') }}</th>
-                        <th>{{ __('admin.vendor.reviews.table.hotel') }}</th>
+                        <th>{{ __('admin.vendor.reviews.table.type') }}</th>
+                        <th>{{ __('admin.vendor.reviews.table.target') }}</th>
                         <th>{{ __('admin.vendor.reviews.table.rating') }}</th>
                         <th>{{ __('admin.vendor.reviews.table.comment') }}</th>
-                        <th>{{ __('admin.vendor.reviews.table.approved') }}</th>
                         <th>{{ __('admin.vendor.reviews.table.hidden') }}</th>
                         <th></th>
                     </tr>
@@ -39,10 +37,10 @@
                     @forelse($reviews as $r)
                     <tr>
                         <td>{{ $r->id }}</td>
-                        <td>{{ $r->booking->hotel->name ?? '-' }}</td>
+                        <td>{{ $r->tour_booking_id ? __('admin.vendor.reviews.type.tour') : __('admin.vendor.reviews.type.hotel') }}</td>
+                        <td>{{ $r->booking->hotel->name ?? $r->tourBooking->tour->title ?? '-' }}</td>
                         <td>{{ $r->rating }}</td>
                         <td>{{ Str::limit($r->comment, 40) }}</td>
-                        <td>{{ $r->approved ? __('admin.vendor.reviews.yes') : __('admin.vendor.reviews.no') }}</td>
                         <td>{{ $r->hidden ? __('admin.vendor.reviews.yes') : __('admin.vendor.reviews.no') }}</td>
                         <td><a href="{{ route('admin.reviews.show', $r) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
                     </tr>

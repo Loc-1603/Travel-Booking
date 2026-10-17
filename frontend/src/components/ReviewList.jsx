@@ -5,16 +5,20 @@ import { Loader2, Star } from 'lucide-react';
 import { api } from '../lib/api';
 import { Modal } from './Modal';
 
-export function TourReviewList({ tourUuid, providerUuid }) {
+/**
+ * Danh sách đánh giá dùng chung (tour_uuid cho tour, provider_uuid cho guide).
+ * Backend hợp nhất: GET /reviews.
+ */
+export function ReviewList({ tourUuid, providerUuid }) {
   const { t } = useTranslation();
   const [lightbox, setLightbox] = useState(null);
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['tour-reviews', tourUuid ?? providerUuid],
+    queryKey: ['reviews', tourUuid ?? providerUuid],
     queryFn: async () => {
       const params = { per_page: 10 };
       if (tourUuid) params.tour_uuid = tourUuid;
       if (providerUuid) params.provider_uuid = providerUuid;
-      const res = await api.get('/tour-reviews', { params });
+      const res = await api.get('/reviews', { params });
       return res.data;
     },
     enabled: !!(tourUuid || providerUuid),

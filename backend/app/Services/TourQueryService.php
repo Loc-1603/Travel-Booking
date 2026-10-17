@@ -23,7 +23,7 @@ class TourQueryService
     public function withRatingStats($query)
     {
         return $query->selectRaw(
-            'tour_products.*, (SELECT COALESCE(AVG(tr.rating), 0) FROM tour_reviews tr INNER JOIN tour_bookings tb ON tr.tour_booking_id = tb.id WHERE tb.tour_id = tour_products.id AND tr.approved = 1) as average_rating, (SELECT COUNT(*) FROM tour_reviews tr INNER JOIN tour_bookings tb ON tr.tour_booking_id = tb.id WHERE tb.tour_id = tour_products.id AND tr.approved = 1) as review_count'
+            'tour_products.*, (SELECT COALESCE(AVG(r.rating), 0) FROM reviews r INNER JOIN tour_bookings tb ON r.tour_booking_id = tb.id WHERE tb.tour_id = tour_products.id AND r.hidden = 0) as average_rating, (SELECT COUNT(*) FROM reviews r INNER JOIN tour_bookings tb ON r.tour_booking_id = tb.id WHERE tb.tour_id = tour_products.id AND r.hidden = 0) as review_count'
         );
     }
 
@@ -63,7 +63,7 @@ class TourQueryService
     /**
      * Attach vendor rating stats + ranking score.
      *
-     * score = AVG(rating 1..5) * COUNT(approved, visible reviews)
+     * score = AVG(rating 1..5) * COUNT(visible reviews)
      * via tour_bookings.provider_id — no schema change needed.
      */
     public function withProviderRatingStats($query, ?int $provinceId = null)
@@ -72,13 +72,13 @@ class TourQueryService
             ? ' AND tb.province_id = '.(int) $provinceId
             : '';
 
-        $avgSql = '(SELECT COALESCE(AVG(tr.rating), 0) FROM tour_reviews tr'
-            .' INNER JOIN tour_bookings tb ON tr.tour_booking_id = tb.id'
-            ." WHERE tb.provider_id = tour_providers.id AND tr.approved = 1 AND (tr.hidden = 0 OR tr.hidden IS NULL){$provinceFilter})";
+        $avgSql = '(SELECT COALESCE(AVG(r.rating), 0) FROM reviews r'
+            .' INNER JOIN tour_bookings tb ON r.tour_booking_id = tb.id'
+            ." WHERE tb.provider_id = tour_providers.id AND r.hidden = 0{$provinceFilter})";
 
-        $countSql = '(SELECT COUNT(*) FROM tour_reviews tr'
-            .' INNER JOIN tour_bookings tb ON tr.tour_booking_id = tb.id'
-            ." WHERE tb.provider_id = tour_providers.id AND tr.approved = 1 AND (tr.hidden = 0 OR tr.hidden IS NULL){$provinceFilter})";
+        $countSql = '(SELECT COUNT(*) FROM reviews r'
+            .' INNER JOIN tour_bookings tb ON r.tour_booking_id = tb.id'
+            ." WHERE tb.provider_id = tour_providers.id AND r.hidden = 0{$provinceFilter})";
 
         $toursWhere = $provinceId !== null
             ? "provider_id = tour_providers.id AND status = 'published' AND province_id = ".(int) $provinceId
@@ -132,16 +132,16 @@ class TourQueryService
             ->where('tour_providers.status', 'approved')
             ->whereNotExists(function ($q) use ($day) {
                 $q->selectRaw(1)
-                  ->from('tour_provider_blackouts')
-                  ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
-                  ->whereRaw("? BETWEEN tour_provider_blackouts.start_date AND tour_provider_blackouts.end_date", [$day]);
+                    ->from('tour_provider_blackouts')
+                    ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
+                    ->whereRaw('? BETWEEN tour_provider_blackouts.start_date AND tour_provider_blackouts.end_date', [$day]);
             })
             ->whereNotExists(function ($q) use ($day) {
                 $q->selectRaw(1)
-                  ->from('tour_bookings')
-                  ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
-                  ->whereDate('tour_bookings.start_at', '=', $day)
-                  ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
+                    ->from('tour_bookings')
+                    ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
+                    ->whereDate('tour_bookings.start_at', '=', $day)
+                    ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
             });
 
         $rows = $query->distinct()->pluck('tour_products.provider_id')->all();
@@ -186,17 +186,17 @@ class TourQueryService
             ->where('tour_providers.status', 'approved')
             ->whereNotExists(function ($q) use ($start, $end) {
                 $q->selectRaw(1)
-                  ->from('tour_provider_blackouts')
-                  ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
-                  ->whereRaw("tour_provider_blackouts.start_date <= ? AND tour_provider_blackouts.end_date >= ?", [$end->toDateString(), $start->toDateString()]);
+                    ->from('tour_provider_blackouts')
+                    ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
+                    ->whereRaw('tour_provider_blackouts.start_date <= ? AND tour_provider_blackouts.end_date >= ?', [$end->toDateString(), $start->toDateString()]);
             })
             ->whereNotExists(function ($q) use ($start, $end) {
                 $q->selectRaw(1)
-                  ->from('tour_bookings')
-                  ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
-                  ->whereDate('tour_bookings.start_at', '>=', $start->toDateString())
-                  ->whereDate('tour_bookings.start_at', '<=', $end->toDateString())
-                  ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
+                    ->from('tour_bookings')
+                    ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
+                    ->whereDate('tour_bookings.start_at', '>=', $start->toDateString())
+                    ->whereDate('tour_bookings.start_at', '<=', $end->toDateString())
+                    ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
             });
 
         $rows = $query->groupBy('tour_products.provider_id')
@@ -229,16 +229,16 @@ class TourQueryService
             ->whereDate('tour_availability_slots.date', '=', $day)
             ->whereNotExists(function ($q) use ($day) {
                 $q->selectRaw(1)
-                  ->from('tour_provider_blackouts')
-                  ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
-                  ->whereRaw("? BETWEEN tour_provider_blackouts.start_date AND tour_provider_blackouts.end_date", [$day]);
+                    ->from('tour_provider_blackouts')
+                    ->whereColumn('tour_provider_blackouts.provider_id', 'tour_providers.id')
+                    ->whereRaw('? BETWEEN tour_provider_blackouts.start_date AND tour_provider_blackouts.end_date', [$day]);
             })
             ->whereNotExists(function ($q) use ($day) {
                 $q->selectRaw(1)
-                  ->from('tour_bookings')
-                  ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
-                  ->whereDate('tour_bookings.start_at', '=', $day)
-                  ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
+                    ->from('tour_bookings')
+                    ->whereColumn('tour_bookings.provider_id', 'tour_providers.id')
+                    ->whereDate('tour_bookings.start_at', '=', $day)
+                    ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
             })
             ->orderBy('tour_availability_slots.start_time')
             ->select('tour_availability_slots.*')

@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { TourGallery } from "./TourGallery";
 
 vi.mock("./LazyImage", () => ({
-  default: ({ src, alt, className }) => (
+  LazyImage: ({ src, alt, className }) => (
     <img src={src} alt={alt} className={className} data-testid="lazy-img" />
   ),
 }));

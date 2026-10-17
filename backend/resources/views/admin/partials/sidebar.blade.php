@@ -101,7 +101,7 @@
                 {{-- Platform content & configuration --}}
                 @php
                     $hotelActive = request()->routeIs('admin.countries.*','admin.cities.*','admin.amenities.*','admin.disputes.*','admin.reviews.*');
-                    $tourActive = request()->routeIs('admin.tour-provinces.*','admin.tour-attractions.*','admin.tour-providers.*','admin.tour-disputes.*','admin.tour-reviews.*');
+                    $tourActive = request()->routeIs('admin.tour-provinces.*','admin.tour-attractions.*','admin.tour-providers.*','admin.tour-disputes.*');
                 @endphp
                 <li class="{{ $hotelActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow {{ $hotelActive ? 'mm-active' : '' }}">
@@ -126,7 +126,6 @@
                         <li><a href="{{ route('admin.tour-attractions.index') }}" class="{{ request()->routeIs('admin.tour-attractions.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_attractions') }}</span></a></li>
                         <li><a href="{{ route('admin.tour-providers.index') }}" class="{{ request()->routeIs('admin.tour-providers.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_providers') }}</span></a></li>
                         <li><a href="{{ route('admin.tour-disputes.index') }}" class="{{ request()->routeIs('admin.tour-disputes.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_disputes') }}</span></a></li>
-                        <li><a href="{{ route('admin.tour-reviews.index') }}" class="{{ request()->routeIs('admin.tour-reviews.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_reviews') }}</span></a></li>
                     </ul>
                 </li>
                 {{-- Partners & revenue --}}
@@ -182,7 +181,7 @@
                 {{-- Admin (non-super): Moderation only (gồm cả tour) --}}
                 @php
                     $hotelActive = request()->routeIs('admin.disputes.*','admin.reviews.*');
-                    $tourActive = request()->routeIs('admin.tour-provinces.*','admin.tour-attractions.*','admin.tour-providers.*','admin.tour-disputes.*','admin.tour-reviews.*');
+                    $tourActive = request()->routeIs('admin.tour-provinces.*','admin.tour-attractions.*','admin.tour-providers.*','admin.tour-disputes.*');
                 @endphp
                 <li class="{{ $hotelActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow {{ $hotelActive ? 'mm-active' : '' }}">
@@ -204,7 +203,6 @@
                         <li><a href="{{ route('admin.tour-attractions.index') }}" class="{{ request()->routeIs('admin.tour-attractions.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_attractions') }}</span></a></li>
                         <li><a href="{{ route('admin.tour-providers.index') }}" class="{{ request()->routeIs('admin.tour-providers.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_providers') }}</span></a></li>
                         <li><a href="{{ route('admin.tour-disputes.index') }}" class="{{ request()->routeIs('admin.tour-disputes.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_disputes') }}</span></a></li>
-                        <li><a href="{{ route('admin.tour-reviews.index') }}" class="{{ request()->routeIs('admin.tour-reviews.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_reviews') }}</span></a></li>
                     </ul>
                 </li>
                 <li>

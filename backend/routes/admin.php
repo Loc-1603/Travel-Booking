@@ -48,10 +48,6 @@ Route::middleware(['auth', 'admin', 'web', 'admin.locale'])->prefix('admin')->na
             Route::get('/tour-disputes/{tourDispute}', [\App\Http\Controllers\Admin\TourDisputeController::class, 'show'])->name('tour-disputes.show');
             Route::patch('/tour-disputes/{tourDispute}', [\App\Http\Controllers\Admin\TourDisputeController::class, 'update'])->name('tour-disputes.update');
             Route::put('/tour-disputes/{tourDispute}', [\App\Http\Controllers\Admin\TourDisputeController::class, 'update']);
-            Route::get('/tour-reviews', [\App\Http\Controllers\Admin\TourReviewModerationController::class, 'index'])->name('tour-reviews.index');
-            Route::get('/tour-reviews/{tourReview}', [\App\Http\Controllers\Admin\TourReviewModerationController::class, 'show'])->name('tour-reviews.show');
-            Route::patch('/tour-reviews/{tourReview}', [\App\Http\Controllers\Admin\TourReviewModerationController::class, 'update'])->name('tour-reviews.update');
-            Route::put('/tour-reviews/{tourReview}', [\App\Http\Controllers\Admin\TourReviewModerationController::class, 'update']);
         });
 
         // Super Admin only: vendors, commission & website settings
