@@ -1,20 +1,20 @@
 @php
-    $authSiteName = \App\Services\WebsiteSettingsService::getSiteName();
-    $authSiteLogo = \App\Services\WebsiteSettingsService::getSiteLogo();
-    $authSiteTagline = \App\Services\WebsiteSettingsService::getSiteDescription();
+    $authSiteName = $authSiteName ?? \App\Services\WebsiteSettingsService::getSiteName();
+    $authSiteLogo = $authSiteLogo ?? \App\Services\WebsiteSettingsService::getSiteLogo();
+    $authSiteTagline = $authSiteTagline ?? \App\Services\WebsiteSettingsService::getSiteDescription();
 @endphp
-<div class="mb-4 mb-md-5 text-center">
-    <a href="{{ url('/') }}" class="text-decoration-none d-flex flex-column align-items-center">
+<div class="auth-brand">
+    <a href="{{ url('/') }}" class="auth-brand-link">
         @if($authSiteLogo)
-            <img src="{{ $authSiteLogo }}" alt="{{ $authSiteName }}" class="mb-2" style="max-height: 52px; max-width: 220px; width: auto; height: auto; object-fit: contain;">
+            <img src="{{ $authSiteLogo }}" alt="{{ $authSiteName }}" class="auth-brand-logo">
         @else
-            <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-primary bg-opacity-10 text-primary mb-2" style="width: 52px; height: 52px;">
-                <i class="mdi mdi-office-building-outline fs-3"></i>
+            <span class="auth-brand-mark" aria-hidden="true">
+                <i class="mdi mdi-airplane"></i>
             </span>
         @endif
-        <span class="text-dark fw-semibold fs-5">{{ $authSiteName }}</span>
+        <span class="auth-brand-name">{{ $authSiteName }}</span>
         @if($authSiteTagline)
-            <span class="text-muted small mt-2 px-1 lh-base" style="max-width: 280px;">{{ $authSiteTagline }}</span>
+            <span class="auth-brand-tagline">{{ $authSiteTagline }}</span>
         @endif
     </a>
 </div>

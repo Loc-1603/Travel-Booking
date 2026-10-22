@@ -22,7 +22,10 @@ test('the role chooser renders the three portal links', function () {
         ->assertSee(__('auth.choose_role.admin_name'), false)
         ->assertSee(__('auth.choose_role.vendor_name'), false)
         ->assertSee(__('auth.choose_role.guide_name'), false)
-        ->assertSee(__('auth.choose_role.continue'), false);
+        ->assertSee(__('auth.choose_role.admin_badge'), false)
+        ->assertSee('auth-role-card--admin', false)
+        ->assertSee('auth-role-card--vendor', false)
+        ->assertSee('auth-role-card--guide', false);
 });
 
 test('authenticated users hitting the root are sent to their dashboard by role', function () {

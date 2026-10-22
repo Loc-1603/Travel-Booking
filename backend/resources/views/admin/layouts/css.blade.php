@@ -27,12 +27,17 @@
     <link href="{{asset('admin/dist/assets/css/icons.min.css')}}" rel="stylesheet" type="text/css">
     <!-- App Css-->
     <link href="{{asset('admin/dist/assets/css/app.min.css')}}" id="app-style" rel="stylesheet" type="text/css">
-    
+
+    @if (!empty($isAuthPage))
+        @include('auth.partials.auth-ui-styles')
+    @endif
+
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 </head>
-<body>
+<body class="{{ !empty($isAuthPage) ? 'auth-body' : '' }}">
+@if (empty($isAuthPage))
 <script>
 (function(){
   try{
@@ -49,4 +54,5 @@
   }catch(e){}
 })();
 </script>
+@endif
 
