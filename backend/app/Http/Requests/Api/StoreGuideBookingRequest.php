@@ -37,7 +37,7 @@ class StoreGuideBookingRequest extends BaseApiRequest
             if (! $this->filled('slot_id')) {
                 return;
             }
-            $slot = \App\Models\TourAvailabilitySlot::with('tour.provider')->find($this->input('slot_id'));
+            $slot = app(\App\Repositories\Contracts\TourAvailabilitySlotRepositoryInterface::class)->findWithTourProvider((int) $this->input('slot_id'));
             if (! $slot) {
                 return;
             }

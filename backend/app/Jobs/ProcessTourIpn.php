@@ -2,17 +2,19 @@
 
 namespace App\Jobs;
 
-use App\Models\TourPayment;
-use App\Models\WebhookEvent;
-use App\Services\TourPaymentService;
-use App\Services\TourVnpayAdapter;
+use App\Actions\ConfirmTourVnpayPaymentAction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
+/**
+ * Queue job for confirming a tour VNPay IPN (Phase 2 / A-5, thin per J-1).
+ *
+ * Thin wrapper around ConfirmTourVnpayPaymentAction: all decision logic
+ * lives in the Action; this job only holds the serialized request payload.
+ */
 class ProcessTourIpn implements ShouldQueue
 {
     use Dispatchable;
@@ -26,47 +28,8 @@ class ProcessTourIpn implements ShouldQueue
         public array $payload
     ) {}
 
-    public function handle(TourPaymentService $payments, TourVnpayAdapter $vnpay): void
+    public function handle(ConfirmTourVnpayPaymentAction $action): void
     {
-        $webhookEvent = WebhookEvent::where('provider', 'vnpay')
-            ->where('event_id', $this->eventId)
-            ->first();
-
-        if (! $webhookEvent) {
-            Log::warning('ProcessTourIpn: webhook event not found', ['event_id' => $this->eventId]);
-            return;
-        }
-
-        if ($webhookEvent->processed_at !== null) {
-            return;
-        }
-
-        $payment = TourPayment::find($this->paymentId);
-        if (! $payment) {
-            Log::warning('ProcessTourIpn: payment not found', ['payment_id' => $this->paymentId]);
-            $webhookEvent->update(['processed_at' => now()]);
-            return;
-        }
-
-        if (! $vnpay->verifySignature($this->payload)) {
-            Log::warning('ProcessTourIpn: invalid signature', ['payment_id' => $payment->id]);
-            $webhookEvent->update(['processed_at' => now()]);
-            return;
-        }
-
-        $responseCode = (string) ($this->payload['vnp_ResponseCode'] ?? '');
-        $transactionStatus = (string) ($this->payload['vnp_TransactionStatus'] ?? '');
-
-        if ($responseCode === '00' && $transactionStatus === '00') {
-            $vnpay->recordTransactionNo($payment, $this->payload);
-            $payments->confirmPayment($payment->fresh());
-        } else {
-            $payments->markFailed(
-                $payment->fresh(),
-                'VNPay response: '.$responseCode.' / transaction: '.$transactionStatus
-            );
-        }
-
-        $webhookEvent->update(['processed_at' => now()]);
+        $action->handle($this->eventId, $this->paymentId, $this->payload);
     }
 }

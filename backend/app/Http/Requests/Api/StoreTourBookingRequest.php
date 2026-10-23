@@ -45,7 +45,7 @@ class StoreTourBookingRequest extends BaseApiRequest
             $tourId = $this->input('tour_id');
             $slotId = $this->input('slot_id');
             if ($tourId && $slotId) {
-                $slot = \App\Models\TourAvailabilitySlot::find($slotId);
+                $slot = app(\App\Repositories\Contracts\TourAvailabilitySlotRepositoryInterface::class)->findById($slotId);
                 if ($slot && (int) $slot->tour_id !== (int) $tourId) {
                     $validator->errors()->add('slot_id', 'The selected slot does not belong to this tour.');
                 }

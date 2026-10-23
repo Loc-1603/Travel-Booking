@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\TourBookingStatus;
-use App\Models\TourBooking;
+use App\Services\TourBookingService;
 use Illuminate\Console\Command;
 
 class TourAutoComplete extends Command
@@ -12,19 +11,11 @@ class TourAutoComplete extends Command
 
     protected $description = 'Advance tour bookings by time (confirmed -> ongoing -> completed)';
 
-    public function handle(): int
+    public function handle(TourBookingService $bookingService): int
     {
-        $now = now();
+        $result = $bookingService->advanceTimedStatuses();
 
-        $ongoing = TourBooking::where('status', TourBookingStatus::CONFIRMED->value)
-            ->where('start_at', '<=', $now)
-            ->update(['status' => TourBookingStatus::ONGOING->value]);
-
-        $completed = TourBooking::where('status', TourBookingStatus::ONGOING->value)
-            ->where('end_at', '<=', $now)
-            ->update(['status' => TourBookingStatus::COMPLETED->value]);
-
-        $this->info("Advanced {$ongoing} tour booking(s) to ongoing, {$completed} to completed.");
+        $this->info("Advanced {$result['ongoing']} tour booking(s) to ongoing, {$result['completed']} to completed.");
 
         return self::SUCCESS;
     }

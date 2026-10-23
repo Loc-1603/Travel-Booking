@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\PaymentStatus;
+use App\Actions\CancelTourBookingAction;
+use App\Actions\CreateGuideTourBookingAction;
+use App\Actions\CreateTourBookingAction;
+use App\Actions\CreateTourVnpayCheckoutAction;
+use App\Actions\OpenTourDisputeAction;
+use App\DTOs\CreateGuideTourBookingData;
+use App\DTOs\CreateTourBookingData;
+use App\DTOs\TourCheckoutData;
 use App\Enums\TourBookingStatus;
 use App\Http\Requests\Api\StoreTourBookingRequest;
 use App\Http\Requests\Api\StoreTourDisputeRequest;
 use App\Http\Resources\TourBookingResource;
 use App\Http\Resources\TourDisputeResource;
-use App\Models\TourBooking;
-use App\Models\TourDispute;
+use App\Repositories\Contracts\TourBookingRepositoryInterface;
 use App\Services\TourBookingService;
-use App\Services\TourPaymentService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,7 +26,12 @@ class TourBookingController extends BaseApiController
 {
     public function __construct(
         protected TourBookingService $bookings,
-        protected TourPaymentService $payments,
+        protected TourBookingRepositoryInterface $bookingRepo,
+        protected CreateTourBookingAction $createBookingAction,
+        protected CreateGuideTourBookingAction $createGuideBookingAction,
+        protected CancelTourBookingAction $cancelAction,
+        protected CreateTourVnpayCheckoutAction $checkoutAction,
+        protected OpenTourDisputeAction $disputeAction,
     ) {}
 
     /**
@@ -58,17 +68,19 @@ class TourBookingController extends BaseApiController
     public function store(StoreTourBookingRequest $request): JsonResponse
     {
         try {
-            $booking = $this->bookings->createBooking(
-                (int) $request->user()->id,
-                (int) $request->tour_id,
-                (int) $request->slot_id,
-                $request->pricing_mode,
-                (int) $request->duration_value,
-                $request->filled('coupon_code') ? trim($request->coupon_code) : null,
-                $request->input('meeting_point'),
-                $request->input('customer_notes'),
-                $request->input('currency', config('tour.currency', 'VND')),
-            );
+            $booking = $this->createBookingAction->handle(new CreateTourBookingData(
+                customerId: (int) $request->user()->id,
+                tourId: (int) $request->tour_id,
+                slotId: (int) $request->slot_id,
+                pricingMode: $request->pricing_mode,
+                durationValue: (int) $request->duration_value,
+                couponCode: $request->filled('coupon_code') ? trim($request->coupon_code) : null,
+                meetingPoint: $request->input('meeting_point'),
+                customerNotes: $request->input('customer_notes'),
+                currency: $request->input('currency', config('tour.currency', 'VND')),
+            ));
+        } catch (\InvalidArgumentException $e) {
+            return $this->error($e->getMessage(), 422, 'UNAVAILABLE');
         } catch (\RuntimeException $e) {
             return $this->error($e->getMessage(), 422, 'UNAVAILABLE');
         }
@@ -119,16 +131,16 @@ class TourBookingController extends BaseApiController
     {
         try {
             $slotId = $request->filled('slot_id') ? (int) $request->input('slot_id') : null;
-            $booking = $this->bookings->createGuideBooking(
-                (int) $request->user()->id,
-                $request->input('provider_uuid'),
-                $slotId,
-                $request->input('travel_date'),
-                $request->filled('coupon_code') ? trim($request->coupon_code) : null,
-                $request->input('meeting_point'),
-                $request->input('customer_notes'),
-                $request->input('currency', config('tour.currency', 'VND')),
-            );
+            $booking = $this->createGuideBookingAction->handle(new CreateGuideTourBookingData(
+                customerId: (int) $request->user()->id,
+                providerUuid: $request->input('provider_uuid'),
+                slotId: $slotId,
+                travelDate: $request->input('travel_date'),
+                couponCode: $request->filled('coupon_code') ? trim($request->coupon_code) : null,
+                meetingPoint: $request->input('meeting_point'),
+                customerNotes: $request->input('customer_notes'),
+                currency: $request->input('currency', config('tour.currency', 'VND')),
+            ));
         } catch (\RuntimeException $e) {
             return $this->error($e->getMessage(), 422, 'UNAVAILABLE');
         }
@@ -144,12 +156,7 @@ class TourBookingController extends BaseApiController
     public function index(Request $request): JsonResponse
     {
         $perPage = (int) $request->input('per_page', 15);
-        $paginator = TourBooking::where('customer_id', $request->user()->id)
-            ->with(['tour.provider', 'tour.province', 'slot'])
-            ->withCount('review')
-            ->orderByDesc('start_at')
-            ->latest()
-            ->paginate($perPage);
+        $paginator = $this->bookingRepo->paginateByCustomer($request->user()->id, ['tour.provider', 'tour.province', 'slot'], $perPage);
 
         return $this->success([
             'data' => TourBookingResource::collection($paginator->items()),
@@ -164,10 +171,8 @@ class TourBookingController extends BaseApiController
 
     public function show(Request $request, string $uuid): JsonResponse
     {
-        $booking = TourBooking::where('uuid', $uuid)
-            ->with(['tour.provider', 'tour.province', 'slot', 'tour.images'])
-            ->withCount('review')
-            ->firstOrFail();
+        $booking = $this->bookingRepo->findByUuidOrFail($uuid, ['tour.provider', 'tour.province', 'slot', 'tour.images']);
+        $booking->loadCount('review');
         $this->authorize('view', $booking);
 
         return $this->success(new TourBookingResource($booking));
@@ -178,7 +183,10 @@ class TourBookingController extends BaseApiController
      */
     public function createCheckoutSession(Request $request, string $uuid): JsonResponse
     {
-        $booking = TourBooking::where('uuid', $uuid)->firstOrFail();
+        $booking = $this->bookingRepo->findByUuid($uuid);
+        if (! $booking) {
+            return $this->error('Tour booking not found.', 404, 'NOT_FOUND');
+        }
         $this->authorize('view', $booking);
 
         if ($booking->status !== TourBookingStatus::PENDING_PAYMENT->value) {
@@ -186,9 +194,15 @@ class TourBookingController extends BaseApiController
         }
 
         try {
-            $result = $this->payments->createCheckoutSession($booking, $request->ip());
+            $result = $this->checkoutAction->handle(new TourCheckoutData(
+                bookingId: $booking->id,
+                ipAddr: $request->ip(),
+                bankCode: $request->input('bank_code'),
+            ));
 
             return $this->success($result);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error($e->getMessage(), 404, 'NOT_FOUND');
         } catch (\RuntimeException $e) {
             return $this->error($e->getMessage(), 500, 'CHECKOUT_FAILED');
         }
@@ -199,21 +213,19 @@ class TourBookingController extends BaseApiController
      */
     public function cancel(Request $request, string $uuid): JsonResponse
     {
-        $booking = TourBooking::where('uuid', $uuid)->with('payments')->firstOrFail();
+        $booking = $this->bookingRepo->findByUuid($uuid, ['payments']);
+        if (! $booking) {
+            return $this->error('Tour booking not found.', 404, 'NOT_FOUND');
+        }
         $this->authorize('cancel', $booking);
 
         try {
-            $this->bookings->cancelBooking($booking);
-            foreach ($booking->payments as $payment) {
-                if ($payment->status === PaymentStatus::COMPLETED->value) {
-                    $this->payments->refund($payment, (float) $payment->amount - (float) ($payment->refunded_amount ?? 0), 'cancelled_by_customer');
-                }
-            }
+            $booking = $this->cancelAction->handle($booking);
         } catch (\Throwable $e) {
             return $this->error($e->getMessage(), 422, 'CANCEL_FAILED');
         }
 
-        return $this->success(new TourBookingResource($booking->fresh()->load(['tour.provider', 'tour.province', 'slot'])));
+        return $this->success(new TourBookingResource($booking->load(['tour.provider', 'tour.province', 'slot'])));
     }
 
     /**
@@ -221,7 +233,10 @@ class TourBookingController extends BaseApiController
      */
     public function storeDispute(StoreTourDisputeRequest $request, string $uuid): JsonResponse
     {
-        $booking = TourBooking::where('uuid', $uuid)->with('dispute')->firstOrFail();
+        $booking = $this->bookingRepo->findByUuid($uuid, ['dispute']);
+        if (! $booking) {
+            return $this->error('Tour booking not found.', 404, 'NOT_FOUND');
+        }
         $this->authorize('dispute', $booking);
 
         if (! $booking->canOpenDispute()) {
@@ -235,11 +250,9 @@ class TourBookingController extends BaseApiController
         $user = $request->user();
 
         try {
-            $dispute = TourDispute::create([
-                'tour_booking_id' => $booking->id,
-                'status' => 'open',
-                'contact_name' => $request->input('contact_name') ?: $user->name,
-                'contact_email' => $request->input('contact_email') ?: $user->email,
+            $dispute = $this->disputeAction->handle($booking, $user, [
+                'contact_name' => $request->input('contact_name'),
+                'contact_email' => $request->input('contact_email'),
                 'contact_phone' => $request->input('contact_phone'),
                 'customer_notes' => $request->input('customer_notes'),
             ]);
@@ -249,6 +262,8 @@ class TourBookingController extends BaseApiController
                 return $this->error('A dispute already exists for this booking.', 422, 'DISPUTE_EXISTS');
             }
             throw $e;
+        } catch (\RuntimeException $e) {
+            return $this->error($e->getMessage(), 422, 'INVALID_STATUS');
         }
 
         return $this->success(new TourDisputeResource($dispute), 201);
@@ -259,9 +274,10 @@ class TourBookingController extends BaseApiController
      */
     public function invoice(Request $request, string $uuid): Response|JsonResponse
     {
-        $booking = TourBooking::where('uuid', $uuid)
-            ->with(['tour.provider', 'tour.province', 'slot', 'customer'])
-            ->firstOrFail();
+        $booking = $this->bookingRepo->findByUuid($uuid, ['tour.provider', 'tour.province', 'slot', 'customer']);
+        if (! $booking) {
+            return $this->error('Tour booking not found.', 404, 'NOT_FOUND');
+        }
         $this->authorize('view', $booking);
 
         $html = view('invoice.tour_booking', ['booking' => $booking])->render();

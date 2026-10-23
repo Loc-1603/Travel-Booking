@@ -15,6 +15,12 @@ use App\Repositories\Contracts\HotelRepositoryInterface;
 use App\Repositories\Contracts\PaymentRepositoryInterface;
 use App\Repositories\Contracts\RoomAvailabilityRepositoryInterface;
 use App\Repositories\Contracts\RoomRepositoryInterface;
+use App\Repositories\Contracts\TourAvailabilitySlotRepositoryInterface;
+use App\Repositories\Contracts\TourBookingRepositoryInterface;
+use App\Repositories\Contracts\TourDisputeRepositoryInterface;
+use App\Repositories\Contracts\TourPaymentRepositoryInterface;
+use App\Repositories\Contracts\TourProductRepositoryInterface;
+use App\Repositories\Contracts\TourProviderRepositoryInterface;
 use App\Repositories\Contracts\WebhookEventRepositoryInterface;
 use App\Repositories\Eloquent\EloquentBookingRepository;
 use App\Repositories\Eloquent\EloquentBookingRoomRepository;
@@ -23,6 +29,12 @@ use App\Repositories\Eloquent\EloquentHotelRepository;
 use App\Repositories\Eloquent\EloquentPaymentRepository;
 use App\Repositories\Eloquent\EloquentRoomAvailabilityRepository;
 use App\Repositories\Eloquent\EloquentRoomRepository;
+use App\Repositories\Eloquent\EloquentTourAvailabilitySlotRepository;
+use App\Repositories\Eloquent\EloquentTourBookingRepository;
+use App\Repositories\Eloquent\EloquentTourDisputeRepository;
+use App\Repositories\Eloquent\EloquentTourPaymentRepository;
+use App\Repositories\Eloquent\EloquentTourProductRepository;
+use App\Repositories\Eloquent\EloquentTourProviderRepository;
 use App\Repositories\Eloquent\EloquentWebhookEventRepository;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Broadcast;
@@ -45,6 +57,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CouponRepositoryInterface::class, EloquentCouponRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class, EloquentPaymentRepository::class);
         $this->app->bind(WebhookEventRepositoryInterface::class, EloquentWebhookEventRepository::class);
+        $this->app->bind(TourBookingRepositoryInterface::class, EloquentTourBookingRepository::class);
+        $this->app->bind(TourAvailabilitySlotRepositoryInterface::class, EloquentTourAvailabilitySlotRepository::class);
+        $this->app->bind(TourPaymentRepositoryInterface::class, EloquentTourPaymentRepository::class);
+        $this->app->bind(TourProductRepositoryInterface::class, EloquentTourProductRepository::class);
+        $this->app->bind(TourDisputeRepositoryInterface::class, EloquentTourDisputeRepository::class);
+        $this->app->bind(TourProviderRepositoryInterface::class, EloquentTourProviderRepository::class);
     }
 
     /**

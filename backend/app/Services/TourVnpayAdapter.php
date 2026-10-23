@@ -3,21 +3,17 @@
 namespace App\Services;
 
 use App\Enums\PaymentStatus;
-use App\Enums\TourBookingStatus;
-use App\Events\TourPaymentConfirmed;
-use App\Models\TourBooking;
-use App\Models\TourPayment;
-use Illuminate\Support\Facades\DB;
+use App\Repositories\Contracts\TourPaymentRepositoryInterface;
 use Illuminate\Support\Str;
 
 /**
- * VNPay URL builder for tour_bookings. Reuses VnpayService crypto
- * (signature/verify) but writes to tour_payments (payments untouched).
+ * VNPay URL builder for tour_bookings.
  */
 class TourVnpayAdapter
 {
     public function __construct(
         protected VnpayService $vnpay,
+        protected TourPaymentRepositoryInterface $payments,
     ) {}
 
     public function isConfigured(): bool
@@ -28,7 +24,7 @@ class TourVnpayAdapter
     /**
      * @return array{payment_url: string, payment_id: int, txn_ref: string}
      */
-    public function createPaymentUrl(TourBooking $booking, ?string $ipAddr = null, ?string $bankCode = null): array
+    public function createPaymentUrl(\App\Models\TourBooking $booking, ?string $ipAddr = null, ?string $bankCode = null): array
     {
         if (! $this->vnpay->isConfigured()) {
             throw new \RuntimeException('VNPay is not configured. Set VNPAY_TMN_CODE and VNPAY_HASH_SECRET in .env.');
@@ -39,10 +35,9 @@ class TourVnpayAdapter
             throw new \RuntimeException('Invalid tour booking amount for VNPay payment.');
         }
 
-        // Prefix tour: keeps txn_refs distinct from hotel payments.
         $txnRef = 'tour_'.$booking->id.'_'.now()->format('YmdHis').'_'.Str::upper(Str::random(4));
 
-        $payment = TourPayment::create([
+        $payment = $this->payments->create([
             'tour_booking_id' => $booking->id,
             'amount' => $amountVnd,
             'currency' => 'VND',
@@ -74,7 +69,6 @@ class TourVnpayAdapter
             $params['vnp_BankCode'] = $bankCode;
         }
 
-        // Reuse public signature() from VnpayService (same HMAC-SHA512 scheme).
         ksort($params);
         $query = '';
         foreach ($params as $key => $value) {
@@ -94,26 +88,24 @@ class TourVnpayAdapter
         return $this->vnpay->verifySignature($input);
     }
 
-    public function findPaymentForIpn(array $input): ?TourPayment
+    public function findPaymentForIpn(array $input): ?\App\Models\TourPayment
     {
         $txnRef = (string) ($input['vnp_TxnRef'] ?? '');
         if ($txnRef === '') {
             return null;
         }
 
-        return TourPayment::where('provider', 'vnpay')
-            ->where('external_id', $txnRef)
-            ->first();
+        return $this->payments->findByTxnRef($txnRef, 'vnpay');
     }
 
-    public function amountMatches(TourPayment $payment, array $input): bool
+    public function amountMatches(\App\Models\TourPayment $payment, array $input): bool
     {
         $vnpAmount = (int) ($input['vnp_Amount'] ?? 0);
 
         return $vnpAmount === (int) round((float) $payment->amount) * 100;
     }
 
-    public function recordTransactionNo(TourPayment $payment, array $input): void
+    public function recordTransactionNo(\App\Models\TourPayment $payment, array $input): void
     {
         $transactionNo = (string) ($input['vnp_TransactionNo'] ?? '');
         if ($transactionNo === '') {
@@ -122,10 +114,10 @@ class TourVnpayAdapter
 
         $payload = $payment->payload ?? [];
         $payload['vnp_transaction_no'] = $transactionNo;
-        $payment->update(['payload' => $payload]);
+        $this->payments->update($payment, ['payload' => $payload]);
     }
 
-    protected function returnUrl(TourBooking $booking): string
+    protected function returnUrl(\App\Models\TourBooking $booking): string
     {
         $base = rtrim((string) config('services.vnpay.return_url'), '/');
 

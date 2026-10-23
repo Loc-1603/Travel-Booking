@@ -4,25 +4,23 @@ namespace App\Services;
 
 use App\DTOs\PriceBreakdown;
 use App\Enums\TourPricingMode;
-use App\Models\Coupon;
-use App\Models\TourAvailabilitySlot;
-use App\Models\TourProduct;
+use App\Repositories\Contracts\CouponRepositoryInterface;
+use App\Repositories\Contracts\TourProductRepositoryInterface;
 
 /**
  * Tour pricing: total = base_fixed + unit_price * duration + transport_fee
- *   - volume discount (>=8h 5% / >=3 days 5%, config tour.php)
- *   - generic coupon (active + date + min_amount + usage limits; hotel/room scoping ignored)
- *   - tax mirrored from PricingService (country tax_rate fallback).
  */
 class TourPricingService
 {
     public function __construct(
         protected CouponService $coupons,
+        protected CouponRepositoryInterface $couponRepo,
+        protected TourProductRepositoryInterface $products,
     ) {}
 
     public function calculate(
-        TourProduct $tour,
-        ?TourAvailabilitySlot $slot,
+        \App\Models\TourProduct $tour,
+        ?\App\Models\TourAvailabilitySlot $slot,
         string $pricingMode,
         int $durationValue,
         ?string $couponCode = null,
@@ -35,7 +33,6 @@ class TourPricingService
             ? (float) $tour->base_price_daily
             : (float) $tour->base_price_hourly;
 
-        // Slot-level weekend/holiday override replaces the unit price.
         if ($slot?->price_override !== null) {
             $unitPrice = (float) $slot->price_override;
         }
@@ -55,7 +52,6 @@ class TourPricingService
 
         $taxRate = $this->taxRate($tour);
         $amountBeforeTax = max(0, $subtotal - $discount + $transportFee);
-        // Tour prices are tax-exclusive (same as Hotel tax-exclusive branch).
         $tax = round($amountBeforeTax * $taxRate);
         $total = $amountBeforeTax + $tax;
 
@@ -91,7 +87,7 @@ class TourPricingService
      */
     protected function couponDiscount(string $code, float $subtotal, string $date, ?int $userId): array
     {
-        $coupon = Coupon::where('code', strtoupper($code))->where('is_active', true)->first();
+        $coupon = $this->couponRepo->findActiveByCode(strtoupper($code));
         if (! $coupon) {
             return [0.0, null];
         }
@@ -104,20 +100,20 @@ class TourPricingService
         if ($coupon->min_amount !== null && $subtotal < (float) $coupon->min_amount) {
             return [0.0, null];
         }
-        if ($coupon->usage_limit_total !== null && $coupon->redemptionCount() >= $coupon->usage_limit_total) {
+        if ($coupon->usage_limit_total !== null && $this->couponRepo->redemptionCount($coupon) >= $coupon->usage_limit_total) {
             return [0.0, null];
         }
         if ($userId !== null && $coupon->usage_limit_per_user !== null
-            && $coupon->redemptionCountForUser($userId) >= $coupon->usage_limit_per_user) {
+            && $this->couponRepo->redemptionCountForUser($coupon, $userId) >= $coupon->usage_limit_per_user) {
             return [0.0, null];
         }
 
         return [$this->coupons->computeDiscount($coupon, $subtotal), $coupon];
     }
 
-    protected function taxRate(TourProduct $tour): float
+    protected function taxRate(\App\Models\TourProduct $tour): float
     {
-        $tour->loadMissing('province.country');
+        $tour = $this->products->loadProvinceCountry($tour);
         $rate = $tour->province?->country?->tax_rate;
 
         return $rate !== null ? (float) $rate : (float) config('booking.default_tax_rate', 0);

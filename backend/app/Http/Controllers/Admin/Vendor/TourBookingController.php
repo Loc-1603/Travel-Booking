@@ -2,32 +2,30 @@
 
 namespace App\Http\Controllers\Admin\Vendor;
 
-use App\Http\Controllers\Controller;
-use App\Models\TourBooking;
-use App\Models\TourProvider;
+use App\Repositories\Contracts\TourBookingRepositoryInterface;
+use App\Repositories\Contracts\TourProviderRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 
-class TourBookingController extends Controller
+class TourBookingController extends \App\Http\Controllers\Controller
 {
+    public function __construct(
+        protected TourBookingRepositoryInterface $bookings,
+        protected TourProviderRepositoryInterface $providers,
+    ) {}
+
     public function index(Request $request): View
     {
-        $providerIds = TourProvider::where('vendor_id', auth()->id())->pluck('id');
-        $query = TourBooking::whereIn('provider_id', $providerIds)
-            ->with(['tour', 'slot', 'customer']);
+        $providerIds = $this->providers->providerIdsForVendor((int) auth()->id());
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-        if ($request->filled('from')) {
-            $query->whereDate('start_at', '>=', $request->from);
-        }
-        if ($request->filled('to')) {
-            $query->whereDate('start_at', '<=', $request->to);
-        }
-
-        $bookings = $query->latest()->paginate(15)->withQueryString();
+        $bookings = $this->bookings->paginateForProviders(
+            $providerIds->all(),
+            $request->input('status'),
+            $request->input('from'),
+            $request->input('to'),
+            15,
+        );
 
         return view('admin.vendor.tour-bookings.index', compact('bookings'));
     }
@@ -37,10 +35,9 @@ class TourBookingController extends Controller
      */
     public function invoice(string $uuid): Response
     {
-        $booking = TourBooking::where('uuid', $uuid)
-            ->with(['tour.provider', 'tour.province', 'slot', 'customer'])
-            ->firstOrFail();
-        $providerIds = TourProvider::where('vendor_id', auth()->id())->pluck('id');
+        $booking = $this->bookings->findByUuidOrFail($uuid, ['tour.provider', 'tour.province', 'slot', 'customer']);
+
+        $providerIds = $this->providers->providerIdsForVendor((int) auth()->id());
         if (! $providerIds->contains($booking->provider_id)) {
             abort(403, __('admin.vendor.tour_bookings.flash.forbidden_invoice'));
         }

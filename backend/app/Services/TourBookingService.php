@@ -3,22 +3,23 @@
 namespace App\Services;
 
 use App\Enums\TourBookingStatus;
-use App\Models\TourAvailabilitySlot;
-use App\Models\TourBooking;
-use App\Models\TourProduct;
+use App\Repositories\Contracts\TourAvailabilitySlotRepositoryInterface;
+use App\Repositories\Contracts\TourBookingRepositoryInterface;
+use App\Repositories\Contracts\TourProductRepositoryInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Create/cancel 1vs1 tour bookings. Mirrors BookingService transaction +
- * compensate pattern, but capacity is always 1 (slot-level lock).
- * Tour requires login: customerId is never null (no guest flow).
+ * Create/cancel 1vs1 tour bookings.
  */
 class TourBookingService
 {
     public function __construct(
         protected TourAvailabilityService $availability,
         protected TourPricingService $pricing,
+        protected TourBookingRepositoryInterface $bookings,
+        protected TourProductRepositoryInterface $products,
+        protected TourAvailabilitySlotRepositoryInterface $slots,
     ) {}
 
     public function createBooking(
@@ -31,14 +32,13 @@ class TourBookingService
         ?string $meetingPoint = null,
         ?string $customerNotes = null,
         string $currency = 'VND',
-    ): TourBooking {
+    ): \App\Models\TourBooking {
         return DB::transaction(function () use ($customerId, $tourId, $slotId, $pricingMode, $durationValue, $couponCode, $meetingPoint, $customerNotes, $currency) {
-            $tour = TourProduct::where('id', $tourId)->where('status', 'published')->first();
+            $tour = $this->products->findPublishedById($tourId);
             if (! $tour) {
                 throw new \RuntimeException('Tour is not available for booking.');
             }
 
-            // Pessimistic slot lock (available -> held).
             $slot = $this->availability->lockSlot($slotId, $tourId);
 
             $breakdown = $this->pricing->calculate($tour, $slot, $pricingMode, $durationValue, $couponCode, $customerId);
@@ -54,7 +54,7 @@ class TourBookingService
                     ? $startAt->copy()->addDays($durationValue)
                     : $startAt->copy()->addHours($durationValue);
 
-                $booking = TourBooking::create([
+                $booking = $this->bookings->create([
                     'customer_id' => $customerId,
                     'tour_id' => $tour->id,
                     'slot_id' => $slot->id,
@@ -82,41 +82,20 @@ class TourBookingService
 
                 return $booking;
             } catch (\Throwable $e) {
-                $this->availability->releaseSlot($slot->fresh());
+                $this->availability->releaseSlot($slot);
                 throw $e;
             }
         });
     }
 
-    /**
-     * Luồng đặt 1 ngày theo Guide: resolve tour từ slot (slot phải thuộc
-     * tour published của đúng provider đã duyệt), giá luôn = 1 ngày.
-     * Khi $slotId = null (UI đặt theo ngày, không chọn giờ), tự lấy slot
-     * trống sớm nhất của provider trong đúng $travelDate.
-     *
-     * @return array{tour: TourProduct, slot: TourAvailabilitySlot}
-     *
-     * @throws \RuntimeException
-     */
-    public function resolveGuideTourSlot(string $providerUuid, ?int $slotId, ?string $travelDate = null): array
+    public function resolveGuideTourSlot(string $providerUuid, ?int $slotId = null, ?string $travelDate = null): array
     {
         if ($slotId === null) {
             if ($travelDate === null) {
                 throw new \RuntimeException('Travel date is required.');
             }
             $day = Carbon::parse($travelDate)->toDateString();
-            $slot = TourAvailabilitySlot::query()
-                ->with('tour.provider')
-                ->join('tour_products', 'tour_products.id', '=', 'tour_availability_slots.tour_id')
-                ->join('tour_providers', 'tour_providers.id', '=', 'tour_products.provider_id')
-                ->where('tour_providers.uuid', $providerUuid)
-                ->where('tour_providers.status', 'approved')
-                ->where('tour_products.status', 'published')
-                ->where('tour_availability_slots.status', 'available')
-                ->whereDate('tour_availability_slots.date', '=', $day)
-                ->orderBy('tour_availability_slots.start_time')
-                ->select('tour_availability_slots.*')
-                ->first();
+            $slot = $this->slots->findGuideSlot($providerUuid, $day);
             if (! $slot || ! $slot->tour) {
                 throw new \RuntimeException('Guide is not free on the travel date.');
             }
@@ -124,7 +103,7 @@ class TourBookingService
             return ['tour' => $slot->tour, 'slot' => $slot];
         }
 
-        $slot = TourAvailabilitySlot::with('tour.provider')->find($slotId);
+        $slot = $this->slots->findWithTourProvider($slotId);
         if (! $slot || ! $slot->tour) {
             throw new \RuntimeException('Tour slot not found.');
         }
@@ -144,9 +123,6 @@ class TourBookingService
         return ['tour' => $tour, 'slot' => $slot];
     }
 
-    /**
-     * Tạo booking 1 ngày theo Guide (pricing_mode=day, duration=1).
-     */
     public function createGuideBooking(
         int $customerId,
         string $providerUuid,
@@ -156,7 +132,7 @@ class TourBookingService
         ?string $meetingPoint = null,
         ?string $customerNotes = null,
         string $currency = 'VND',
-    ): TourBooking {
+    ): \App\Models\TourBooking {
         $resolved = $this->resolveGuideTourSlot($providerUuid, $slotId, $travelDate);
 
         return $this->createBooking(
@@ -172,9 +148,6 @@ class TourBookingService
         );
     }
 
-    /**
-     * Xem trước giá 1 ngày theo Guide (không lock slot).
-     */
     public function previewGuide(
         string $providerUuid,
         ?int $slotId,
@@ -187,24 +160,65 @@ class TourBookingService
         return $this->preview($resolved['tour']->id, $resolved['slot']->id, 'day', 1, $couponCode, $userId);
     }
 
-    public function cancelBooking(TourBooking $booking): void
+    /**
+     * Cancel pending bookings past the hold TTL and release their slots.
+     * Returns the number of candidate bookings examined (same as the command).
+     */
+    public function expirePendingBookings(): int
+    {
+        $ttl = (int) config('tour.hold_ttl_minutes', 15);
+        $cutoff = Carbon::now()->subMinutes($ttl);
+        $count = 0;
+
+        foreach ($this->bookings->expiredPendingIds($cutoff) as $bookingId) {
+            DB::transaction(function () use ($bookingId) {
+                $booking = $this->bookings->findByIdForUpdate((int) $bookingId);
+
+                if (! $booking
+                    || $booking->status !== TourBookingStatus::PENDING_PAYMENT->value
+                    || ! $booking->isExpired()) {
+                    return;
+                }
+
+                $slot = $this->slots->findByIdForUpdate((int) $booking->slot_id);
+                if ($slot) {
+                    $this->availability->releaseSlot($slot);
+                }
+
+                $this->bookings->update($booking, ['status' => TourBookingStatus::CANCELLED->value]);
+            });
+
+            $count++;
+        }
+
+        return $count;
+    }
+
+    /**
+     * Advance confirmed -> ongoing -> completed by time.
+     *
+     * @return array{ongoing: int, completed: int}
+     */
+    public function advanceTimedStatuses(): array
+    {
+        return $this->bookings->advanceTimedStatuses();
+    }
+
+    public function cancelBooking(\App\Models\TourBooking $booking): void
     {
         if ($booking->status === TourBookingStatus::CANCELLED->value) {
             return;
         }
 
         DB::transaction(function () use ($booking) {
-            $slot = TourAvailabilitySlot::where('id', $booking->slot_id)->lockForUpdate()->first();
+            $slot = $this->slots->findByIdForUpdate($booking->slot_id);
             if ($slot) {
                 $this->availability->releaseSlot($slot);
             }
-            $booking->update(['status' => TourBookingStatus::CANCELLED->value]);
+            $this->bookings->update($booking, ['status' => TourBookingStatus::CANCELLED->value]);
         });
     }
 
-    /**
-     * Price preview without creating anything (no lock).
-     */
     public function preview(
         int $tourId,
         int $slotId,
@@ -213,8 +227,8 @@ class TourBookingService
         ?string $couponCode,
         ?int $userId,
     ): \App\DTOs\PriceBreakdown {
-        $tour = TourProduct::findOrFail($tourId);
-        $slot = TourAvailabilitySlot::find($slotId);
+        $tour = $this->products->findByIdOrFail($tourId);
+        $slot = $this->slots->findById($slotId);
 
         return $this->pricing->calculate($tour, $slot, $pricingMode, $durationValue, $couponCode, $userId);
     }

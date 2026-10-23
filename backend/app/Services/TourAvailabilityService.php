@@ -3,23 +3,21 @@
 namespace App\Services;
 
 use App\Enums\TourSlotStatus;
-use App\Models\TourAvailabilitySlot;
+use App\Repositories\Contracts\TourAvailabilitySlotRepositoryInterface;
 use Illuminate\Support\Carbon;
 
 /**
  * Slot-level availability for 1vs1 tours (capacity always = 1).
- * Mirrors AvailabilityService pessimistic-lock pattern, but per-slot
- * instead of per-night room counts. Hotel tables untouched.
  */
 class TourAvailabilityService
 {
+    public function __construct(
+        protected TourAvailabilitySlotRepositoryInterface $slots,
+    ) {}
+
     public function listSlots(int $tourId, string $from, string $to): \Illuminate\Database\Eloquent\Collection
     {
-        return TourAvailabilitySlot::where('tour_id', $tourId)
-            ->whereBetween('date', [$from, $to])
-            ->orderBy('date')
-            ->orderBy('start_time')
-            ->get();
+        return $this->slots->listForTourRange($tourId, $from, $to);
     }
 
     /**
@@ -27,9 +25,9 @@ class TourAvailabilityService
      *
      * @throws \RuntimeException when slot is not bookable
      */
-    public function lockSlot(int $slotId, ?int $expectedTourId = null): TourAvailabilitySlot
+    public function lockSlot(int $slotId, ?int $expectedTourId = null): \App\Models\TourAvailabilitySlot
     {
-        $slot = TourAvailabilitySlot::where('id', $slotId)->lockForUpdate()->first();
+        $slot = $this->slots->findByIdForUpdate($slotId);
         if (! $slot) {
             throw new \RuntimeException('Tour slot not found.');
         }
@@ -41,34 +39,33 @@ class TourAvailabilityService
         if ($slot->status === TourSlotStatus::HELD->value
             && $slot->held_until !== null
             && $slot->held_until->isPast()) {
-            $slot->update(['status' => TourSlotStatus::AVAILABLE->value, 'held_until' => null, 'tour_booking_id' => null]);
-            $slot->refresh();
+            $slot = $this->slots->update($slot, ['status' => TourSlotStatus::AVAILABLE->value, 'held_until' => null, 'tour_booking_id' => null]);
         }
 
         if ($slot->status !== TourSlotStatus::AVAILABLE->value) {
             throw new \RuntimeException('Tour slot is no longer available.');
         }
 
-        $slot->update([
+        $slot = $this->slots->update($slot, [
             'status' => TourSlotStatus::HELD->value,
             'held_until' => Carbon::now()->addMinutes((int) config('tour.hold_ttl_minutes', 15)),
         ]);
 
-        return $slot->fresh();
+        return $slot;
     }
 
-    public function confirmSlot(TourAvailabilitySlot $slot, int $bookingId): void
+    public function confirmSlot(\App\Models\TourAvailabilitySlot $slot, int $bookingId): void
     {
-        $slot->update([
+        $this->slots->update($slot, [
             'status' => TourSlotStatus::BOOKED->value,
             'held_until' => null,
             'tour_booking_id' => $bookingId,
         ]);
     }
 
-    public function releaseSlot(TourAvailabilitySlot $slot): void
+    public function releaseSlot(\App\Models\TourAvailabilitySlot $slot): void
     {
-        $slot->update([
+        $this->slots->update($slot, [
             'status' => TourSlotStatus::AVAILABLE->value,
             'held_until' => null,
             'tour_booking_id' => null,
@@ -80,9 +77,6 @@ class TourAvailabilityService
      */
     public function releaseExpiredHolds(): int
     {
-        return TourAvailabilitySlot::where('status', TourSlotStatus::HELD->value)
-            ->whereNotNull('held_until')
-            ->where('held_until', '<', Carbon::now())
-            ->update(['status' => TourSlotStatus::AVAILABLE->value, 'held_until' => null, 'tour_booking_id' => null]);
+        return $this->slots->releaseExpiredHolds();
     }
 }
