@@ -4,6 +4,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, Search, SlidersHorizontal, X, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/useAuth';
 import { useWishlist } from '../hooks/useWishlist';
@@ -63,12 +64,13 @@ function LocationPicker({ onPick }) {
 }
 
 function WishlistHeart({ hotelId, checkIn, checkOut }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { isInWishlist, addToWishlist, removeFromWishlist, addPending, removePending } = useWishlist(!!user);
 
   if (!user) {
     return (
-      <Link to="/login" className="absolute top-2 right-2 p-2 rounded-full bg-white/90 shadow hover:bg-white" aria-label="Log in to save">
+      <Link to="/login" className="absolute top-2 right-2 p-2 rounded-full bg-white/90 shadow hover:bg-white" aria-label={t('hotels.mapSearch.wishlistLogin')}>
         <HeartIcon filled={false} />
       </Link>
     );
@@ -89,7 +91,7 @@ function WishlistHeart({ hotelId, checkIn, checkOut }) {
       onClick={handleClick}
       disabled={addPending || removePending}
       className="absolute top-2 right-2 p-2 rounded-full bg-white/90 shadow hover:bg-white disabled:opacity-60"
-      aria-label={inList ? 'Remove from wishlist' : 'Add to wishlist'}
+      aria-label={inList ? t('hotels.mapSearch.wishlistRemove') : t('hotels.mapSearch.wishlistAdd')}
     >
       <HeartIcon filled={inList} />
     </button>
@@ -105,6 +107,7 @@ function HeartIcon({ filled }) {
 }
 
 export default function MapSearch() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const latParam = searchParams.get('latitude');
   const lngParam = searchParams.get('longitude');
@@ -220,14 +223,14 @@ export default function MapSearch() {
                 value={searchText}
                 onChange={handleSearchInput}
                 onFocus={() => suggestions.length > 0 && setSuggestionsOpen(true)}
-                placeholder="Search city or address..."
+                placeholder={t('hotels.mapSearch.placeholder')}
                 className="w-full h-12 pl-10 pr-4 rounded-xl border border-stone-200 text-stone-900 placeholder-stone-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white"
               />
               {suggestionsOpen && suggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl border border-stone-200 shadow-lg py-2 max-h-64 overflow-y-auto z-30">
                   {suggestions.map((f, i) => {
                     const p = f.properties || {};
-                    const label = p.formatted || p.address_line1 || 'Unknown';
+                    const label = p.formatted || p.address_line1 || t('hotels.mapSearch.unknownPlace');
                     return (
                       <button
                         key={i}
@@ -246,14 +249,14 @@ export default function MapSearch() {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="w-5 h-5 text-stone-500" />
-                <span className="text-sm font-medium text-stone-700">Radius:</span>
+                <span className="text-sm font-medium text-stone-700">{t('hotels.mapSearch.radiusLabel')}</span>
                 <select
                   value={radius}
                   onChange={(e) => setRadius(Number(e.target.value))}
                   className="rounded-xl border border-stone-200 px-4 py-2.5 text-sm text-stone-700 bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 >
                   {RADIUS_OPTIONS.map((r) => (
-                    <option key={r} value={r}>{r} km</option>
+                    <option key={r} value={r}>{t('hotels.mapSearch.km', { value: r })}</option>
                   ))}
                 </select>
               </div>
@@ -264,12 +267,12 @@ export default function MapSearch() {
                 className="h-12 px-6 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
               >
                 <Search className="w-5 h-5" />
-                Search hotels
+                {t('hotels.mapSearch.searchHotels')}
               </button>
             </div>
           </div>
           <p className="mt-2 text-sm text-stone-500">
-            Click the map or choose a place from search to find hotels (default radius 50 km). Adjust radius and click &quot;Search hotels&quot; to refresh.
+            {t('hotels.mapSearch.helpText')}
           </p>
           {hasSearched && (
             <div
@@ -281,22 +284,22 @@ export default function MapSearch() {
               ) : (
                 <>
                   <span className="font-semibold text-stone-900">
-                    {total} {total === 1 ? 'hotel' : 'hotels'} match this search
+                    {t('hotels.mapSearch.matchThisSearch', { count: total })}
                   </span>
                   <span className="text-stone-300" aria-hidden>
                     ·
                   </span>
                   <span className="text-stone-600">
-                    {radiusParam} km radius
+                    {t('hotels.mapSearch.radius', { radius: radiusParam })}
                     {checkIn && checkOut && (
                       <span className="text-stone-500">
                         {' '}
-                        · dates applied
+                        · {t('hotels.mapSearch.datesApplied')}
                       </span>
                     )}
                   </span>
                   {isFetching && !isLoading && (
-                    <span className="text-xs font-medium text-amber-600">Refreshing…</span>
+                    <span className="text-xs font-medium text-amber-600">{t('hotels.mapSearch.refreshing')}</span>
                   )}
                 </>
               )}
@@ -323,7 +326,7 @@ export default function MapSearch() {
             <LocationPicker onPick={handleMapClick} />
             {marker && (
               <Marker position={marker} icon={searchAreaIcon}>
-                <Popup>Search area center. Results update automatically when you click the map.</Popup>
+                <Popup>{t('hotels.mapSearch.searchAreaCenter')}</Popup>
               </Marker>
             )}
             {hasSearched && hotels.filter((h) => h.latitude != null && h.longitude != null).map((h) => (
@@ -346,11 +349,11 @@ export default function MapSearch() {
           <div className="flex flex-col flex-1 bg-stone-50 rounded-2xl border border-stone-200/90 overflow-y-auto min-h-[280px] lg:min-h-0 shadow-[0_4px_24px_rgba(26,26,26,0.06)] ring-1 ring-stone-200/50">
           <div className="p-4 sm:p-6 lg:p-8">
             <nav className="text-sm text-stone-600 mb-4">
-              <Link to="/" className="hover:text-amber-600">Home</Link>
+              <Link to="/" className="hover:text-amber-600">{t('hotels.mapSearch.home')}</Link>
               <span className="mx-1">›</span>
-              <Link to="/hotels" className="hover:text-amber-600">Hotels</Link>
+              <Link to="/hotels" className="hover:text-amber-600">{t('hotels.mapSearch.hotels')}</Link>
               <span className="mx-1">›</span>
-              <span className="text-stone-900 font-medium">Map search</span>
+              <span className="text-stone-900 font-medium">{t('hotels.mapSearch.title')}</span>
             </nav>
 
             {!hasSearched ? (
@@ -358,9 +361,9 @@ export default function MapSearch() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 text-amber-600 mb-4">
                   <MapPin className="w-8 h-8" />
                 </div>
-                <h2 className="text-xl font-semibold text-stone-900 mb-2">Pick a location on the map</h2>
+                <h2 className="text-xl font-semibold text-stone-900 mb-2">{t('hotels.mapSearch.pickLocation')}</h2>
                 <p className="text-stone-600 max-w-sm mx-auto mb-6">
-                  Search for a city or click anywhere on the map — hotels load automatically (50 km radius by default). Change radius and use Search hotels to refresh.
+                  {t('hotels.mapSearch.pickLocationDesc')}
                 </p>
                 <div className="flex flex-wrap justify-center gap-3">
                   <button
@@ -373,25 +376,25 @@ export default function MapSearch() {
                     }}
                     className="px-4 py-2.5 rounded-xl border border-stone-200 hover:bg-amber-50 text-sm font-medium transition-colors"
                   >
-                    Reset map
+                    {t('hotels.mapSearch.resetMap')}
                   </button>
                 </div>
               </div>
             ) : isError ? (
-              <ErrorMessage message={error?.response?.data?.message || error?.message || 'Could not load hotels'} />
+              <ErrorMessage message={error?.response?.data?.message || error?.message || t('hotels.mapSearch.loadError')} />
             ) : isLoading ? (
               <HotelListSkeleton count={4} />
             ) : hotels.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-stone-600 text-lg font-medium mb-2">No hotels found in this area</p>
-                <p className="text-stone-500 mb-6">Try increasing the search radius or picking a different location.</p>
+                <p className="text-stone-600 text-lg font-medium mb-2">{t('hotels.mapSearch.noHotels')}</p>
+                <p className="text-stone-500 mb-6">{t('hotels.mapSearch.noHotelsDesc')}</p>
                 <button
                   type="button"
                   onClick={() => setSearchParams({})}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors"
                 >
                   <MapPin className="w-5 h-5" />
-                  Pick another location
+                  {t('hotels.mapSearch.pickAnother')}
                 </button>
               </div>
             ) : (
@@ -399,12 +402,12 @@ export default function MapSearch() {
                 <div className="flex items-center justify-between mb-6 gap-3">
                   <div className="min-w-0">
                     <h2 className="text-xl font-bold text-stone-900">
-                      {total} {total === 1 ? 'hotel' : 'hotels'} in this area
+                      {t('hotels.mapSearch.inThisArea', { count: total })}
                     </h2>
                     <p className="mt-1 text-sm text-stone-500">
-                      {radiusParam} km radius
+                      {t('hotels.mapSearch.radius', { radius: radiusParam })}
                       {isFetching && !isLoading && (
-                        <span className="ml-2 text-xs font-medium text-amber-600">Updating…</span>
+                        <span className="ml-2 text-xs font-medium text-amber-600">{t('hotels.mapSearch.updating')}</span>
                       )}
                     </p>
                   </div>
@@ -412,7 +415,7 @@ export default function MapSearch() {
                     to={`/hotels?latitude=${latParam}&longitude=${lngParam}&radius_km=${radiusParam}${checkIn ? `&check_in=${checkIn}&check_out=${checkOut}` : ''}`}
                     className="text-sm font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1"
                   >
-                    View all <ChevronRight className="w-4 h-4" />
+                    {t('hotels.mapSearch.viewAll')} <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -424,7 +427,7 @@ export default function MapSearch() {
                       imageOverlay={<WishlistHeart hotelId={h.id} checkIn={checkIn || undefined} checkOut={checkOut || undefined} />}
                     >
                       <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[#b8860b] group-hover:text-[#996f09]">
-                        View details <span aria-hidden>→</span>
+                        {t('hotels.mapSearch.viewDetails')} <span aria-hidden>→</span>
                       </span>
                     </HotelCard>
                   ))}

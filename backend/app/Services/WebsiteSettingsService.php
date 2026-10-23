@@ -23,7 +23,7 @@ class WebsiteSettingsService
 
     public static function getSiteDescription(): string
     {
-        return self::get('site_description', 'Find and book the perfect travel for your next trip');
+        return self::get('site_description', 'Tìm kiếm và đặt chuyến đi hoàn hảo cho chuyến đi tiếp theo của bạn');
     }
 
     public static function getSiteLogo(): ?string

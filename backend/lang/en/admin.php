@@ -135,7 +135,7 @@ return [
     'sidebar' => [
         'menu' => 'Menu',
         'dashboard' => 'Dashboard',
-        'vendors' => 'Vendors',
+        'vendors' => 'Hotel Owners',
         'commission' => 'Commission',
         'payouts' => 'Payouts',
         'website_settings' => 'Website Settings',
@@ -905,6 +905,7 @@ return [
             'title' => 'Review Moderation',
             'filter' => [
                 'label' => 'Filter',
+                'type_label' => 'Type',
                 'all' => 'All',
                 'visible' => 'Visible',
                 'hidden' => 'Hidden',
@@ -1167,7 +1168,7 @@ return [
 
         // Vendors (Admin)
         'vendors' => [
-            'title' => 'Vendors',
+            'title' => 'Hotel Owners',
             'filters' => [
                 'all' => 'All',
                 'pending' => 'Pending',

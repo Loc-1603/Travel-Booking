@@ -24,7 +24,7 @@ import { HotelCard } from '../components/HotelCard';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useTranslation } from 'react-i18next';
 
-function LocationCard({ to, name, subtext, image, cta = 'View stays', className = '' }) {
+function LocationCard({ to, name, subtext, image, cta = 'Xem khách sạn', className = '' }) {
   return (
     <Link
       to={to}
@@ -99,17 +99,17 @@ const PROPERTY_TYPES = [
 const TESTIMONIALS = [
   {
     quote: 'home.testimonials.quote1',
-    author: 'Maria K.',
+    author: 'Nguyễn Duy',
     trip: 'Hà Nội',
   },
   {
     quote: 'home.testimonials.quote2',
-    author: 'James L.',
+    author: 'Xuân Lộc',
     trip: 'Đà Nẵng',
   },
   {
     quote: 'home.testimonials.quote3',
-    author: 'Sofia R.',
+    author: 'Anh Dức',
     trip: 'Hội An',
   },
 ];

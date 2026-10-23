@@ -14,7 +14,7 @@ Travel-Booking là giải pháp SaaS hoàn chỉnh để quản lý đặt phòn
 - **Quản lý đa khách sạn & đa tour** — Vendors độc lập với cô lập hoàn toàn và thương hiệu tùy chỉnh; tour provider riêng biệt cho mỗi vendor
 - **Quản lý phòng & tour động** — Tạo, cập nhật nhiều loại phòng/tour mỗi khách sạn/provider
 - **Tính khả dụng & giá thông minh** — Theo dõi khả dụng thời gian thực với quy tắc giá động, slot tour, mùa vụ
-- **Thanh toán tích hợp** — VNPay và PayPal với webhook và xác nhận bất đồng bộ
+- **Thanh toán tích hợp** — VNPay với webhook và xác nhận bất đồng bộ
 - **Hệ thống hoa hồng** — Tính toán và theo dõi hoa hồng tự động cho khách sạn và tour
 - **Thanh toán nhà cung cấp** — Super Admin tạo payout theo kỳ, đánh dấu đã thanh toán kèm tham chiếu, xuất CSV; vendor xem lịch sử payout
 - **Cài đặt website động** — Tên site, logo, favicon trong admin, vendor dashboard và frontend khách hàng
@@ -152,7 +152,7 @@ Vite proxy `/api` → backend. Hoặc tạo `.env.local` với `VITE_API_URL=htt
 - Đặt tour, tin nhắn, review
 
 ### Thanh toán
-- Phương thức VNPay/PayPal, ghi nhận giao dịch, hoàn tiền
+- Phương thức VNPay, ghi nhận giao dịch, hoàn tiền
 - Tính hoa hồng, payout vendor với trạng thái Pending → Processing → Paid
 
 ### Cài đặt website
@@ -176,7 +176,7 @@ Sử dụng **Laravel Sanctum** cho API token và **Laravel Policies** cho ủy 
 
 ## 💳 Tích hợp thanh toán
 
-- VNPay & PayPal cho thanh toán an toàn
+- VNPay cho thanh toán an toàn
 - Webhook xử lý xác nhận thanh toán
 - Xác nhận bất đồng bộ với xác thực webhook
 - Xử lý hoàn tiền
@@ -211,7 +211,7 @@ Checklist production:
 - `APP_ENV=production`, `APP_DEBUG=false`
 - Chạy migration với `--force`
 - Redis cho cache & queue
-- Cấu hình VNPay/PayPal
+- Cấu hình VNPay
 - Supervisor cho queue worker
 - Cron cho scheduler
 - SSL/TLS, CORS, backup DB

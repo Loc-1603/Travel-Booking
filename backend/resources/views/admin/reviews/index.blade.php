@@ -15,6 +15,14 @@
                         <option value="hidden" {{ request('filter') === 'hidden' ? 'selected' : '' }}>{{ __('admin.vendor.reviews.filter.hidden') }}</option>
                     </select>
                 </div>
+                <div class="col-auto">
+                    <label class="form-label mb-0">{{ __('admin.vendor.reviews.filter.type_label') }}</label>
+                    <select name="type" class="form-select form-select-sm">
+                        <option value="">{{ __('admin.vendor.reviews.filter.all') }}</option>
+                        <option value="hotel" {{ request('type') === 'hotel' ? 'selected' : '' }}>{{ __('admin.vendor.reviews.type.hotel') }}</option>
+                        <option value="tour" {{ request('type') === 'tour' ? 'selected' : '' }}>{{ __('admin.vendor.reviews.type.tour') }}</option>
+                    </select>
+                </div>
                 <div class="col-auto"><button type="submit" class="btn btn-sm btn-primary">{{ __('admin.vendor.reviews.filter.apply') }}</button></div>
             </form>
         </div>

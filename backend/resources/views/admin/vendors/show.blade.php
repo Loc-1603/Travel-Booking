@@ -107,7 +107,7 @@
                             @endif
                         </table>
                     @else
-                        <p class="text-muted mb-0">No business details provided yet.</p>
+                        <p class="text-muted mb-0">Chưa có thông tin doanh nghiệp.</p>
                     @endif
                 </div>
             </div>

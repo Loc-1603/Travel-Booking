@@ -30,6 +30,13 @@ class ReviewModerationController extends Controller
                 default => null,
             };
         }
+        if ($request->filled('type')) {
+            match ($request->type) {
+                'hotel' => $query->whereNull('tour_booking_id'),
+                'tour' => $query->whereNotNull('tour_booking_id'),
+                default => null,
+            };
+        }
         $reviews = $query->latest()->paginate(15)->withQueryString();
 
         return view('admin.reviews.index', compact('reviews'));

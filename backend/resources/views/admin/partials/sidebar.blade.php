@@ -100,7 +100,7 @@
                 @if(auth()->user()->role === \App\Enums\Role::SUPER_ADMIN)
                 {{-- Platform content & configuration --}}
                 @php
-                    $hotelActive = request()->routeIs('admin.countries.*','admin.cities.*','admin.amenities.*','admin.disputes.*','admin.reviews.*');
+                    $hotelActive = request()->routeIs('admin.countries.*','admin.cities.*','admin.amenities.*','admin.disputes.*','admin.vendors.*');
                     $tourActive = request()->routeIs('admin.tour-provinces.*','admin.tour-attractions.*','admin.tour-providers.*','admin.tour-disputes.*');
                 @endphp
                 <li class="{{ $hotelActive ? 'mm-active' : '' }}">
@@ -113,7 +113,7 @@
                         <li><a href="{{ route('admin.cities.index') }}" class="{{ request()->routeIs('admin.cities.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.cities') }}</span></a></li>
                         <li><a href="{{ route('admin.amenities.index') }}" class="{{ request()->routeIs('admin.amenities.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.amenities') }}</span></a></li>
                         <li><a href="{{ route('admin.disputes.index') }}" class="{{ request()->routeIs('admin.disputes.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.disputes') }}</span></a></li>
-                        <li><a href="{{ route('admin.reviews.index') }}" class="{{ request()->routeIs('admin.reviews.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.reviews') }}</span></a></li>
+                        <li><a href="{{ route('admin.vendors.index') }}" class="{{ request()->routeIs('admin.vendors.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.vendors') }}</span></a></li>
                     </ul>
                 </li>
                 <li class="{{ $tourActive ? 'mm-active' : '' }}">
@@ -128,13 +128,13 @@
                         <li><a href="{{ route('admin.tour-disputes.index') }}" class="{{ request()->routeIs('admin.tour-disputes.*') ? 'mm-active' : '' }}"><span>{{ __('admin.sidebar.tour_disputes') }}</span></a></li>
                     </ul>
                 </li>
-                {{-- Partners & revenue --}}
                 <li>
-                    <a href="{{ route('admin.vendors.index') }}">
-                        <i data-feather="users"></i>
-                        <span>{{ __('admin.sidebar.vendors') }}</span>
+                    <a href="{{ route('admin.reviews.index') }}">
+                        <i data-feather="star"></i>
+                        <span>{{ __('admin.sidebar.reviews') }}</span>
                     </a>
                 </li>
+                {{-- Revenue --}}
                 <li>
                     <a href="{{ route('admin.commission.index') }}">
                         <i data-feather="percent"></i>

@@ -108,17 +108,17 @@ class BookingSeeder extends Seeder
                     'booking_id' => $booking->id,
                     'rating' => (int) rand(3, 5),
                     'comment' => [
-                        'Excellent stay, highly recommended!',
-                        'Great location and service.',
-                        'Comfortable rooms and friendly staff.',
-                        'Would definitely stay again.',
-                        'Good value for money.',
+                        'Mọi người nên thử.',
+                        'Vị trí và dịch vụ tuyệt vời.',
+                        'Phòng thoải mái và nhân viên thân thiện.',
+                        'Tôi sẽ quay lại lần sau.',
+                        'Giá rẻ chất lượng cao.',
                     ][array_rand([
-                        'Excellent stay, highly recommended!',
-                        'Great location and service.',
-                        'Comfortable rooms and friendly staff.',
-                        'Would definitely stay again.',
-                        'Good value for money.',
+                        'Mọi người nên thử.',
+                        'Vị trí và dịch vụ tuyệt vời.',
+                        'Phòng thoải mái và nhân viên thân thiện.',
+                        'Tôi sẽ quay lại lần sau.',
+                        'Giá rẻ chất lượng cao.',
                     ])],
                 ]);
             }

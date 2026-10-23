@@ -14,7 +14,7 @@ class WebsiteSettingsController extends Controller
     {
         $settings = [
             'site_name' => PlatformSetting::get('site_name', 'Hotel Booking Platform'),
-            'site_description' => PlatformSetting::get('site_description', 'Find and book the perfect travel for your next trip'),
+            'site_description' => PlatformSetting::get('site_description', 'Tìm kiếm và đặt chuyến đi hoàn hảo cho chuyến đi tiếp theo của bạn'),
             'site_logo' => PlatformSetting::get('site_logo'),
             'site_favicon' => PlatformSetting::get('site_favicon'),
             'site_email' => PlatformSetting::get('site_email', 'info@travelbooking.com'),
@@ -25,7 +25,7 @@ class WebsiteSettingsController extends Controller
             'social_instagram' => PlatformSetting::get('social_instagram'),
             'social_linkedin' => PlatformSetting::get('social_linkedin'),
             'meta_title' => PlatformSetting::get('meta_title', 'Hotel Booking Platform'),
-            'meta_description' => PlatformSetting::get('meta_description', 'Find and book the perfect travel for your next trip'),
+            'meta_description' => PlatformSetting::get('meta_description', 'Tìm kiếm và đặt chuyến đi hoàn hảo cho chuyến đi tiếp theo của bạn'),
             'meta_keywords' => PlatformSetting::get('meta_keywords', 'hotel, booking, travel, accommodation'),
             'google_analytics' => PlatformSetting::get('google_analytics'),
             'maintenance_mode' => PlatformSetting::get('maintenance_mode', '0'),

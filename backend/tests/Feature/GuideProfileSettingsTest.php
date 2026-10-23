@@ -106,7 +106,8 @@ test('db:seed restores the default rich bio sample for Giàng A Páo', function 
     $provider = TourProvider::where('business_name', 'Giàng A Páo')->firstOrFail();
     expect($provider->bio_json)->toBeArray()
         ->and($provider->bio_json['type'])->toBe('doc')
-        ->and($provider->bio_html)->toContain('<h2>Giàng A Páo — guide người Mông ở Đồng Văn</h2>');
+        ->and($provider->bio_html)->toContain('<h2>Giàng A Páo — guide người Mông ở Đồng Văn</h2>')
+        ->and(substr_count($provider->bio_html, '<img'))->toBe(4);
 
     // Vendor chỉnh giới thiệu trên web...
     $provider->update([
@@ -119,5 +120,6 @@ test('db:seed restores the default rich bio sample for Giàng A Páo', function 
     (new TourHaGiangDemoSeeder)->run();
 
     expect($provider->refresh()->bio)->toBe('Người Mông bản địa Đồng Văn, 8 năm chở khách loop Hà Giang bằng xe máy. Nhận chở tới: Đèo Mã Pí Lèng, Sông Nho Quế, Cột cờ Lũng Cú.')
-        ->and($provider->bio_html)->toContain('<h2>Giàng A Páo — guide người Mông ở Đồng Văn</h2>');
+        ->and($provider->bio_html)->toContain('<h2>Giàng A Páo — guide người Mông ở Đồng Văn</h2>')
+        ->and(substr_count($provider->bio_html, '<img'))->toBe(4);
 });

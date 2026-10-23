@@ -41,7 +41,7 @@ return [
     'booking_volume_subtitle' => 'Xu hướng theo tháng (6 tháng gần nhất)',
     'top_vendors' => 'Chủ nhà hàng đầu',
     'top_vendors_subtitle' => 'Theo doanh thu đã hoàn tất (top 5)',
-    'recent_vendors' => 'Chủ nhà gần đây',
+    'recent_vendors' => 'Chủ khách sạn gần đây',
     'recent_vendors_subtitle' => 'Truy cập nhanh đến phê duyệt và trạng thái tài khoản',
     'view_all_vendors' => 'Xem tất cả chủ nhà',
     'name' => 'Tên',
@@ -139,7 +139,7 @@ return [
     'sidebar' => [
         'menu' => 'Danh mục',
         'dashboard' => 'Bảng điều khiển',
-        'vendors' => 'Chủ nhà',
+        'vendors' => 'Chủ khách sạn',
         'commission' => 'Hoa hồng',
         'payouts' => 'Thanh toán',
         'website_settings' => 'Cài đặt website',
@@ -547,7 +547,7 @@ return [
                 'created' => 'Ngày tạo',
                 'actions' => '',
             ],
-            'empty' => 'Chưa có yêu cầu nào. <a href=":url">Tạo một</a>.',
+            'empty' => 'Chưa có yêu cầu nào',
             'form' => [
                 'category' => 'Danh mục',
                 'subject' => 'Chủ đề',
@@ -910,6 +910,7 @@ return [
             'title' => 'Duyệt đánh giá',
             'filter' => [
                 'label' => 'Lọc',
+                'type_label' => 'Loại',
                 'all' => 'Tất cả',
                 'visible' => 'Hiển thị',
                 'hidden' => 'Đã ẩn',
@@ -1172,7 +1173,7 @@ return [
 
         // Vendors (Admin)
         'vendors' => [
-            'title' => 'Chủ nhà',
+            'title' => 'Chủ khách sạn',
             'filters' => [
                 'all' => 'Tất cả',
                 'pending' => 'Chờ duyệt',
