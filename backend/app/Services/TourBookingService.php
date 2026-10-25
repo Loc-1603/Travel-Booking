@@ -41,7 +41,7 @@ class TourBookingService
 
             $slot = $this->availability->lockSlot($slotId, $tourId);
 
-            $breakdown = $this->pricing->calculate($tour, $slot, $pricingMode, $durationValue, $couponCode, $customerId);
+            $breakdown = $this->pricing->calculate($tour, $slot, $pricingMode, $durationValue, $couponCode, $customerId, true);
 
             $mode = $pricingMode === 'day' ? 'day' : 'hour';
             $unitPrice = $slot->price_override !== null

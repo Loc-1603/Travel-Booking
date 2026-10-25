@@ -4,37 +4,34 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\RoomAvailability;
 use App\Repositories\Contracts\RoomAvailabilityRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class EloquentRoomAvailabilityRepository implements RoomAvailabilityRepositoryInterface
 {
     public function findForDate(int $roomId, string $date): ?RoomAvailability
     {
-        return RoomAvailability::where('room_id', $roomId)
-            ->whereDate('date', $date)
-            ->first();
+        return $this->forDate($roomId, $date)->first();
     }
 
     public function findForDateLocked(int $roomId, string $date): ?RoomAvailability
     {
-        return RoomAvailability::where('room_id', $roomId)
-            ->whereDate('date', $date)
-            ->lockForUpdate()
-            ->first();
+        return $this->forDate($roomId, $date)->lockForUpdate()->first();
     }
 
     public function listForRange(int $roomId, string $checkIn, string $checkOut): Collection
     {
         return RoomAvailability::where('room_id', $roomId)
-            ->whereDate('date', '>=', $checkIn)
-            ->whereDate('date', '<=', $checkOut)
+            ->where('date', '>=', $checkIn)
+            ->where('date', '<', $this->nextDay($checkOut))
             ->get();
     }
 
     public function listForDateRange(string $from, string $to): Collection
     {
-        return RoomAvailability::whereDate('date', '>=', $from)
-            ->whereDate('date', '<=', $to)
+        return RoomAvailability::where('date', '>=', $from)
+            ->where('date', '<', $this->nextDay($to))
             ->get();
     }
 
@@ -47,12 +44,10 @@ class EloquentRoomAvailabilityRepository implements RoomAvailabilityRepositoryIn
 
     public function firstOrCreateForDate(int $roomId, string $date, array $values): RoomAvailability
     {
-        // whereDate (not exact-match firstOrCreate): the date cast serializes
-        // with a time part on SQLite, so an exact `date = ?` lookup would miss
-        // the existing row and hit the unique constraint on re-ensure.
-        $existing = RoomAvailability::where('room_id', $roomId)
-            ->whereDate('date', $date)
-            ->first();
+        // date-range match (not whereDate/exact equality): the date cast
+        // serializes with a time part on SQLite, and a sargable range keeps
+        // MySQL/PgSQL on the (room_id, date) index when locking.
+        $existing = $this->forDate($roomId, $date)->first();
 
         return $existing ?? RoomAvailability::create(
             array_merge(['room_id' => $roomId, 'date' => $date], $values)
@@ -61,8 +56,18 @@ class EloquentRoomAvailabilityRepository implements RoomAvailabilityRepositoryIn
 
     public function incrementAvailable(int $roomId, string $date, int $quantity): int
     {
+        return $this->forDate($roomId, $date)->increment('available_rooms', $quantity);
+    }
+
+    private function forDate(int $roomId, string $date): Builder
+    {
         return RoomAvailability::where('room_id', $roomId)
-            ->whereDate('date', $date)
-            ->increment('available_rooms', $quantity);
+            ->where('date', '>=', $date)
+            ->where('date', '<', $this->nextDay($date));
+    }
+
+    private function nextDay(string $date): string
+    {
+        return Carbon::parse($date)->addDay()->toDateString();
     }
 }

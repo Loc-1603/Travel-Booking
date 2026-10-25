@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Coupon extends Model
 {
     public const TYPE_PERCENTAGE = 'percentage';
+
     public const TYPE_FIXED = 'fixed';
 
     protected $fillable = [
@@ -43,21 +44,5 @@ class Coupon extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
-    }
-
-    /**
-     * Number of times this coupon has been used (confirmed or pending bookings).
-     */
-    public function redemptionCount(): int
-    {
-        return $this->bookings()->count();
-    }
-
-    /**
-     * Number of times this coupon has been used by a specific user.
-     */
-    public function redemptionCountForUser(int $userId): int
-    {
-        return $this->bookings()->where('customer_id', $userId)->count();
     }
 }

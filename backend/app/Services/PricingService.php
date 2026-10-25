@@ -32,6 +32,7 @@ class PricingService
         ?string $couponCode = null,
         ?int $userId = null,
         bool $lateCheckout = false,
+        bool $lockCoupon = false,
     ): PriceBreakdown {
         $subtotal = 0.0;
         $period = CarbonPeriod::create($checkIn, $checkOut)->excludeEndDate();
@@ -50,7 +51,7 @@ class PricingService
         }
 
         $nights = $period->count();
-        [$discount, $coupon] = $this->applyDiscounts($subtotal, $checkIn, $checkOut, $nights, $couponCode, $hotelId, $roomQuantities, $userId);
+        [$discount, $coupon] = $this->applyDiscounts($subtotal, $checkIn, $checkOut, $nights, $couponCode, $hotelId, $roomQuantities, $userId, $lockCoupon);
 
         $hotel = $this->hotels->findById($hotelId, ['countryRelation']);
         $addOnAmount = 0.0;
@@ -93,7 +94,7 @@ class PricingService
      * @param  array<int, int>  $roomQuantities
      * @return array{0: float, 1: \App\Models\Coupon|null}
      */
-    protected function applyDiscounts(float $subtotal, string $checkIn, string $checkOut, int $nights, ?string $couponCode, int $hotelId, array $roomQuantities, ?int $userId): array
+    protected function applyDiscounts(float $subtotal, string $checkIn, string $checkOut, int $nights, ?string $couponCode, int $hotelId, array $roomQuantities, ?int $userId, bool $lockCoupon = false): array
     {
         $discount = 0.0;
         if ($nights >= 7) {
@@ -111,6 +112,7 @@ class PricingService
                 $checkOut,
                 $nights,
                 $userId,
+                $lockCoupon,
             );
             $discount += $couponDiscount;
         }

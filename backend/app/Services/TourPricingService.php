@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\DTOs\PriceBreakdown;
 use App\Enums\TourPricingMode;
-use App\Repositories\Contracts\CouponRepositoryInterface;
 use App\Repositories\Contracts\TourProductRepositoryInterface;
 
 /**
@@ -14,7 +13,6 @@ class TourPricingService
 {
     public function __construct(
         protected CouponService $coupons,
-        protected CouponRepositoryInterface $couponRepo,
         protected TourProductRepositoryInterface $products,
     ) {}
 
@@ -25,6 +23,7 @@ class TourPricingService
         int $durationValue,
         ?string $couponCode = null,
         ?int $userId = null,
+        bool $lockCoupon = false,
     ): PriceBreakdown {
         $mode = $pricingMode === TourPricingMode::DAY->value ? TourPricingMode::DAY : TourPricingMode::HOUR;
 
@@ -45,7 +44,7 @@ class TourPricingService
         $coupon = null;
         if ($couponCode !== null && $couponCode !== '') {
             [$couponDiscount, $coupon] = $this->couponDiscount(
-                $couponCode, $subtotal, $slot?->date?->format('Y-m-d') ?? now()->toDateString(), $userId
+                $couponCode, $subtotal, $slot?->date?->format('Y-m-d') ?? now()->toDateString(), $userId, $lockCoupon
             );
             $discount += $couponDiscount;
         }
@@ -85,30 +84,9 @@ class TourPricingService
     /**
      * @return array{0: float, 1: \App\Models\Coupon|null}
      */
-    protected function couponDiscount(string $code, float $subtotal, string $date, ?int $userId): array
+    protected function couponDiscount(string $code, float $subtotal, string $date, ?int $userId, bool $lockCoupon = false): array
     {
-        $coupon = $this->couponRepo->findActiveByCode(strtoupper($code));
-        if (! $coupon) {
-            return [0.0, null];
-        }
-        if ($coupon->valid_from && $coupon->valid_from->isAfter($date)) {
-            return [0.0, null];
-        }
-        if ($coupon->valid_to && $coupon->valid_to->isBefore($date)) {
-            return [0.0, null];
-        }
-        if ($coupon->min_amount !== null && $subtotal < (float) $coupon->min_amount) {
-            return [0.0, null];
-        }
-        if ($coupon->usage_limit_total !== null && $this->couponRepo->redemptionCount($coupon) >= $coupon->usage_limit_total) {
-            return [0.0, null];
-        }
-        if ($userId !== null && $coupon->usage_limit_per_user !== null
-            && $this->couponRepo->redemptionCountForUser($coupon, $userId) >= $coupon->usage_limit_per_user) {
-            return [0.0, null];
-        }
-
-        return [$this->coupons->computeDiscount($coupon, $subtotal), $coupon];
+        return $this->coupons->validateAndGetTourDiscount($code, $subtotal, $date, $userId, $lockCoupon);
     }
 
     protected function taxRate(\App\Models\TourProduct $tour): float

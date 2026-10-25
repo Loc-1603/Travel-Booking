@@ -80,6 +80,7 @@ class BookingService
                 $couponCode,
                 $customerId,
                 $lateCheckout,
+                true,
             );
 
             foreach ($roomQuantities as $roomId => $quantity) {
