@@ -1189,7 +1189,7 @@
       "travelDateLabel": "Travel date",
       "newDatePlaceholder": "Select a new date",
       "updateDate": "Update",
-      "changeDate": "Change date",
+      "changeGuide": "Change date",
       "noDateHint": "Please pick a travel date on the province page before booking.",
       "pickSlot": "Pick a free time slot",
       "pickSlotHint": "Pick a free slot to see the price and book.",

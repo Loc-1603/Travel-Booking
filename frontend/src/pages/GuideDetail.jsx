@@ -316,7 +316,7 @@ export default function GuideDetail() {
               {t('tours.guides.updateDate')}
             </button>
             <Link to={backTo} className="text-accent hover:underline">
-              {t('tours.guides.changeDate')}
+              {t('tours.guides.changeGuide')}
             </Link>
           </div>
         ) : (
