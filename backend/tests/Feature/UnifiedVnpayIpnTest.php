@@ -3,8 +3,8 @@
 use App\Enums\PaymentStatus;
 use App\Enums\TourBookingStatus;
 use App\Events\PaymentConfirmed;
-use App\Events\TourPaymentConfirmed;
 use App\Models\Country;
+use App\Models\OutboxEvent;
 use App\Models\Payment;
 use App\Models\TourAvailabilitySlot;
 use App\Models\TourBooking;
@@ -91,8 +91,6 @@ function makeUnifiedTourPayment($booking, string $txnRef): TourPayment
 }
 
 test('unified ipn confirms a tour payment and booking', function (): void {
-    Event::fake([TourPaymentConfirmed::class]);
-
     $payment = makeUnifiedTourPayment($this->tourBooking, 'tour_unified-1');
 
     $response = $this->getJson('/api/v1/payments/vnpay-ipn?'.http_build_query(
@@ -101,9 +99,8 @@ test('unified ipn confirms a tour payment and booking', function (): void {
 
     $response->assertOk()->assertJson(['RspCode' => '00']);
     expect($payment->fresh()->status)->toBe(PaymentStatus::COMPLETED->value)
-        ->and($this->tourBooking->fresh()->status)->toBe(TourBookingStatus::CONFIRMED->value);
-
-    Event::assertDispatched(TourPaymentConfirmed::class);
+        ->and($this->tourBooking->fresh()->status)->toBe(TourBookingStatus::CONFIRMED->value)
+        ->and(OutboxEvent::where('event_id', 'tour-payment-confirmed:'.$payment->id)->exists())->toBeTrue();
 });
 
 test('legacy tour ipn url still confirms tour payments', function (): void {

@@ -8,6 +8,8 @@ interface TourPaymentRepositoryInterface
 {
     public function findById(int $id): ?TourPayment;
 
+    public function findByIdForUpdate(int $id): ?TourPayment;
+
     public function findByTxnRef(string $txnRef, string $provider = 'vnpay'): ?TourPayment;
 
     /**

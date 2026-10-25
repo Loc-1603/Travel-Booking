@@ -54,6 +54,13 @@ return [
         'currency' => env('VNPAY_CURR_CODE', 'VND'),
         'locale' => env('VNPAY_LOCALE', 'vn'),
         'expire_minutes' => env('VNPAY_EXPIRE_MINUTES', 30),
+
+        // Merchant Web API (refund + querydr).
+        'api_url' => env('VNPAY_API_URL', 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction'),
+        'refund_enabled' => env('VNPAY_REFUND_ENABLED', false),
+        'refund_timeout' => env('VNPAY_REFUND_TIMEOUT', 15),
+        'refund_max_attempts' => env('VNPAY_REFUND_MAX_ATTEMPTS', 5),
+        'refund_create_by' => env('VNPAY_REFUND_CREATE_BY', 'system'),
     ],
 
     'unsplash' => [

@@ -19,3 +19,5 @@ Artisan::command('inspire', function () {
 // + command auto-expire/release chạy mỗi phút.
 Schedule::command('tour-bookings:expire-pending')->everyMinute();
 Schedule::command('tour:expire-holds')->everyMinute();
+Schedule::command('outbox:publish')->everyMinute()->withoutOverlapping();
+Schedule::command('refunds:process')->everyMinute()->withoutOverlapping();

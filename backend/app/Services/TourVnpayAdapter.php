@@ -37,6 +37,8 @@ class TourVnpayAdapter
 
         $txnRef = 'tour_'.$booking->id.'_'.now()->format('YmdHis').'_'.Str::upper(Str::random(4));
 
+        $now = now('Asia/Ho_Chi_Minh');
+
         $payment = $this->payments->create([
             'tour_booking_id' => $booking->id,
             'amount' => $amountVnd,
@@ -44,10 +46,12 @@ class TourVnpayAdapter
             'provider' => 'vnpay',
             'external_id' => $txnRef,
             'status' => PaymentStatus::PENDING->value,
-            'payload' => ['txn_ref' => $txnRef],
+            'payload' => [
+                'txn_ref' => $txnRef,
+                'vnp_create_date' => $now->format('YmdHis'),
+            ],
         ]);
 
-        $now = now('Asia/Ho_Chi_Minh');
         $expire = $now->copy()->addMinutes((int) config('services.vnpay.expire_minutes', 30));
 
         $params = [
@@ -114,6 +118,12 @@ class TourVnpayAdapter
 
         $payload = $payment->payload ?? [];
         $payload['vnp_transaction_no'] = $transactionNo;
+
+        $payDate = (string) ($input['vnp_PayDate'] ?? '');
+        if ($payDate !== '') {
+            $payload['vnp_pay_date'] = $payDate;
+        }
+
         $this->payments->update($payment, ['payload' => $payload]);
     }
 

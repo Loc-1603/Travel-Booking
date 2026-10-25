@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\PaymentStatus;
+use App\Enums\TourBookingStatus;
 use App\Http\Controllers\Controller;
 use App\Models\TourDispute;
+use App\Services\RefundService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class TourDisputeController extends Controller
 {
+    public function __construct(
+        protected RefundService $refunds,
+    ) {}
     public function index(Request $request): View
     {
         $query = TourDispute::with(['booking.customer', 'booking.tour']);
@@ -47,12 +53,34 @@ class TourDisputeController extends Controller
         if ($refund) {
             $booking = $tourDispute->booking;
             if ($booking) {
-                $payments = app(\App\Services\TourPaymentService::class);
                 foreach ($booking->payments as $payment) {
-                    $payments->refundFull($payment->fresh(), 'Tour dispute #'.$tourDispute->id);
+                    if (! in_array($payment->status, [PaymentStatus::COMPLETED->value, PaymentStatus::REFUNDED->value], true)) {
+                        continue;
+                    }
+
+                    $remaining = round((float) $payment->amount - (float) ($payment->refunded_amount ?? 0), 2);
+                    if ($remaining <= 0) {
+                        continue;
+                    }
+
+                    $this->refunds->request(
+                        $payment,
+                        $remaining,
+                        'Tour dispute #'.$tourDispute->id,
+                        'tour-dispute:'.$tourDispute->id.':'.$payment->id,
+                        auth()->id(),
+                    );
                 }
-                if ($booking->fresh()->payments()->where('status', \App\Enums\PaymentStatus::REFUNDED->value)->exists()) {
-                    $booking->update(['status' => \App\Enums\TourBookingStatus::REFUNDED->value]);
+
+                $booking->refresh()->load('payments');
+                $fullyCovered = $booking->payments->isNotEmpty()
+                    && $booking->payments->every(
+                        fn ($payment) => $payment->status !== PaymentStatus::COMPLETED->value
+                            || $this->refunds->fullyReserved($payment)
+                    );
+
+                if ($booking->payments()->where('status', PaymentStatus::REFUNDED->value)->exists() || $fullyCovered) {
+                    $booking->update(['status' => TourBookingStatus::REFUNDED->value]);
                 }
             }
 

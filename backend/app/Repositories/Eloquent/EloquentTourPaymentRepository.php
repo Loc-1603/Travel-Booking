@@ -12,6 +12,11 @@ class EloquentTourPaymentRepository implements TourPaymentRepositoryInterface
         return TourPayment::find($id);
     }
 
+    public function findByIdForUpdate(int $id): ?TourPayment
+    {
+        return TourPayment::whereKey($id)->lockForUpdate()->first();
+    }
+
     public function findByTxnRef(string $txnRef, string $provider = 'vnpay'): ?TourPayment
     {
         return TourPayment::where('provider', $provider)

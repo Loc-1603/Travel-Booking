@@ -8,6 +8,8 @@ interface PaymentRepositoryInterface
 {
     public function findById(int $id): ?Payment;
 
+    public function findByIdForUpdate(int $id): ?Payment;
+
     public function findByTxnRef(string $txnRef, string $provider = 'vnpay'): ?Payment;
 
     /**

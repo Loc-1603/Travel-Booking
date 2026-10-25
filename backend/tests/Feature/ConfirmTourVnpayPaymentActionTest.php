@@ -3,8 +3,8 @@
 use App\Actions\ConfirmTourVnpayPaymentAction;
 use App\Enums\PaymentStatus;
 use App\Enums\TourBookingStatus;
-use App\Events\TourPaymentConfirmed;
 use App\Models\Country;
+use App\Models\OutboxEvent;
 use App\Models\TourAvailabilitySlot;
 use App\Models\TourBooking;
 use App\Models\TourPayment;
@@ -15,7 +15,6 @@ use App\Models\User;
 use App\Models\WebhookEvent;
 use App\Services\VnpayService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Event;
 
 beforeEach(function (): void {
     config([
@@ -93,8 +92,6 @@ function makeTourIpnPayload(array $overrides = []): array
 }
 
 test('action confirms a successful tour ipn', function (): void {
-    Event::fake([TourPaymentConfirmed::class]);
-
     $handled = app(ConfirmTourVnpayPaymentAction::class)->handle(
         $this->event->event_id,
         $this->payment->id,
@@ -105,9 +102,8 @@ test('action confirms a successful tour ipn', function (): void {
         ->and($this->payment->fresh()->status)->toBe(PaymentStatus::COMPLETED->value)
         ->and($this->booking->fresh()->status)->toBe(TourBookingStatus::CONFIRMED->value)
         ->and($this->event->fresh()->processed_at)->not->toBeNull()
-        ->and($this->payment->fresh()->payload['vnp_transaction_no'])->toBe('14000001');
-
-    Event::assertDispatched(TourPaymentConfirmed::class);
+        ->and($this->payment->fresh()->payload['vnp_transaction_no'])->toBe('14000001')
+        ->and(OutboxEvent::where('event_id', 'tour-payment-confirmed:'.$this->payment->id)->exists())->toBeTrue();
 });
 
 test('action marks payment failed for non-success response code', function (): void {

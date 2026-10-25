@@ -12,6 +12,11 @@ class EloquentPaymentRepository implements PaymentRepositoryInterface
         return Payment::find($id);
     }
 
+    public function findByIdForUpdate(int $id): ?Payment
+    {
+        return Payment::whereKey($id)->lockForUpdate()->first();
+    }
+
     public function findByTxnRef(string $txnRef, string $provider = 'vnpay'): ?Payment
     {
         return Payment::where('provider', $provider)

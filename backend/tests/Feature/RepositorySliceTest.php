@@ -161,6 +161,7 @@ test('payment repository covers slice queries', function (): void {
     ]);
 
     expect($payments->findById($payment->id)?->id)->toBe($payment->id)
+        ->and($payments->findByIdForUpdate($payment->id)?->id)->toBe($payment->id)
         ->and($payments->findByTxnRef('repo-txn-1')?->id)->toBe($payment->id);
 
     $updated = $payments->update($payment, ['status' => PaymentStatus::COMPLETED->value]);

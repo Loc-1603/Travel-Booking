@@ -8,8 +8,8 @@ use App\Models\TourBooking;
 use App\Models\TourDispute;
 use App\Models\TourPayment;
 use App\Models\TourProduct;
-use App\Models\TourProvince;
 use App\Models\TourProvider;
+use App\Models\TourProvince;
 use App\Models\User;
 use App\Services\TourCommissionService;
 use App\Services\TourPaymentService;
@@ -205,5 +205,68 @@ test('resolving tour dispute with refund settles payments and booking', function
     ])->assertRedirect('/admin/tour-disputes/'.$dispute->id);
 
     expect($payment->fresh()->status)->toBe(PaymentStatus::REFUNDED->value)
+        ->and($booking->fresh()->status)->toBe(TourBookingStatus::REFUNDED->value);
+});
+
+test('resolving tour dispute with refunds enabled creates an obligation before provider settlement', function (): void {
+    config([
+        'services.vnpay.refund_enabled' => true,
+        'services.vnpay.tmn_code' => 'TESTCODE',
+        'services.vnpay.hash_secret' => 'tour-dispute-secret',
+    ]);
+    \Illuminate\Support\Facades\Queue::fake();
+
+    foreach (['super-admin'] as $role) {
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
+    }
+    $admin = User::create([
+        'name' => 'Dispute Refund Admin', 'email' => 'dispute-refund-admin@test.local',
+        'password' => bcrypt('password'), 'role' => 'super_admin', 'status' => 'active',
+    ]);
+    $admin->assignRole('super-admin');
+
+    $slot = TourAvailabilitySlot::create([
+        'tour_id' => $this->tour->id, 'date' => Carbon::today()->toDateString(),
+        'start_time' => '10:00:00', 'end_time' => '12:00:00', 'status' => 'available',
+    ]);
+    $booking = TourBooking::create([
+        'customer_id' => $this->customer->id, 'tour_id' => $this->tour->id,
+        'slot_id' => $slot->id, 'provider_id' => $this->tour->provider_id,
+        'province_id' => $this->tour->province_id,
+        'start_at' => now(), 'end_at' => now()->addHours(2),
+        'pricing_mode' => 'hour', 'duration_value' => 2,
+        'base_fixed' => 200000, 'unit_price' => 100000, 'subtotal' => 400000,
+        'total_price' => 500000, 'currency' => 'VND',
+        'status' => TourBookingStatus::CONFIRMED->value,
+    ]);
+    $payment = TourPayment::create([
+        'tour_booking_id' => $booking->id, 'amount' => 500000,
+        'currency' => 'VND', 'provider' => 'vnpay',
+        'external_id' => 'tour-dispute-txn-1',
+        'status' => PaymentStatus::COMPLETED->value,
+        'payload' => [
+            'vnp_transaction_no' => '14000009',
+            'vnp_create_date' => '20261024101010',
+        ],
+    ]);
+    $dispute = TourDispute::create([
+        'tour_booking_id' => $booking->id, 'status' => 'open',
+        'customer_notes' => 'Guide cancelled at the last minute.',
+    ]);
+
+    $this->actingAs($admin)->patch('/admin/tour-disputes/'.$dispute->id, [
+        'status' => 'resolved', 'refund_payments' => '1',
+    ])->assertRedirect('/admin/tour-disputes/'.$dispute->id);
+
+    $refund = \App\Models\PaymentRefund::first();
+
+    expect($refund)->not->toBeNull()
+        ->and($refund->payment_type)->toBe(\App\Models\PaymentRefund::TYPE_TOUR)
+        ->and($refund->payment_id)->toBe($payment->id)
+        ->and($refund->status)->toBe('pending')
+        ->and($refund->idempotency_key)->toBe('tour-dispute:'.$dispute->id.':'.$payment->id)
+        ->and((float) $refund->amount)->toBe(500000.0)
+        ->and((float) $payment->fresh()->refunded_amount)->toBe(0.0)
+        ->and($payment->fresh()->status)->toBe(PaymentStatus::COMPLETED->value)
         ->and($booking->fresh()->status)->toBe(TourBookingStatus::REFUNDED->value);
 });

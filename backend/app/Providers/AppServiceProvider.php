@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Events\BookingDisputeCreated;
 use App\Events\PaymentConfirmed;
 use App\Events\SupportTicketReplyCreated;
+use App\Events\TourPaymentConfirmed;
+use App\Listeners\HandleTourPaymentConfirmed;
 use App\Listeners\SendBookingConfirmationNotification;
 use App\Listeners\SendBookingDisputeAdminNotification;
 use App\Listeners\SendSupportTicketReplyNotification;
@@ -12,6 +14,8 @@ use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Repositories\Contracts\BookingRoomRepositoryInterface;
 use App\Repositories\Contracts\CouponRepositoryInterface;
 use App\Repositories\Contracts\HotelRepositoryInterface;
+use App\Repositories\Contracts\OutboxEventRepositoryInterface;
+use App\Repositories\Contracts\PaymentRefundRepositoryInterface;
 use App\Repositories\Contracts\PaymentRepositoryInterface;
 use App\Repositories\Contracts\RoomAvailabilityRepositoryInterface;
 use App\Repositories\Contracts\RoomRepositoryInterface;
@@ -26,6 +30,8 @@ use App\Repositories\Eloquent\EloquentBookingRepository;
 use App\Repositories\Eloquent\EloquentBookingRoomRepository;
 use App\Repositories\Eloquent\EloquentCouponRepository;
 use App\Repositories\Eloquent\EloquentHotelRepository;
+use App\Repositories\Eloquent\EloquentOutboxEventRepository;
+use App\Repositories\Eloquent\EloquentPaymentRefundRepository;
 use App\Repositories\Eloquent\EloquentPaymentRepository;
 use App\Repositories\Eloquent\EloquentRoomAvailabilityRepository;
 use App\Repositories\Eloquent\EloquentRoomRepository;
@@ -56,6 +62,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(HotelRepositoryInterface::class, EloquentHotelRepository::class);
         $this->app->bind(CouponRepositoryInterface::class, EloquentCouponRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class, EloquentPaymentRepository::class);
+        $this->app->bind(PaymentRefundRepositoryInterface::class, EloquentPaymentRefundRepository::class);
+        $this->app->bind(OutboxEventRepositoryInterface::class, EloquentOutboxEventRepository::class);
         $this->app->bind(WebhookEventRepositoryInterface::class, EloquentWebhookEventRepository::class);
         $this->app->bind(TourBookingRepositoryInterface::class, EloquentTourBookingRepository::class);
         $this->app->bind(TourAvailabilitySlotRepositoryInterface::class, EloquentTourAvailabilitySlotRepository::class);
@@ -77,6 +85,7 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(SupportTicketReplyCreated::class, SendSupportTicketReplyNotification::class);
         Event::listen(PaymentConfirmed::class, SendBookingConfirmationNotification::class);
+        Event::listen(TourPaymentConfirmed::class, HandleTourPaymentConfirmed::class);
         Event::listen(BookingDisputeCreated::class, SendBookingDisputeAdminNotification::class);
 
         $this->checkStorageLink();

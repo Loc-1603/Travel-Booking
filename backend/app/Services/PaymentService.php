@@ -17,6 +17,7 @@ class PaymentService
         protected VnpayService $vnpay,
         protected PaymentRepositoryInterface $payments,
         protected BookingRepositoryInterface $bookings,
+        protected RefundService $refunds,
     ) {}
 
     /**
@@ -74,33 +75,14 @@ class PaymentService
     }
 
     /**
-     * Record a refund (manual / via VNPay merchant portal).
-     * VNPay refunds are settled outside the checkout API, so this only
-     * updates local accounting (refunded_amount + status).
+     * Record a refund. Flag off keeps the legacy local accounting; flag on
+     * creates a VNPay obligation handled by RefundService/ProcessVnpayRefund.
      *
      * @param  float  $amount  Amount to refund in booking currency (VND)
      */
     public function refund(Payment $payment, float $amount, ?string $reason = null, ?string $idempotencyKey = null): void
     {
-        $maxRefundable = (float) $payment->amount - (float) ($payment->refunded_amount ?? 0);
-        if ($amount <= 0 || $amount > $maxRefundable) {
-            throw new \InvalidArgumentException("Refund amount must be between 0 and {$maxRefundable}.");
-        }
-
-        $newRefunded = (float) ($payment->refunded_amount ?? 0) + $amount;
-        $payment->refunded_amount = $newRefunded;
-        $payment->status = $newRefunded >= (float) $payment->amount
-            ? PaymentStatus::REFUNDED->value
-            : PaymentStatus::COMPLETED->value;
-
-        $payload = $payment->payload ?? [];
-        $payload['refunds'][] = [
-            'amount' => $amount,
-            'reason' => $reason,
-            'refunded_at' => now()->toIso8601String(),
-        ];
-        $payment->payload = $payload;
-        $payment->save();
+        $this->refunds->request($payment, $amount, $reason, $idempotencyKey);
     }
 
     /**
