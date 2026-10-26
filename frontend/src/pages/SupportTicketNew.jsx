@@ -14,9 +14,9 @@ const CATEGORIES = [
 ];
 
 const PRIORITIES = [
-  { value: 'low', label: 'Low' },
-  { value: 'normal', label: 'Normal' },
-  { value: 'high', label: 'High' },
+  { value: 'low', label: 'Thấp' },
+  { value: 'normal', label: 'Trung bình' },
+  { value: 'high', label: 'Cao' },
 ];
 
 export default function SupportTicketNew() {
