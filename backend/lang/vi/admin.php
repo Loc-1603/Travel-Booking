@@ -554,7 +554,7 @@ return [
                 'message' => 'Nội dung',
                 'priority' => 'Ưu tiên',
                 'priority_low' => 'Thấp',
-                'priority_normal' => 'Bình thường',
+                'priority_normal' => 'Trung bình',
                 'priority_high' => 'Cao',
                 'submit' => 'Gửi yêu cầu',
                 'cancel' => 'Hủy',
@@ -896,7 +896,7 @@ return [
                 'status' => 'Trạng thái',
                 'priority' => 'Ưu tiên',
                 'priority_low' => 'Thấp',
-                'priority_normal' => 'Bình thường',
+                'priority_normal' => 'Trung bình',
                 'priority_high' => 'Cao',
             ],
             'flash' => [
