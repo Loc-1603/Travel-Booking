@@ -1,15 +1,15 @@
 @extends('admin.layouts.app')
-@section('title', 'Manage Room Images')
+@section('title', 'Quản lý ảnh phòng')
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="Manage Images - {{ $room->name }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => 'Rooms', 'url' => route('admin.vendor.rooms.index')], ['label' => 'Images']]" />
+    <x-page-title title="Quản lý ảnh - {{ $room->name }}" :breadcrumbs="[['label' => 'Nhà cung cấp', 'url' => route('admin.vendor.dashboard')], ['label' => 'Phòng', 'url' => route('admin.vendor.rooms.index', request()->query())], ['label' => 'Ảnh']]" />
     <x-alert />
     
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Current Images</h5>
+                    <h5 class="card-title mb-0">Ảnh hiện tại</h5>
                 </div>
                 <div class="card-body">
                     @if($images->count() > 0)
@@ -22,16 +22,16 @@
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <small class="text-muted">ID: {{ $image->id }}</small>
                                             @if($image->is_banner)
-                                            <span class="badge bg-warning">Banner</span>
+                                            <span class="badge bg-warning">Ảnh bìa</span>
                                             @endif
                                         </div>
                                         <div class="mb-2">
-                                            <input type="text" class="form-control form-control-sm" placeholder="Alt text" value="{{ $image->alt_text ?? '' }}" data-field="alt_text">
+                                            <input type="text" class="form-control form-control-sm" placeholder="Văn bản thay thế" value="{{ $image->alt_text ?? '' }}" data-field="alt_text">
                                         </div>
                                         <div class="d-flex gap-1">
-                                            <button class="btn btn-sm btn-primary set-banner-btn" {{ $image->is_banner ? 'disabled' : '' }}>Set Banner</button>
-                                            <button class="btn btn-sm btn-success save-alt-btn">Save</button>
-                                            <button class="btn btn-sm btn-danger delete-image-btn">Delete</button>
+                                            <button class="btn btn-sm btn-primary set-banner-btn" {{ $image->is_banner ? 'disabled' : '' }}>Đặt làm ảnh bìa</button>
+                                            <button class="btn btn-sm btn-success save-alt-btn">Lưu</button>
+                                            <button class="btn btn-sm btn-danger delete-image-btn">Xóa</button>
                                         </div>
                                     </div>
                                 </div>
@@ -39,11 +39,11 @@
                             @endforeach
                         </div>
                         <div class="mt-3">
-                            <button class="btn btn-secondary" id="reorder-btn">Save Order</button>
+                            <button type="button" class="btn btn-secondary" id="reorder-btn" onclick="if(window.updateSortOrders){window.updateSortOrders();}" style="cursor: pointer; position: relative; z-index: 10;">Lưu thứ tự</button>
                         </div>
                     @else
                         <div class="text-center py-4">
-                            <p class="text-muted">No images uploaded yet.</p>
+                            <p class="text-muted">Chưa có ảnh nào được tải lên.</p>
                         </div>
                     @endif
                 </div>
@@ -53,33 +53,33 @@
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Upload New Images</h5>
+                    <h5 class="card-title mb-0">Tải lên ảnh mới</h5>
                 </div>
                 <div class="card-body">
                     <form id="upload-form" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
-                            <label for="images" class="form-label">Select Images</label>
+                            <label for="images" class="form-label">Chọn ảnh</label>
                             <input type="file" class="form-control" id="images" name="images[]" multiple accept="image/jpeg,image/png,image/gif" required>
-                            <div class="form-text">JPEG, PNG, GIF - Max 1MB each</div>
+                            <div class="form-text">JPEG, PNG, GIF - Tối đa 1MB mỗi ảnh</div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="banner_image" class="form-label">Banner Image</label>
+                            <label for="banner_image" class="form-label">Ảnh bìa</label>
                             <select class="form-select" id="banner_image" name="banner_image">
-                                <option value="">No banner (first image will be banner)</option>
-                                <option value="0">First uploaded image</option>
-                                <option value="1">Second uploaded image</option>
-                                <option value="2">Third uploaded image</option>
-                                <option value="3">Fourth uploaded image</option>
-                                <option value="4">Fifth uploaded image</option>
+                                <option value="">Không có ảnh bìa (ảnh đầu tiên sẽ là ảnh bìa)</option>
+                                <option value="0">Ảnh tải lên thứ nhất</option>
+                                <option value="1">Ảnh tải lên thứ hai</option>
+                                <option value="2">Ảnh tải lên thứ ba</option>
+                                <option value="3">Ảnh tải lên thứ tư</option>
+                                <option value="4">Ảnh tải lên thứ năm</option>
                             </select>
                         </div>
                         
                         <button type="submit" class="btn btn-primary w-100" id="upload-btn">
-                            <span class="upload-text">Upload Images</span>
+                            <span class="upload-text">Tải lên ảnh</span>
                             <span class="upload-loading d-none">
-                                <span class="spinner-border spinner-border-sm me-2"></span>Uploading...
+                                <span class="spinner-border spinner-border-sm me-2"></span>Đang tải lên...
                             </span>
                         </button>
                     </form>
@@ -88,13 +88,13 @@
             
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6 class="card-title">Instructions</h6>
+                    <h6 class="card-title">Hướng dẫn</h6>
                     <ul class="small">
-                        <li>Upload multiple images at once</li>
-                        <li>Drag and drop to reorder images</li>
-                        <li>Set one image as banner (main display)</li>
-                        <li>Add alt text for better SEO</li>
-                        <li>Recommended size: 1200x800px</li>
+                        <li>Tải lên nhiều ảnh cùng lúc</li>
+                        <li>Kéo và thả để sắp xếp lại ảnh</li>
+                        <li>Đặt một ảnh làm ảnh bìa (hiển thị chính)</li>
+                        <li>Thêm văn bản thay thế để tối ưu SEO</li>
+                        <li>Kích thước đề xuất: 1200x800px</li>
                     </ul>
                 </div>
             </div>
@@ -126,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
             animation: 150,
             ghostClass: 'sortable-ghost',
             dragClass: 'sortable-drag',
+            filter: 'button, input, a, .btn',
+            preventOnFilter: false,
             onEnd: function(evt) {
                 updateSortOrders();
             }
@@ -164,12 +166,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 location.reload();
             } else {
-                alert(data.message || 'Upload failed');
+                alert(data.message || 'Tải lên thất bại');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Upload failed: ' + error.message);
+            alert('Tải lên thất bại: ' + error.message);
         })
         .finally(() => {
             text.classList.remove('d-none');
@@ -198,12 +200,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     location.reload();
                 } else {
-                    alert(data.message || 'Failed to set banner');
+                    alert(data.message || 'Không thể đặt ảnh bìa');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Failed to set banner');
+                alert('Không thể đặt ảnh bìa');
             });
         });
     });
@@ -228,14 +230,14 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Alt text saved');
+                    alert('Đã lưu văn bản thay thế');
                 } else {
-                    alert(data.message || 'Failed to save alt text');
+                    alert(data.message || 'Không thể lưu văn bản thay thế');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Failed to save alt text');
+                alert('Không thể lưu văn bản thay thế');
             });
         });
     });
@@ -243,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Delete image
     document.querySelectorAll('.delete-image-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to delete this image?')) return;
+            if (!confirm('Bạn có chắc chắn muốn xóa ảnh này không?')) return;
             
             const item = this.closest('.image-item');
             const imageId = item.dataset.id;
@@ -259,12 +261,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     item.remove();
                 } else {
-                    alert(data.message || 'Failed to delete image');
+                    alert(data.message || 'Không thể xóa ảnh');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Failed to delete image');
+                alert('Không thể xóa ảnh');
             });
         });
     });
@@ -291,18 +293,28 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (!data.success) {
-                alert(data.message || 'Failed to reorder images');
+            if (data.success) {
+                alert('Đã lưu thứ tự ảnh');
+            } else {
+                alert(data.message || 'Không thể sắp xếp lại ảnh');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to reorder images');
+            alert('Không thể sắp xếp lại ảnh');
         });
     }
     
     // Save order button
-    document.getElementById('reorder-btn')?.addEventListener('click', updateSortOrders);
+    const reorderBtn = document.getElementById('reorder-btn');
+    if (reorderBtn) {
+        reorderBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            updateSortOrders();
+        });
+    }
+    window.updateSortOrders = updateSortOrders;
 });
 </script>
 @endsection

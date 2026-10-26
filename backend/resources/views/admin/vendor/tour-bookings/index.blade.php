@@ -67,7 +67,7 @@
                         <td>{{ format_vnd($b->total_price ?? 0) }}</td>
                         <td>
                             <a href="{{ route('admin.vendor.tour-bookings.invoice', $b->uuid) }}" class="btn btn-sm btn-outline-primary" target="_blank">{{ __('admin.vendor.tour_bookings.invoice') }}</a>
-                            <a href="{{ route('admin.vendor.tour-messages.show', $b->uuid) }}" class="btn btn-sm btn-outline-secondary">{{ __('admin.vendor.tour_bookings.chat') }}</a>
+                            <a href="{{ route('admin.vendor.tour-messages.show', array_merge([$b->uuid], request()->query())) }}" class="btn btn-sm btn-outline-secondary">{{ __('admin.vendor.tour_bookings.chat') }}</a>
                         </td>
                     </tr>
                     @empty

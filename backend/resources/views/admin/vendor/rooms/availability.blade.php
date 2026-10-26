@@ -2,13 +2,13 @@
 @section('title', __('admin.vendor.rooms.availability.title'))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.rooms.availability.title') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.rooms.title'), 'url' => route('admin.vendor.rooms.index')], ['label' => __('admin.vendor.rooms.availability.title')]]" />
+    <x-page-title title="{{ __('admin.vendor.rooms.availability.title') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.rooms.title'), 'url' => route('admin.vendor.rooms.index', request()->query())], ['label' => __('admin.vendor.rooms.availability.title')]]" />
     <x-alert />
     <p class="text-muted">{{ __('admin.vendor.rooms.availability.room_info', ['room' => $room->name, 'hotel' => $room->hotel->name ?? '-', 'price' => format_vnd($room->base_price)]) }}</p>
     <div class="card mb-4">
         <div class="card-header"><h5 class="mb-0">{{ __('admin.vendor.rooms.availability.add_date') }}</h5></div>
         <div class="card-body">
-            <form action="{{ route('admin.vendor.rooms.availability.store', $room) }}" method="POST" class="row g-2 align-items-end">
+            <form action="{{ route('admin.vendor.rooms.availability.store', array_merge([$room], request()->query())) }}" method="POST" class="row g-2 align-items-end">
                 @csrf
                 <div class="col-auto">
                     <label class="form-label mb-0">{{ __('admin.vendor.rooms.availability.date') }}</label>
@@ -53,6 +53,6 @@
             {{ $availability->links() }}
         </div>
     </div>
-    <a href="{{ route('admin.vendor.rooms.index') }}" class="btn btn-secondary mt-2">{{ __('admin.vendor.rooms.availability.back_to_rooms') }}</a>
+    <a href="{{ route('admin.vendor.rooms.index', request()->query()) }}" class="btn btn-secondary mt-2">{{ __('admin.vendor.rooms.availability.back_to_rooms') }}</a>
 </div>
 @endsection

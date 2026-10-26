@@ -40,7 +40,7 @@
                         @endphp
                         <tr>
                             <td>
-                                <a href="{{ route('admin.vendors.show', $v) }}">{{ $v->name }}</a>
+                                <a href="{{ route('admin.vendors.show', array_merge([$v], request()->query())) }}">{{ $v->name }}</a>
                             </td>
                             <td>{{ $v->email }}</td>
                             <td>
@@ -62,9 +62,9 @@
                                 <span class="badge {{ $v->status === 'active' ? 'bg-success' : 'bg-secondary' }}">{{ $v->status }}</span>
                             </td>
                             <td>
-                                <a href="{{ route('admin.vendors.show', $v) }}" class="btn btn-sm btn-outline-primary me-1">{{ __('admin.vendor.vendors.actions.view') }}</a>
+                                <a href="{{ route('admin.vendors.show', array_merge([$v], request()->query())) }}" class="btn btn-sm btn-outline-primary me-1">{{ __('admin.vendor.vendors.actions.view') }}</a>
                                 @if($approvalStatus === 'pending')
-                                    <form action="{{ route('admin.vendors.approve', $v) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('admin.vendors.approve', array_merge([$v], request()->query())) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-success">{{ __('admin.vendor.vendors.actions.approve') }}</button>
                                     </form>
@@ -72,7 +72,7 @@
                                     <div class="modal fade" id="rejectModal{{ $v->id }}" tabindex="-1">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
-                                                <form action="{{ route('admin.vendors.reject', $v) }}" method="POST">
+                                                <form action="{{ route('admin.vendors.reject', array_merge([$v], request()->query())) }}" method="POST">
                                                     @csrf
                                                     <div class="modal-header">
                                                         <h5 class="modal-title">{{ __('admin.vendor.vendors.modal.reject_title') }}</h5>

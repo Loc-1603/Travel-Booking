@@ -65,6 +65,6 @@ class ReviewModerationController extends Controller
         $data['hidden'] = $validated['action'] === 'hide';
         $review->update($data);
 
-        return redirect()->route('admin.reviews.show', $review)->with('success', __('admin.vendor.reviews.flash.updated'));
+        return redirect()->route('admin.reviews.show', array_merge([$review], request()->query()))->with('success', __('admin.vendor.reviews.flash.updated'));
     }
 }

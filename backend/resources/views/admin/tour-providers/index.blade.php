@@ -41,7 +41,7 @@
                         <td>{{ $p->vendor->name ?? '-' }} ({{ $p->vendor->email ?? '-' }})</td>
                         <td>{{ $p->tours->count() }}</td>
                         <td><span class="badge bg-secondary">{{ $p->status }}</span></td>
-                        <td><a href="{{ route('admin.tour-providers.show', $p) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a> <a href="{{ route('admin.tour-providers.edit', $p) }}" class="btn btn-sm btn-outline-secondary">{{ __('admin.vendor.common.edit') }}</a></td>
+                        <td><a href="{{ route('admin.tour-providers.show', array_merge([$p], request()->query())) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a> <a href="{{ route('admin.tour-providers.edit', array_merge([$p], request()->query())) }}" class="btn btn-sm btn-outline-secondary">{{ __('admin.vendor.common.edit') }}</a></td>
                     </tr>
                     @empty
                     <tr><td colspan="6" class="text-muted">{{ __('admin.vendor.tour_providers.empty') }}</td></tr>

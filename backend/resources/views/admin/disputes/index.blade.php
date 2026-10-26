@@ -38,7 +38,7 @@
                     @forelse($disputes as $d)
                     <tr>
                         <td>{{ $d->id }}</td>
-                        <td><a href="{{ route('admin.disputes.show', $d) }}">{{ $d->booking->uuid ?? $d->booking_id }}</a></td>
+                        <td><a href="{{ route('admin.disputes.show', array_merge([$d], request()->query())) }}">{{ $d->booking->uuid ?? $d->booking_id }}</a></td>
                         <td>{{ $d->booking->hotel->name ?? '-' }}</td>
                         <td>
                             @php
@@ -53,7 +53,7 @@
                             <span class="badge {{ $badgeClass }}">{{ __('admin.vendor.disputes.filter.' . $d->status) }}</span>
                         </td>
                         <td>{{ $d->created_at->format('Y-m-d') }}</td>
-                        <td><a href="{{ route('admin.disputes.show', $d) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
+                        <td><a href="{{ route('admin.disputes.show', array_merge([$d], request()->query())) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
                     </tr>
                     @empty
                     <tr><td colspan="6" class="text-muted">{{ __('admin.vendor.disputes.empty') }}</td></tr>

@@ -5,7 +5,7 @@
     <x-page-title title="{{ __('admin.vendor.bookings.title') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.bookings.title')]]" />
     <x-alert />
     <div class="mb-3">
-        <a href="{{ route('admin.vendor.bookings.old') }}" class="btn btn-outline-secondary btn-sm">
+        <a href="{{ route('admin.vendor.bookings.old', request()->query()) }}" class="btn btn-outline-secondary btn-sm">
             <i data-feather="archive" class="icon-sm me-1"></i>{{ __('admin.vendor.bookings.view_old') }}
         </a>
     </div>
@@ -83,12 +83,12 @@
                         <td>
                             <a href="{{ route('admin.vendor.bookings.invoice', $b->uuid) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="{{ __('admin.vendor.bookings.view_invoice') }}">{{ __('admin.vendor.bookings.invoice') }}</a>
                             @if($b->status === 'confirmed')
-                            <form method="POST" action="{{ route('admin.vendor.bookings.complete', $b->uuid) }}" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.bookings.complete_confirm') }}');">
+                            <form method="POST" action="{{ route('admin.vendor.bookings.complete', array_merge([$b->uuid], request()->query())) }}" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.bookings.complete_confirm') }}');">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-outline-success" title="{{ __('admin.vendor.bookings.complete') }}">{{ __('admin.vendor.bookings.complete') }}</button>
                             </form>
                             @endif
-                            <form method="POST" action="{{ route('admin.vendor.bookings.mark-old', $b->uuid) }}" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.bookings.mark_as_old_confirm') }}');">
+                            <form method="POST" action="{{ route('admin.vendor.bookings.mark-old', array_merge([$b->uuid], request()->query())) }}" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.bookings.mark_as_old_confirm') }}');">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-outline-secondary" title="{{ __('admin.vendor.bookings.mark_as_old') }}">{{ __('admin.vendor.bookings.mark_as_old') }}</button>
                             </form>

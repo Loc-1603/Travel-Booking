@@ -17,7 +17,7 @@
                     </select>
                 </div>
                 <div class="col-auto"><button type="submit" class="btn btn-sm btn-primary">{{ __('admin.vendor.tour_attractions.filter.apply') }}</button></div>
-                <div class="col-auto"><a href="{{ route('admin.tour-attractions.create', request('province_id') ? ['province_id' => request('province_id')] : []) }}" class="btn btn-sm btn-success">{{ __('admin.vendor.tour_attractions.add') }}</a></div>
+                <div class="col-auto"><a href="{{ route('admin.tour-attractions.create', request()->query()) }}" class="btn btn-sm btn-success">{{ __('admin.vendor.tour_attractions.add') }}</a></div>
             </form>
         </div>
     </div>
@@ -47,8 +47,8 @@
                         <td>{{ $a->province->name ?? '—' }}</td>
                         <td>{{ $a->is_famous ? '★' : '—' }}</td>
                         <td>
-                            <a href="{{ route('admin.tour-attractions.edit', $a) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.vendor.common.edit') }}</a>
-                            <form action="{{ route('admin.tour-attractions.destroy', $a) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.tour_attractions.confirm_delete') }}');">
+                            <a href="{{ route('admin.tour-attractions.edit', array_merge([$a], request()->query())) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.vendor.common.edit') }}</a>
+                            <form action="{{ route('admin.tour-attractions.destroy', array_merge([$a], request()->query())) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.tour_attractions.confirm_delete') }}');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger">{{ __('admin.vendor.common.delete') }}</button>

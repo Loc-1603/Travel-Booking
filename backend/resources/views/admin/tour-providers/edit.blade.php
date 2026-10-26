@@ -2,11 +2,11 @@
 @section('title', __('admin.vendor.tour_providers.edit_title', ['id' => $tourProvider->id]))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.tour_providers.edit_title', ['id' => $tourProvider->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_providers.title'), 'url' => route('admin.tour-providers.index')], ['label' => __('admin.vendor.common.edit')]]" />
+    <x-page-title title="{{ __('admin.vendor.tour_providers.edit_title', ['id' => $tourProvider->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_providers.title'), 'url' => route('admin.tour-providers.index', request()->query())], ['label' => __('admin.vendor.common.edit')]]" />
     <x-alert />
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.tour-providers.update', $tourProvider) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.tour-providers.update', array_merge([$tourProvider], request()->query())) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">{{ __('admin.vendor.common.save') }}</button>
-                <a href="{{ route('admin.tour-providers.show', $tourProvider) }}" class="btn btn-secondary">{{ __('admin.vendor.common.cancel') }}</a>
+                <a href="{{ route('admin.tour-providers.show', array_merge([$tourProvider], request()->query())) }}" class="btn btn-secondary">{{ __('admin.vendor.common.cancel') }}</a>
             </form>
         </div>
     </div>

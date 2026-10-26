@@ -2,7 +2,7 @@
 @section('title', __('admin.vendor.tour_messages.chat_title', ['title' => $booking->tour->title ?? 'Tour']))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.tour_messages.chat_title', ['title' => $booking->tour->title ?? 'Tour']) }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.tour_messages.title'), 'url' => route('admin.vendor.tour-messages.index')], ['label' => __('admin.vendor.tour_messages.chat')]]" />
+    <x-page-title title="{{ __('admin.vendor.tour_messages.chat_title', ['title' => $booking->tour->title ?? 'Tour']) }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.tour_messages.title'), 'url' => route('admin.vendor.tour-messages.index', request()->query())], ['label' => __('admin.vendor.tour_messages.chat')]]" />
     <x-alert />
     <div id="tour-message-sent-alert" class="alert alert-success d-none" role="alert"></div>
     <div class="card mb-3">
@@ -34,7 +34,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form id="tour-message-reply-form" action="{{ route('admin.vendor.tour-messages.reply', $booking->uuid) }}" method="POST" data-booking-uuid="{{ $booking->uuid }}">
+            <form id="tour-message-reply-form" action="{{ route('admin.vendor.tour-messages.reply', array_merge([$booking->uuid], request()->query())) }}" method="POST" data-booking-uuid="{{ $booking->uuid }}">
                 @csrf
                 <div class="input-group">
                     <input type="text" name="body" class="form-control" placeholder="{{ __('admin.vendor.tour_messages.detail.reply_placeholder') }}" maxlength="2000" required autocomplete="off">

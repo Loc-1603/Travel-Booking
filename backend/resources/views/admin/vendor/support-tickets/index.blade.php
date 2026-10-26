@@ -7,7 +7,7 @@
     <div class="card mb-3">
         <div class="card-body d-flex justify-content-between align-items-center">
             <p class="mb-0">{{ __('admin.vendor.vendor_support_tickets.form.help') }}</p>
-            <a href="{{ route('admin.vendor.support-tickets.create') }}" class="btn btn-primary">{{ __('admin.vendor.vendor_support_tickets.create') }}</a>
+            <a href="{{ route('admin.vendor.support-tickets.create', request()->query()) }}" class="btn btn-primary">{{ __('admin.vendor.vendor_support_tickets.create') }}</a>
         </div>
     </div>
     <div class="card mb-3">
@@ -48,10 +48,10 @@
                         <td>{{ $t->id }}</td>
                         <td>{{ Str::limit($t->subject, 50) }}</td>
                         <td>{{ \App\Enums\TicketCategory::tryFrom($t->category)?->label() ?? $t->category }}</td>
-                        <td><span class="badge bg-secondary">{{ $t->status }}</span></td>
+                        <td><span class="badge bg-secondary">{{ __('admin.vendor.vendor_support_tickets.filter.status_' . $t->status) }}</span></td>
                         <td>{{ $t->replies_count }}</td>
                         <td>{{ $t->created_at->format('Y-m-d H:i') }}</td>
-                        <td><a href="{{ route('admin.vendor.support-tickets.show', $t) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.vendor_support_tickets.view') }}</a></td>
+                        <td><a href="{{ route('admin.vendor.support-tickets.show', array_merge([$t], request()->query())) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.vendor_support_tickets.view') }}</a></td>
                     </tr>
                     @empty
                     <tr><td colspan="7" class="text-muted">{{ __('admin.vendor.vendor_support_tickets.empty', ['url' => route('admin.vendor.support-tickets.create')]) }}</td></tr>

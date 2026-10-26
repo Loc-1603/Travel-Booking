@@ -2,11 +2,11 @@
 @section('title', __('admin.vendor.tour_attractions.add'))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.tour_attractions.add') }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_attractions.title'), 'url' => route('admin.tour-attractions.index')], ['label' => __('admin.vendor.common.create')]]" />
+    <x-page-title title="{{ __('admin.vendor.tour_attractions.add') }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_attractions.title'), 'url' => route('admin.tour-attractions.index', request()->query())], ['label' => __('admin.vendor.common.create')]]" />
     <x-alert />
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.tour-attractions.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.tour-attractions.store', request()->query()) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">{{ __('admin.vendor.tour_attractions.form.province') }} *</label>
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">{{ __('admin.vendor.tour_attractions.form.create') }}</button>
-                <a href="{{ route('admin.tour-attractions.index') }}" class="btn btn-secondary">{{ __('admin.vendor.common.cancel') }}</a>
+                <a href="{{ route('admin.tour-attractions.index', request()->query()) }}" class="btn btn-secondary">{{ __('admin.vendor.common.cancel') }}</a>
             </form>
         </div>
     </div>

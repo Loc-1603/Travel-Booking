@@ -6,7 +6,7 @@
         title="{{ __('admin.vendor.payouts_admin.detail.title', ['id' => $payout->id]) }}"
         :breadcrumbs="[
             ['label' => 'Admin', 'url' => route('admin.dashboard')],
-            ['label' => __('admin.vendor.payouts_admin.title'), 'url' => route('admin.payouts.index')],
+            ['label' => __('admin.vendor.payouts_admin.title'), 'url' => route('admin.payouts.index', request()->query())],
             ['label' => '#' . $payout->id]
         ]"
     />
@@ -42,7 +42,7 @@
                         @endif
                     </table>
                     @if(!$payout->isPaid())
-                    <form method="POST" action="{{ route('admin.payouts.mark-paid', $payout) }}" class="mt-3">
+                    <form method="POST" action="{{ route('admin.payouts.mark-paid', array_merge([$payout], request()->query())) }}" class="mt-3">
                         @csrf
                         <div class="input-group">
                             <input type="text" name="reference" class="form-control" placeholder="{{ __('admin.vendor.payouts_admin.detail.reference_placeholder') }}">

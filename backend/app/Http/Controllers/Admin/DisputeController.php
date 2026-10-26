@@ -40,6 +40,6 @@ class DisputeController extends Controller
             $validated['resolved_by'] = auth()->id();
         }
         $dispute->update($validated);
-        return redirect()->route('admin.disputes.show', $dispute)->with('success', __('admin.vendor.disputes.flash.updated'));
+        return redirect()->route('admin.disputes.show', array_merge([$dispute], request()->query()))->with('success', __('admin.vendor.disputes.flash.updated'));
     }
 }

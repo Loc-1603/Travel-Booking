@@ -3,7 +3,7 @@
 @section('content')
 @php($isTour = $review->tour_booking_id !== null)
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.reviews.detail.title', ['id' => $review->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.reviews.title'), 'url' => route('admin.reviews.index')], ['label' => __('admin.vendor.common.view')]]" />
+    <x-page-title title="{{ __('admin.vendor.reviews.detail.title', ['id' => $review->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.reviews.title'), 'url' => route('admin.reviews.index', request()->query())], ['label' => __('admin.vendor.common.view')]]" />
     <x-alert />
     <div class="row">
         <div class="col-md-6">
@@ -39,14 +39,14 @@
                 <div class="card-body">
                     <p class="mb-2">{{ __('admin.vendor.reviews.detail.hidden') }}: {{ $review->hidden ? __('admin.vendor.reviews.yes') : __('admin.vendor.reviews.no') }}</p>
                     @if($review->hidden)
-                    <form action="{{ route('admin.reviews.update', $review) }}" method="POST" class="d-inline">
+                    <form action="{{ route('admin.reviews.update', array_merge([$review], request()->query())) }}" method="POST" class="d-inline">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="action" value="unhide">
                         <button type="submit" class="btn btn-info btn-sm">{{ __('admin.vendor.reviews.detail.actions.unhide') }}</button>
                     </form>
                     @else
-                    <form action="{{ route('admin.reviews.update', $review) }}" method="POST" class="d-inline">
+                    <form action="{{ route('admin.reviews.update', array_merge([$review], request()->query())) }}" method="POST" class="d-inline">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="action" value="hide">

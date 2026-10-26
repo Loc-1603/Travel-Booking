@@ -2,7 +2,7 @@
 @section('title', __('admin.vendor.support_tickets.detail.title', ['id' => $supportTicket->id]))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.support_tickets.detail.title', ['id' => $supportTicket->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.support_tickets.title'), 'url' => route('admin.support-tickets.index')], ['label' => __('admin.vendor.common.view')]]" />
+    <x-page-title title="{{ __('admin.vendor.support_tickets.detail.title', ['id' => $supportTicket->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.support_tickets.title'), 'url' => route('admin.support-tickets.index', request()->query())], ['label' => __('admin.vendor.common.view')]]" />
     <x-alert />
     <div class="row">
         <div class="col-md-6">
@@ -12,7 +12,7 @@
                     <p class="mb-1"><strong>{{ __('admin.vendor.support_tickets.detail.subject') }}:</strong> {{ $supportTicket->subject }}</p>
                     <p class="mb-1"><strong>{{ __('admin.vendor.support_tickets.detail.category') }}:</strong> {{ \App\Enums\TicketCategory::tryFrom($supportTicket->category)?->label() ?? $supportTicket->category }}</p>
                     <p class="mb-1"><strong>{{ __('admin.vendor.support_tickets.detail.from') }}:</strong> {{ $supportTicket->user->name ?? '-' }} ({{ $supportTicket->user->email ?? '-' }})</p>
-                    <p class="mb-1"><strong>{{ __('admin.vendor.support_tickets.detail.status') }}:</strong> {{ $supportTicket->status }} | <strong>{{ __('admin.vendor.support_tickets.detail.priority') }}:</strong> {{ $supportTicket->priority }}</p>
+                    <p class="mb-1"><strong>{{ __('admin.vendor.support_tickets.detail.status') }}:</strong> {{ __('admin.vendor.support_tickets.filter.status_' . $supportTicket->status) }} | <strong>{{ __('admin.vendor.support_tickets.detail.priority') }}:</strong> {{ __('admin.vendor.support_tickets.form.priority_' . $supportTicket->priority) }}</p>
                     <p class="mb-0"><strong>{{ __('admin.vendor.support_tickets.detail.body') }}:</strong></p>
                     <div class="border rounded p-2 mt-1">{{ $supportTicket->body }}</div>
                 </div>
@@ -29,7 +29,7 @@
                     <p class="text-muted mb-0">{{ __('admin.vendor.support_tickets.detail.no_replies') }}</p>
                     @endforelse
                     <hr>
-                    <form action="{{ route('admin.support-tickets.replies.store', $supportTicket) }}" method="POST">
+                    <form action="{{ route('admin.support-tickets.replies.store', array_merge([$supportTicket], request()->query())) }}" method="POST">
                         @csrf
                         <div class="mb-2">
                             <label class="form-label">{{ __('admin.vendor.support_tickets.detail.add_reply') }}</label>
@@ -45,14 +45,14 @@
             <div class="card mb-3">
                 <div class="card-header"><h5 class="mb-0">{{ __('admin.vendor.support_tickets.detail.update_ticket') }}</h5></div>
                 <div class="card-body">
-                    <form action="{{ route('admin.support-tickets.update', $supportTicket) }}" method="POST">
+                    <form action="{{ route('admin.support-tickets.update', array_merge([$supportTicket], request()->query())) }}" method="POST">
                         @csrf
                         @method('PATCH')
                         <div class="mb-3">
                             <label class="form-label">{{ __('admin.vendor.support_tickets.form.status') }}</label>
                             <select name="status" class="form-select">
                                 @foreach(['open','assigned','in_progress','resolved','closed'] as $s)
-                                <option value="{{ $s }}" {{ $supportTicket->status === $s ? 'selected' : '' }}>{{ $s }}</option>
+                                <option value="{{ $s }}" {{ $supportTicket->status === $s ? 'selected' : '' }}>{{ __('admin.vendor.support_tickets.filter.status_' . $s) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -69,7 +69,7 @@
                             <label class="form-label">{{ __('admin.vendor.support_tickets.form.priority') }}</label>
                             <select name="priority" class="form-select">
                                 @foreach(['low','normal','high'] as $p)
-                                <option value="{{ $p }}" {{ $supportTicket->priority === $p ? 'selected' : '' }}>{{ $p }}</option>
+                                <option value="{{ $p }}" {{ $supportTicket->priority === $p ? 'selected' : '' }}>{{ __('admin.vendor.support_tickets.form.priority_' . $p) }}</option>
                                 @endforeach
                             </select>
                         </div>

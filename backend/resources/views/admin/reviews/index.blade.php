@@ -50,7 +50,7 @@
                         <td>{{ $r->rating }}</td>
                         <td>{{ Str::limit($r->comment, 40) }}</td>
                         <td>{{ $r->hidden ? __('admin.vendor.reviews.yes') : __('admin.vendor.reviews.no') }}</td>
-                        <td><a href="{{ route('admin.reviews.show', $r) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
+                        <td><a href="{{ route('admin.reviews.show', array_merge([$r], request()->query())) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
                     </tr>
                     @empty
                     <tr><td colspan="7" class="text-muted">{{ __('admin.vendor.reviews.empty') }}</td></tr>

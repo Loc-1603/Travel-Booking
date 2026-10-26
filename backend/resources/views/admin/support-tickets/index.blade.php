@@ -53,10 +53,10 @@
                         <td>{{ Str::limit($t->subject, 40) }}</td>
                         <td>{{ \App\Enums\TicketCategory::tryFrom($t->category)?->label() ?? $t->category }}</td>
                         <td>{{ $t->user->name ?? $t->user->email ?? '-' }}</td>
-                        <td><span class="badge bg-secondary">{{ $t->status }}</span></td>
+                        <td><span class="badge bg-secondary">{{ __('admin.vendor.support_tickets.filter.status_' . $t->status) }}</span></td>
                         <td>{{ $t->priority }}</td>
                         <td>{{ $t->assignedTo->name ?? '-' }}</td>
-                        <td><a href="{{ route('admin.support-tickets.show', $t) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.support_tickets.view') }}</a></td>
+                        <td><a href="{{ route('admin.support-tickets.show', array_merge([$t], request()->query())) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.support_tickets.view') }}</a></td>
                     </tr>
                     @empty
                     <tr><td colspan="8" class="text-muted">{{ __('admin.vendor.support_tickets.empty') }}</td></tr>

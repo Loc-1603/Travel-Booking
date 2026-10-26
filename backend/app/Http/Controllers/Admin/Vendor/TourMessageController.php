@@ -31,7 +31,7 @@ class TourMessageController extends Controller
             ->whereHas('messages')
             ->with(['tour', 'customer', 'messages'])
             ->latest()
-            ->paginate(15);
+            ->paginate(15)->withQueryString();
 
         return view('admin.vendor.tour-messages.index', compact('bookings'));
     }
@@ -126,6 +126,6 @@ class TourMessageController extends Controller
             ], 201);
         }
 
-        return redirect()->route('admin.vendor.tour-messages.show', $booking->uuid)->with('success', __('admin.vendor.tour_messages.flash.reply_sent'));
+        return redirect()->route('admin.vendor.tour-messages.show', array_merge([$booking->uuid], request()->query()))->with('success', __('admin.vendor.tour_messages.flash.reply_sent'));
     }
 }

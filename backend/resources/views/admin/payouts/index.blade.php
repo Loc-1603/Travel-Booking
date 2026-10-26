@@ -85,7 +85,7 @@
                         </td>
                         <td>{{ $p->reference ?? '-' }}</td>
                         <td>
-                            <a href="{{ route('admin.payouts.show', $p) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.vendor.payouts_admin.actions.view') }}</a>
+                            <a href="{{ route('admin.payouts.show', array_merge([$p], request()->query())) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.vendor.payouts_admin.actions.view') }}</a>
                             @if(!$p->isPaid())
                             <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#markPaidModal{{ $p->id }}">{{ __('admin.vendor.payouts_admin.actions.mark_paid') }}</button>
                             @endif
@@ -105,7 +105,7 @@
     <div class="modal fade" id="markPaidModal{{ $p->id }}" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="POST" action="{{ route('admin.payouts.mark-paid', $p) }}">
+                <form method="POST" action="{{ route('admin.payouts.mark-paid', array_merge([$p], request()->query())) }}">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title">{{ __('admin.vendor.payouts_admin.detail.mark_as_paid', ['id' => $p->id]) }}</h5>

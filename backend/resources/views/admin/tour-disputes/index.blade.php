@@ -37,7 +37,7 @@
                     @forelse($disputes as $d)
                     <tr>
                         <td>{{ $d->id }}</td>
-                        <td><a href="{{ route('admin.tour-disputes.show', $d) }}">{{ $d->booking->uuid ?? $d->tour_booking_id }}</a></td>
+                        <td><a href="{{ route('admin.tour-disputes.show', array_merge([$d], request()->query())) }}">{{ $d->booking->uuid ?? $d->tour_booking_id }}</a></td>
                         <td>{{ $d->booking->tour->title ?? '-' }}</td>
                         <td>
                             @php
@@ -52,7 +52,7 @@
                             <span class="badge {{ $badgeClass }}">{{ __('admin.vendor.tour_disputes.filter.' . $d->status) }}</span>
                         </td>
                         <td>{{ $d->created_at->format('Y-m-d') }}</td>
-                        <td><a href="{{ route('admin.tour-disputes.show', $d) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
+                        <td><a href="{{ route('admin.tour-disputes.show', array_merge([$d], request()->query())) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.common.view') }}</a></td>
                     </tr>
                     @empty
                     <tr><td colspan="6" class="text-muted">{{ __('admin.vendor.tour_disputes.empty') }}</td></tr>

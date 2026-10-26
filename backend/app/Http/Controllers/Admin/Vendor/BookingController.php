@@ -75,7 +75,7 @@ class BookingController extends Controller
 
         $booking->update(['marked_old' => true]);
 
-        return redirect()->route('admin.vendor.bookings.index')
+        return redirect()->route('admin.vendor.bookings.index', request()->query())
             ->with('success', __('admin.vendor.bookings.flash.marked_old'));
     }
 
@@ -93,11 +93,11 @@ class BookingController extends Controller
         try {
             $bookings->completeBooking($booking);
         } catch (\RuntimeException $e) {
-            return redirect()->route('admin.vendor.bookings.index')
+            return redirect()->route('admin.vendor.bookings.index', request()->query())
                 ->with('error', __('admin.vendor.bookings.flash.complete_invalid'));
         }
 
-        return redirect()->route('admin.vendor.bookings.index')
+        return redirect()->route('admin.vendor.bookings.index', request()->query())
             ->with('success', __('admin.vendor.bookings.flash.completed'));
     }
 
@@ -111,7 +111,7 @@ class BookingController extends Controller
 
         $booking->update(['marked_old' => false]);
 
-        return redirect()->route('admin.vendor.bookings.old')
+        return redirect()->route('admin.vendor.bookings.old', request()->query())
             ->with('success', __('admin.vendor.bookings.flash.restored'));
     }
 

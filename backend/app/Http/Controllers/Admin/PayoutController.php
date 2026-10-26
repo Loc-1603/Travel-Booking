@@ -56,7 +56,7 @@ class PayoutController extends Controller
             ? __('admin.vendor.payouts.flash.generated', ['count' => $count])
             : __('admin.vendor.payouts.flash.empty_period');
 
-        return redirect()->route('admin.payouts.index')->with('success', $message);
+        return redirect()->route('admin.payouts.index', request()->query())->with('success', $message);
     }
 
     public function show(Payout $payout): View
@@ -84,7 +84,7 @@ class PayoutController extends Controller
 
         $payout->update($data);
 
-        return redirect()->route('admin.payouts.index')->with('success', __('admin.vendor.payouts.flash.updated'));
+        return redirect()->route('admin.payouts.index', request()->query())->with('success', __('admin.vendor.payouts.flash.updated'));
     }
 
     public function markPaid(Request $request, Payout $payout): RedirectResponse
@@ -99,7 +99,7 @@ class PayoutController extends Controller
             'paid_at' => now(),
         ]);
 
-        return redirect()->route('admin.payouts.index')->with('success', __('admin.vendor.payouts.flash.marked_paid'));
+        return redirect()->route('admin.payouts.index', request()->query())->with('success', __('admin.vendor.payouts.flash.marked_paid'));
     }
 
     public function export(Request $request): StreamedResponse|Response

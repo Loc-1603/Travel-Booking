@@ -2,11 +2,11 @@
 @section('title', __('admin.vendor.vendor_support_tickets.new'))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.vendor_support_tickets.new') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.sidebar.support'), 'url' => route('admin.vendor.support-tickets.index')], ['label' => __('admin.vendor.common.create')]]" />
+    <x-page-title title="{{ __('admin.vendor.vendor_support_tickets.new') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.sidebar.support'), 'url' => route('admin.vendor.support-tickets.index', request()->query())], ['label' => __('admin.vendor.common.create')]]" />
     <x-alert />
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.vendor.support-tickets.store') }}" method="POST">
+            <form action="{{ route('admin.vendor.support-tickets.store', request()->query()) }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">{{ __('admin.vendor.vendor_support_tickets.form.category') }}</label>
@@ -35,7 +35,7 @@
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">{{ __('admin.vendor.vendor_support_tickets.form.submit') }}</button>
-                <a href="{{ route('admin.vendor.support-tickets.index') }}" class="btn btn-outline-secondary">{{ __('admin.vendor.vendor_support_tickets.form.cancel') }}</a>
+                <a href="{{ route('admin.vendor.support-tickets.index', request()->query()) }}" class="btn btn-outline-secondary">{{ __('admin.vendor.vendor_support_tickets.form.cancel') }}</a>
             </form>
         </div>
     </div>

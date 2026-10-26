@@ -2,11 +2,11 @@
 @section('title', __('admin.vendor.rooms.add'))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.rooms.add') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.rooms.title'), 'url' => route('admin.vendor.rooms.index')], ['label' => __('admin.vendor.rooms.form.create')]]" />
+    <x-page-title title="{{ __('admin.vendor.rooms.add') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.rooms.title'), 'url' => route('admin.vendor.rooms.index', request()->query())], ['label' => __('admin.vendor.rooms.form.create')]]" />
     <x-alert />
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.vendor.rooms.store') }}" method="POST">
+            <form action="{{ route('admin.vendor.rooms.store', request()->query()) }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">{{ __('admin.vendor.rooms.form.hotel') }} *</label>
@@ -68,7 +68,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">{{ __('admin.vendor.rooms.form.create') }}</button>
-                <a href="{{ route('admin.vendor.rooms.index') }}" class="btn btn-secondary">{{ __('admin.vendor.rooms.form.cancel') }}</a>
+                <a href="{{ route('admin.vendor.rooms.index', request()->query()) }}" class="btn btn-secondary">{{ __('admin.vendor.rooms.form.cancel') }}</a>
             </form>
         </div>
     </div>

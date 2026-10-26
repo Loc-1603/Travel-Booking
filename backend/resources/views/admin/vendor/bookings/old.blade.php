@@ -2,10 +2,10 @@
 @section('title', __('admin.vendor.bookings.old_title'))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.bookings.old_title') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.bookings.title'), 'url' => route('admin.vendor.bookings.index')], ['label' => __('admin.vendor.bookings.old_title')]]" />
+    <x-page-title title="{{ __('admin.vendor.bookings.old_title') }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.vendor.bookings.title'), 'url' => route('admin.vendor.bookings.index', request()->query())], ['label' => __('admin.vendor.bookings.old_title')]]" />
     <x-alert />
     <div class="mb-3">
-        <a href="{{ route('admin.vendor.bookings.index') }}" class="btn btn-outline-primary btn-sm">
+        <a href="{{ route('admin.vendor.bookings.index', request()->query()) }}" class="btn btn-outline-primary btn-sm">
             <i data-feather="arrow-left" class="icon-sm me-1"></i>{{ __('admin.vendor.bookings.back_to_bookings') }}
         </a>
     </div>
@@ -82,7 +82,7 @@
                         <td>{{ format_vnd($b->total_price ?? 0) }}</td>
                         <td>
                             <a href="{{ route('admin.vendor.bookings.invoice', $b->uuid) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="{{ __('admin.vendor.bookings.view_invoice') }}">{{ __('admin.vendor.bookings.invoice') }}</a>
-                            <form method="POST" action="{{ route('admin.vendor.bookings.unmark-old', $b->uuid) }}" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.bookings.restore_confirm') }}');">
+                            <form method="POST" action="{{ route('admin.vendor.bookings.unmark-old', array_merge([$b->uuid], request()->query())) }}" class="d-inline" onsubmit="return confirm('{{ __('admin.vendor.bookings.restore_confirm') }}');">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-outline-success" title="{{ __('admin.vendor.bookings.restore') }}">{{ __('admin.vendor.bookings.restore') }}</button>
                             </form>

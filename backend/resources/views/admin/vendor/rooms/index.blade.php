@@ -56,10 +56,10 @@
                         <td>{{ format_vnd($r->base_price) }}</td>
                         <td>{{ $r->total_rooms }}</td>
                         <td>
-                            <a href="{{ route('admin.vendor.rooms.images.index', $r) }}" class="btn btn-sm btn-info me-1">{{ __('admin.vendor.rooms.images') }}</a>
-                            <a href="{{ route('admin.vendor.rooms.availability', $r) }}" class="btn btn-sm btn-secondary me-1">{{ __('admin.vendor.rooms.availability_label') }}</a>
-                            <a href="{{ route('admin.vendor.rooms.edit', $r) }}" class="btn btn-sm btn-warning me-1">{{ __('admin.vendor.rooms.edit') }}</a>
-                            <form action="{{ route('admin.vendor.rooms.destroy', $r) }}" method="POST" class="d-inline">
+                            <a href="{{ route('admin.vendor.rooms.images.index', array_merge([$r], request()->query())) }}" class="btn btn-sm btn-info me-1">{{ __('admin.vendor.rooms.images') }}</a>
+                            <a href="{{ route('admin.vendor.rooms.availability', array_merge([$r], request()->query())) }}" class="btn btn-sm btn-secondary me-1">{{ __('admin.vendor.rooms.availability_label') }}</a>
+                            <a href="{{ route('admin.vendor.rooms.edit', array_merge([$r], request()->query())) }}" class="btn btn-sm btn-warning me-1">{{ __('admin.vendor.rooms.edit') }}</a>
+                            <form action="{{ route('admin.vendor.rooms.destroy', array_merge([$r], request()->query())) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('{{ __('admin.vendor.rooms.delete_confirm') }}')">{{ __('admin.vendor.rooms.delete') }}</button>

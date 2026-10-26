@@ -2,11 +2,11 @@
 @section('title', __('admin.vendor.tour_attractions.edit'))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.tour_attractions.edit') }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_attractions.title'), 'url' => route('admin.tour-attractions.index')], ['label' => __('admin.vendor.common.edit')]]" />
+    <x-page-title title="{{ __('admin.vendor.tour_attractions.edit') }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_attractions.title'), 'url' => route('admin.tour-attractions.index', request()->query())], ['label' => __('admin.vendor.common.edit')]]" />
     <x-alert />
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.tour-attractions.update', $tourAttraction) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.tour-attractions.update', array_merge([$tourAttraction], request()->query())) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
@@ -50,7 +50,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">{{ __('admin.vendor.tour_attractions.form.update') }}</button>
-                <a href="{{ route('admin.tour-attractions.index') }}" class="btn btn-secondary">{{ __('admin.vendor.common.cancel') }}</a>
+                <a href="{{ route('admin.tour-attractions.index', request()->query()) }}" class="btn btn-secondary">{{ __('admin.vendor.common.cancel') }}</a>
             </form>
         </div>
     </div>

@@ -2,7 +2,7 @@
 @section('title', __('admin.vendor.tour_disputes.detail_title', ['id' => $tourDispute->id]))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.tour_disputes.detail_title', ['id' => $tourDispute->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_disputes.title'), 'url' => route('admin.tour-disputes.index')], ['label' => __('admin.vendor.common.view')]]" />
+    <x-page-title title="{{ __('admin.vendor.tour_disputes.detail_title', ['id' => $tourDispute->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_disputes.title'), 'url' => route('admin.tour-disputes.index', request()->query())], ['label' => __('admin.vendor.common.view')]]" />
     <x-alert />
     <div class="row">
         <div class="col-md-6">
@@ -32,7 +32,7 @@
             <div class="card mb-3">
                 <div class="card-header"><h5 class="mb-0">{{ __('admin.vendor.tour_disputes.detail.update') }}</h5></div>
                 <div class="card-body">
-                    <form action="{{ route('admin.tour-disputes.update', $tourDispute) }}" method="POST">
+                    <form action="{{ route('admin.tour-disputes.update', array_merge([$tourDispute], request()->query())) }}" method="POST">
                         @csrf
                         @method('PATCH')
                         <div class="mb-3">

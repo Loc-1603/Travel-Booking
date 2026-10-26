@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin\Vendor;
 use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\RoomImage;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -16,13 +16,14 @@ class RoomImageController extends Controller
     {
         $this->authorize('update', $room);
         $images = $room->images()->ordered()->get();
+
         return view('admin.vendor.rooms.images.index', compact('room', 'images'));
     }
 
     public function store(Request $request, Room $room): JsonResponse
     {
         $this->authorize('update', $room);
-        
+
         $request->validate([
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:1024',
             'alt_texts.*' => 'nullable|string|max:255',
@@ -30,13 +31,13 @@ class RoomImageController extends Controller
         ]);
 
         $uploadedImages = [];
-        
+
         if ($request->hasFile('images')) {
             $bannerImageId = $request->input('banner_image');
-            
+
             foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('rooms/' . $room->id, 'public');
-                
+                $path = $image->store('rooms/'.$room->id, 'public');
+
                 $roomImage = RoomImage::create([
                     'room_id' => $room->id,
                     'image_path' => $path,
@@ -44,7 +45,7 @@ class RoomImageController extends Controller
                     'is_banner' => $bannerImageId == $index,
                     'sort_order' => $room->images()->max('sort_order') + 1,
                 ]);
-                
+
                 $uploadedImages[] = [
                     'id' => $roomImage->id,
                     'url' => $roomImage->image_url,
@@ -64,7 +65,7 @@ class RoomImageController extends Controller
     public function update(Request $request, Room $room, RoomImage $image): JsonResponse
     {
         $this->authorize('update', $room);
-        
+
         $request->validate([
             'alt_text' => 'nullable|string|max:255',
             'is_banner' => 'boolean',
@@ -94,12 +95,12 @@ class RoomImageController extends Controller
     public function destroy(Room $room, RoomImage $image): JsonResponse
     {
         $this->authorize('update', $room);
-        
+
         // Delete file from storage
         if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
             Storage::disk('public')->delete($image->image_path);
         }
-        
+
         $image->delete();
 
         return response()->json([
@@ -111,7 +112,7 @@ class RoomImageController extends Controller
     public function reorder(Request $request, Room $room): JsonResponse
     {
         $this->authorize('update', $room);
-        
+
         $request->validate([
             'images' => 'required|array',
             'images.*.id' => 'required|exists:room_images,id',

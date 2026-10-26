@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Amenity;
 use App\Models\Hotel;
 use App\Models\Room;
-use App\Models\RoomType;
 use App\Models\RoomAvailability;
+use App\Models\RoomType;
 use App\Services\AvailabilityService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,8 +27,9 @@ class RoomController extends Controller
             $hotel = Hotel::where('id', $request->hotel_id)->where('vendor_id', auth()->id())->firstOrFail();
             $query->where('hotel_id', $hotel->id);
         }
-        $rooms = $query->with(['hotel', 'images', 'bannerImage', 'roomType'])->latest()->paginate(15);
+        $rooms = $query->with(['hotel', 'images', 'bannerImage', 'roomType'])->latest()->paginate(15)->withQueryString();
         $hotels = Hotel::where('vendor_id', auth()->id())->orderBy('name')->get();
+
         return view('admin.vendor.rooms.index', compact('rooms', 'hotels'));
     }
 
@@ -41,6 +42,7 @@ class RoomController extends Controller
         $roomTypes = $hotelId
             ? RoomType::where('hotel_id', $hotelId)->orderBy('sort_order')->get()
             : collect();
+
         return view('admin.vendor.rooms.create', compact('hotels', 'hotelId', 'amenities', 'roomTypes'));
     }
 
@@ -69,7 +71,8 @@ class RoomController extends Controller
         unset($validated['cancellation_policy_preset'], $validated['cancellation_policy_custom'], $validated['amenities']);
         $room = Room::create($validated);
         $room->amenities()->sync($amenityIds);
-        return redirect()->route('admin.vendor.rooms.index', ['hotel_id' => $hotel->id])->with('success', __('admin.vendor.rooms.flash.created'));
+
+        return redirect()->route('admin.vendor.rooms.index', array_merge(['hotel_id' => $hotel->id], request()->query()))->with('success', __('admin.vendor.rooms.flash.created'));
     }
 
     public function edit(Room $room): View
@@ -78,6 +81,7 @@ class RoomController extends Controller
         $room->load(['hotel', 'amenities', 'roomType']);
         $amenities = Amenity::orderBy('sort_order')->orderBy('name')->get();
         $roomTypes = RoomType::where('hotel_id', $room->hotel_id)->orderBy('sort_order')->get();
+
         return view('admin.vendor.rooms.edit', compact('room', 'amenities', 'roomTypes'));
     }
 
@@ -104,21 +108,24 @@ class RoomController extends Controller
         unset($validated['cancellation_policy_preset'], $validated['cancellation_policy_custom'], $validated['amenities']);
         $room->update($validated);
         $room->amenities()->sync($amenityIds);
-        return redirect()->route('admin.vendor.rooms.index')->with('success', __('admin.vendor.rooms.flash.updated'));
+
+        return redirect()->route('admin.vendor.rooms.index', request()->query())->with('success', __('admin.vendor.rooms.flash.updated'));
     }
 
     public function destroy(Room $room): RedirectResponse
     {
         $this->authorize('delete', $room);
         $room->delete();
-        return redirect()->route('admin.vendor.rooms.index')->with('success', __('admin.vendor.rooms.flash.deleted'));
+
+        return redirect()->route('admin.vendor.rooms.index', request()->query())->with('success', __('admin.vendor.rooms.flash.deleted'));
     }
 
     public function availability(Room $room): View
     {
         $this->authorize('update', $room);
         $room->load('hotel');
-        $availability = $room->availability()->orderBy('date')->paginate(30);
+        $availability = $room->availability()->orderBy('date')->paginate(30)->withQueryString();
+
         return view('admin.vendor.rooms.availability', compact('room', 'availability'));
     }
 
@@ -137,7 +144,8 @@ class RoomController extends Controller
                 'price_override' => $request->price_override ?: null,
             ]
         );
-        return redirect()->route('admin.vendor.rooms.availability', $room)->with('success', __('admin.vendor.rooms.flash.availability_updated'));
+
+        return redirect()->route('admin.vendor.rooms.availability', array_merge([$room], request()->query()))->with('success', __('admin.vendor.rooms.flash.availability_updated'));
     }
 
     /**
@@ -160,6 +168,7 @@ class RoomController extends Controller
             if (! is_array($decoded) || json_last_error() !== JSON_ERROR_NONE) {
                 return null;
             }
+
             return $decoded;
         }
         $map = [
@@ -168,6 +177,7 @@ class RoomController extends Controller
             'free_48' => ['type' => 'free_until_hours', 'hours' => 48],
             'free_168' => ['type' => 'free_until_hours', 'hours' => 168],
         ];
+
         return $map[$preset] ?? null;
     }
 }

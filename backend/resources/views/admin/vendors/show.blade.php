@@ -6,7 +6,7 @@
         title="{{ __('admin.vendor.vendors.detail.title') }}"
         :breadcrumbs="[
             ['label' => 'Admin', 'url' => route('admin.dashboard')],
-            ['label' => __('admin.vendor.vendors.title'), 'url' => route('admin.vendors.index')],
+            ['label' => __('admin.vendor.vendors.title'), 'url' => route('admin.vendors.index', request()->query())],
             ['label' => $vendor->name]
         ]"
     />
@@ -179,7 +179,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">{{ __('admin.vendor.vendors.detail.actions') }}</h5>
-            <a href="{{ route('admin.vendors.index') }}" class="btn btn-sm btn-secondary">{{ __('admin.vendor.vendors.detail.back_to_list') }}</a>
+            <a href="{{ route('admin.vendors.index', request()->query()) }}" class="btn btn-sm btn-secondary">{{ __('admin.vendor.vendors.detail.back_to_list') }}</a>
         </div>
         <div class="card-body">
             @if($profile?->status === 'pending')

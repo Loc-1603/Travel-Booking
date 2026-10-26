@@ -2,15 +2,15 @@
 @section('title', __('admin.vendor.vendor_support_tickets.detail.title', ['id' => $supportTicket->id]))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.vendor_support_tickets.detail.title', ['id' => $supportTicket->id]) }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.sidebar.support'), 'url' => route('admin.vendor.support-tickets.index')], ['label' => __('admin.vendor.common.view')]]" />
+    <x-page-title title="{{ __('admin.vendor.vendor_support_tickets.detail.title', ['id' => $supportTicket->id]) }}" :breadcrumbs="[['label' => 'Vendor', 'url' => route('admin.vendor.dashboard')], ['label' => __('admin.sidebar.support'), 'url' => route('admin.vendor.support-tickets.index', request()->query())], ['label' => __('admin.vendor.common.view')]]" />
     <x-alert />
     <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{{ $supportTicket->subject }}</h5>
-            <span class="badge bg-secondary">{{ $supportTicket->status }}</span>
+            <span class="badge bg-secondary">{{ __('admin.vendor.vendor_support_tickets.filter.status_' . $supportTicket->status) }}</span>
         </div>
         <div class="card-body">
-            <p class="mb-1"><strong>{{ __('admin.vendor.vendor_support_tickets.detail.category') }}:</strong> {{ \App\Enums\TicketCategory::tryFrom($supportTicket->category)?->label() ?? $supportTicket->category }} | <strong>{{ __('admin.vendor.vendor_support_tickets.detail.priority') }}:</strong> {{ $supportTicket->priority }}</p>
+            <p class="mb-1"><strong>{{ __('admin.vendor.vendor_support_tickets.detail.category') }}:</strong> {{ \App\Enums\TicketCategory::tryFrom($supportTicket->category)?->label() ?? $supportTicket->category }} | <strong>{{ __('admin.vendor.vendor_support_tickets.detail.priority') }}:</strong> {{ __('admin.vendor.vendor_support_tickets.form.priority_' . $supportTicket->priority) }}</p>
             <p class="mb-2"><strong>{{ __('admin.vendor.vendor_support_tickets.detail.created') }}:</strong> {{ $supportTicket->created_at->format('Y-m-d H:i') }}</p>
             <div class="border rounded p-2 bg-light">{{ $supportTicket->body }}</div>
         </div>
@@ -29,7 +29,7 @@
         </div>
     </div>
     <div class="mt-2">
-        <a href="{{ route('admin.vendor.support-tickets.index') }}" class="btn btn-outline-secondary">{{ __('admin.vendor.vendor_support_tickets.back_to_list') }}</a>
+        <a href="{{ route('admin.vendor.support-tickets.index', request()->query()) }}" class="btn btn-outline-secondary">{{ __('admin.vendor.vendor_support_tickets.back_to_list') }}</a>
     </div>
 </div>
 @endsection

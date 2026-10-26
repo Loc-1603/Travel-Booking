@@ -2,7 +2,7 @@
 @section('title', __('admin.vendor.tour_providers.detail_title', ['id' => $tourProvider->id]))
 @section('content')
 <div class="container-fluid">
-    <x-page-title title="{{ __('admin.vendor.tour_providers.detail_title', ['id' => $tourProvider->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_providers.title'), 'url' => route('admin.tour-providers.index')], ['label' => __('admin.vendor.common.view')]]" />
+    <x-page-title title="{{ __('admin.vendor.tour_providers.detail_title', ['id' => $tourProvider->id]) }}" :breadcrumbs="[['label' => 'Admin', 'url' => route('admin.dashboard')], ['label' => __('admin.vendor.tour_providers.title'), 'url' => route('admin.tour-providers.index', request()->query())], ['label' => __('admin.vendor.common.view')]]" />
     <x-alert />
     <div class="row">
         <div class="col-md-6">
@@ -20,7 +20,7 @@
                             <p class="mb-0"><strong>{{ __('admin.vendor.tour_providers.detail.vendor') }}:</strong> {{ $tourProvider->vendor->name ?? '-' }} ({{ $tourProvider->vendor->email ?? '-' }})</p>
                         </div>
                     </div>
-                    <a href="{{ route('admin.tour-providers.edit', $tourProvider) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.tour_providers.detail.edit_profile') }}</a>
+                    <a href="{{ route('admin.tour-providers.edit', array_merge([$tourProvider], request()->query())) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.tour_providers.detail.edit_profile') }}</a>
                     <p class="mb-1"><strong>{{ __('admin.vendor.tour_providers.detail.status') }}:</strong> <span class="badge bg-secondary">{{ $tourProvider->status }}</span></p>
                     <p class="mb-0"><strong>{{ __('admin.vendor.tour_providers.detail.bio') }}:</strong> {{ $tourProvider->bio ?: '-' }}</p>
                 </div>

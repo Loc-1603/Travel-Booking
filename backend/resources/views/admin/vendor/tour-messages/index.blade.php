@@ -34,7 +34,7 @@
                                 <span data-row-unread data-count="{{ $unread }}" class="badge bg-danger rounded-pill">{{ $unread }} {{ __('admin.vendor.tour_messages.table.unread') }}</span>
                             @endif
                         </td>
-                        <td><a href="{{ route('admin.vendor.tour-messages.show', $b->uuid) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.tour_messages.open') }}</a></td>
+                        <td><a href="{{ route('admin.vendor.tour-messages.show', array_merge([$b->uuid], request()->query())) }}" class="btn btn-sm btn-primary">{{ __('admin.vendor.tour_messages.open') }}</a></td>
                     </tr>
                     @empty
                     <tr><td colspan="5" class="text-muted">{{ __('admin.vendor.tour_messages.empty') }}</td></tr>

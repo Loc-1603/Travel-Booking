@@ -24,7 +24,7 @@ class PayoutController extends Controller
             'net' => (float) $vendorRow['net'],
         ] : ['booking_count' => 0, 'gross' => 0, 'commission' => 0, 'net' => 0];
 
-        $payouts = auth()->user()->payouts()->latest()->paginate(20);
+        $payouts = auth()->user()->payouts()->latest()->paginate(20)->withQueryString();
 
         return view('admin.vendor.payouts.index', compact('totals', 'payouts'));
     }

@@ -84,9 +84,9 @@ class TourDisputeController extends Controller
                 }
             }
 
-            return redirect()->route('admin.tour-disputes.show', $tourDispute)->with('success', __('admin.vendor.tour_disputes.flash.updated_refunded'));
+            return redirect()->route('admin.tour-disputes.show', array_merge([$tourDispute], request()->query()))->with('success', __('admin.vendor.tour_disputes.flash.updated_refunded'));
         }
 
-        return redirect()->route('admin.tour-disputes.show', $tourDispute)->with('success', __('admin.vendor.tour_disputes.flash.updated'));
+        return redirect()->route('admin.tour-disputes.show', array_merge([$tourDispute], request()->query()))->with('success', __('admin.vendor.tour_disputes.flash.updated'));
     }
 }

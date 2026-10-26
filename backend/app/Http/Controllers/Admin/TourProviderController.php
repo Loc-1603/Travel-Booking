@@ -74,7 +74,7 @@ class TourProviderController extends Controller
 
         $tourProvider->update($validated);
 
-        return redirect()->route('admin.tour-providers.show', $tourProvider)->with('success', __('admin.vendor.tour_providers.flash.updated'));
+        return redirect()->route('admin.tour-providers.show', array_merge([$tourProvider], request()->query()))->with('success', __('admin.vendor.tour_providers.flash.updated'));
     }
 
     public function approve(TourProvider $tourProvider): RedirectResponse

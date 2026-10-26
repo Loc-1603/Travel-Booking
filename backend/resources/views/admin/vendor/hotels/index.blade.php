@@ -36,17 +36,10 @@
                                 <span class="text-muted">{{ __('admin.vendor.hotels.no_images') }}</span>
                             @endif
                         </td>
-                        <td><span class="badge {{ $h->status === 'active' ? 'bg-success' : 'bg-secondary' }}">{{ $h->status }}</span></td>
+                        <td><span class="badge {{ $h->status === 'active' ? 'bg-success' : 'bg-secondary' }}">{{ $h->status === 'active' ? __('admin.vendor.hotels.form.status_active') : __('admin.vendor.hotels.form.status_inactive') }}</span></td>
                         <td>
-                            <a href="{{ route('admin.vendor.hotels.images.index', $h) }}" class="btn btn-sm btn-info me-1">{{ __('admin.vendor.hotels.images') }}</a>
-                            <a href="{{ route('admin.vendor.hotels.edit', $h) }}" class="btn btn-sm btn-warning me-1">{{ __('admin.vendor.hotels.edit') }}</a>
-                            @if($h->status === 'active')
-                            <form action="{{ route('admin.vendor.hotels.destroy', $h) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-secondary" onclick="return confirm('{{ __('admin.vendor.hotels.deactivate_confirm') }}')">{{ __('admin.vendor.hotels.deactivate') }}</button>
-                            </form>
-                            @endif
+                            <a href="{{ route('admin.vendor.hotels.images.index', array_merge([$h], request()->query())) }}" class="btn btn-sm btn-info me-1">{{ __('admin.vendor.hotels.images') }}</a>
+                            <a href="{{ route('admin.vendor.hotels.edit', array_merge([$h], request()->query())) }}" class="btn btn-sm btn-warning me-1">{{ __('admin.vendor.hotels.edit') }}</a>
                         </td>
                     </tr>
                     @empty
