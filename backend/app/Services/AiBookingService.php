@@ -75,8 +75,8 @@ class AiBookingService
             'ai_enabled' => $aiEnabled,
             'personalized' => $personalized,
             'tagline' => $tagline ?? ($personalized
-                ? 'Suggested from your wishlist and past stays.'
-                : 'Popular stays with strong guest ratings.'),
+                ? 'Gợi ý dựa trên danh sách yêu thích và các chuyến đi trước của bạn.'
+                : 'Những chỗ nghỉ được yêu thích với đánh giá cao từ khách hàng.'),
             'data' => $data,
         ];
     }
@@ -95,7 +95,7 @@ class AiBookingService
             return null;
         }
 
-        return Cache::remember('hotel_review_sentiment.v2.'.$hotelId, 86400, function () use ($hotel, $hotelId, $request) {
+        return Cache::remember('hotel_review_sentiment.v3.'.$hotelId, 86400, function () use ($hotel, $hotelId, $request) {
             $stats = Review::query()
                 ->visible()
                 ->whereHas('booking', fn ($q) => $q->where('hotel_id', $hotelId))
@@ -121,7 +121,7 @@ class AiBookingService
 
             if ($count === 0) {
                 return [
-                    'summary' => 'No verified reviews yet for this property.',
+                    'summary' => 'Chỗ nghỉ này chưa có đánh giá đã xác minh.',
                     'bullets' => [],
                     'tone' => 'neutral',
                     'avg_rating' => 0.0,
@@ -133,9 +133,9 @@ class AiBookingService
 
             if ($aiEnabled && $comments !== []) {
                 $text = implode("\n---\n", array_slice($comments, 0, 40));
-                $prompt = "Hotel: {$hotel->name}. Here are verified guest comments (may be multiple languages). Respond with JSON only:\n{\n  \"summary\": \"2-3 sentences on overall sentiment\",\n  \"bullets\": [\"up to 4 short bullet points: pros or themes\"],\n  \"tone\": \"positive\"|\"mixed\"|\"negative\"\n}\n\nComments:\n".$text;
+                $prompt = "Khách sạn: {$hotel->name}. Sau đây là các nhận xét đã xác minh của khách (có thể bằng nhiều ngôn ngữ). Chỉ trả về JSON và viết phần nội dung hiển thị bằng tiếng Việt:\n{\n  \"summary\": \"2-3 câu tóm tắt cảm nhận chung bằng tiếng Việt\",\n  \"bullets\": [\"tối đa 4 gạch đầu dòng ngắn bằng tiếng Việt về ưu điểm hoặc chủ đề nổi bật\"],\n  \"tone\": \"positive\"|\"mixed\"|\"negative\"\n}\n\nNhận xét:\n".$text;
                 $raw = $this->gemini->chatCompletion([
-                    ['role' => 'system', 'content' => 'You summarize hotel review sentiment for travelers. Be fair and concise. JSON only.'],
+                    ['role' => 'system', 'content' => 'Bạn tóm tắt cảm nhận về đánh giá khách sạn cho khách du lịch. Hãy công bằng, súc tích, luôn viết nội dung hiển thị bằng tiếng Việt và chỉ xuất JSON hợp lệ. Giữ nguyên các giá trị tone theo định dạng được yêu cầu.'],
                     ['role' => 'user', 'content' => $prompt],
                 ], 0.25, ['type' => 'json_object']);
                 if ($raw) {
@@ -271,13 +271,13 @@ class AiBookingService
             );
         }
         $profile = $user
-            ? 'Logged-in user. Prioritize hotels matching their saved wishlist or cities they stayed in before when relevant.'
-            : 'Guest user (not logged in). Favor highly rated, well-reviewed properties.';
+            ? 'Người dùng đã đăng nhập. Ưu tiên khách sạn phù hợp với danh sách yêu thích hoặc các thành phố họ từng lưu trú nếu có liên quan.'
+            : 'Khách chưa đăng nhập. Ưu tiên chỗ nghỉ được đánh giá cao và có nhiều đánh giá.';
 
-        $prompt = $profile."\n\nHotels:\n".implode("\n", $lines)."\n\nReturn JSON only:\n{\n  \"tagline\": \"one short engaging line for the homepage\",\n  \"items\": [\n    {\"hotel_id\": <number>, \"reason\": \"one sentence why it fits\"}\n  ]\n}\nMax 6 items, best matches first.";
+        $prompt = $profile."\n\nDanh sách khách sạn:\n".implode("\n", $lines)."\n\nChỉ trả về JSON hợp lệ. Viết tagline và reason bằng tiếng Việt, giữ nguyên tên riêng và địa danh:\n{\n  \"tagline\": \"một câu ngắn gọn, hấp dẫn cho trang chủ bằng tiếng Việt\",\n  \"items\": [\n    {\"hotel_id\": <number>, \"reason\": \"một câu tiếng Việt giải thích vì sao khách sạn phù hợp\"}\n  ]\n}\nTối đa 6 khách sạn, xếp theo mức độ phù hợp giảm dần.";
 
         $raw = $this->gemini->chatCompletion([
-            ['role' => 'system', 'content' => 'You help travelers pick hotels. Output valid JSON only.'],
+            ['role' => 'system', 'content' => 'Bạn giúp khách du lịch chọn khách sạn. Luôn viết nội dung hiển thị bằng tiếng Việt, giữ nguyên tên riêng, địa danh và chỉ xuất JSON hợp lệ.'],
             ['role' => 'user', 'content' => $prompt],
         ], 0.45, ['type' => 'json_object']);
 
@@ -295,17 +295,16 @@ class AiBookingService
         $city = trim(implode(', ', array_filter([(string) $hotel->city, (string) $hotel->country])));
 
         return $city !== ''
-            ? "Well-rated in {$city} — browse rooms and book with flexible options."
-            : 'Popular with guests — strong ratings and verified reviews.';
+            ? "Được đánh giá tốt tại {$city} — hãy xem các loại phòng và tùy chọn đặt phòng linh hoạt."
+            : 'Được khách yêu thích với điểm đánh giá cao và các nhận xét đã xác minh.';
     }
 
     private function fallbackSentimentSummary(float $avg, int $count): string
     {
         return sprintf(
-            'Guests rate this property %.1f/5 on average across %d verified review%s.',
+            'Khách đánh giá chỗ nghỉ này trung bình %.1f/5 dựa trên %d nhận xét đã xác minh.',
             $avg,
-            $count,
-            $count === 1 ? '' : 's'
+            $count
         );
     }
 
@@ -315,12 +314,12 @@ class AiBookingService
     private function fallbackBullets(float $avg): array
     {
         if ($avg >= 4.2) {
-            return ['Overall feedback is very positive.', 'Worth comparing room types before booking.'];
+            return ['Nhìn chung, khách đánh giá rất tích cực.', 'Bạn nên so sánh các loại phòng trước khi đặt.'];
         }
         if ($avg >= 3.5) {
-            return ['Reviews are generally favorable.', 'Read recent comments for details that matter to you.'];
+            return ['Các đánh giá nhìn chung khá tích cực.', 'Hãy đọc nhận xét gần đây để tìm hiểu những điều bạn quan tâm.'];
         }
 
-        return ['Ratings are mixed — read individual reviews carefully.', 'Contact the property if you have specific needs.'];
+        return ['Đánh giá còn khác nhau — hãy đọc kỹ từng nhận xét.', 'Liên hệ chỗ nghỉ nếu bạn có yêu cầu cụ thể.'];
     }
 }

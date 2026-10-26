@@ -17,7 +17,7 @@ return [
 
     'api_key' => $apiKey,
 
-    'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+    'model' => env('GEMINI_MODEL', 'gemini-3-flash-preview'),
 
     'base_url' => rtrim(env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'), '/'),
 

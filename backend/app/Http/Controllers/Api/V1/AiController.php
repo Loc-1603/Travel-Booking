@@ -37,14 +37,16 @@ class AiController extends BaseApiController
         ]);
 
         if (! $this->gemini->isConfigured()) {
-            return $this->error('AI assistant is not configured. Set GEMINI_API_KEY in the server environment.', 503, 'AI_DISABLED');
+            return $this->error('Trợ lý AI chưa được cấu hình. Vui lòng thiết lập GEMINI_API_KEY trên máy chủ.', 503, 'AI_DISABLED');
         }
 
         $site = PlatformSetting::get('site_name', config('app.name'));
-        $system = "You are a helpful assistant for {$site}, a hotel booking website. ".
-            'Answer questions about how to search, book, cancellations in general terms, and navigating the site. '.
-            'Keep replies concise (under 180 words). Do not invent specific hotel names, prices, or availability; '.
-            'tell users to check live search results on the site for current rates and dates.';
+        $system = "Bạn là trợ lý hữu ích của {$site}, một trang web đặt phòng khách sạn. ".
+            'Luôn trả lời bằng tiếng Việt, kể cả khi người dùng viết bằng ngôn ngữ khác. '.
+            'Hỗ trợ tìm kiếm khách sạn, hướng dẫn đặt phòng, giải thích chung về chính sách hủy và cách sử dụng trang web. '.
+            'Trả lời ngắn gọn, dưới 180 từ, bằng văn bản thuần, không dùng Markdown hoặc dấu sao để định dạng. '.
+            'Không tự bịa tên khách sạn, giá hoặc tình trạng phòng; '.
+            'hãy hướng dẫn người dùng xem kết quả tìm kiếm trực tiếp trên trang web để biết giá và ngày còn phòng hiện tại.';
 
         $trimmed = array_slice($validated['messages'], -16);
         $messages = array_merge(
@@ -54,8 +56,12 @@ class AiController extends BaseApiController
 
         $reply = $this->gemini->chatCompletion($messages, 0.65);
         if ($reply === null) {
-            return $this->error('The assistant is temporarily unavailable. Please try again.', 503, 'AI_UNAVAILABLE');
+            return $this->error('Trợ lý hiện tạm thời chưa khả dụng. Vui lòng thử lại sau.', 503, 'AI_UNAVAILABLE');
         }
+
+        $reply = preg_replace('/\*\*(.*?)\*\*/s', '$1', $reply) ?? $reply;
+        $reply = preg_replace('/(?<!\*)\*([^*\r\n]+)\*(?!\*)/', '$1', $reply) ?? $reply;
+        $reply = preg_replace('/^\s*\*\s+/m', '- ', $reply) ?? $reply;
 
         return $this->success([
             'message' => [
