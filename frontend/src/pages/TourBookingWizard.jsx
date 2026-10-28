@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,26 @@ export default function TourBookingWizard() {
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+
+  const storageKey = uuid ? `tourWizard:returnState:${uuid}` : null;
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const raw = sessionStorage.getItem(storageKey);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (typeof saved.pricingMode === 'string') setPricingMode(saved.pricingMode);
+        if (typeof saved.duration === 'number') setDuration(saved.duration);
+        if (typeof saved.couponCode === 'string') setCouponCode(saved.couponCode);
+        if (typeof saved.meetingPoint === 'string') setMeetingPoint(saved.meetingPoint);
+        if (typeof saved.notes === 'string') setNotes(saved.notes);
+        if (typeof saved.calendarOpen === 'boolean') setCalendarOpen(saved.calendarOpen);
+        sessionStorage.removeItem(storageKey);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [storageKey]);
 
   const initialSlotId = searchParams.get('slot_id');
   // Calendar is collapsed once a slot is chosen (deep-link or picked);
@@ -121,7 +141,22 @@ export default function TourBookingWizard() {
           <h2 className="text-xl font-semibold mb-2">{t('tours.wizard.loginRequired')}</h2>
           <p className="text-neutral-600 mb-6">{t('tours.wizard.loginRequiredHint')}</p>
           <Link
-            to={`/login?redirect=${encodeURIComponent(`/tours/book/${uuid}${initialSlotId ? `?slot_id=${initialSlotId}` : ''}`)}`}
+            to={`/login?redirect=${encodeURIComponent(`/tours/book/${uuid}${(activeSlot?.id || initialSlotId) ? `?slot_id=${activeSlot?.id || initialSlotId}` : ''}`)}`}
+            onClick={() => {
+              if (!storageKey) return;
+              try {
+                sessionStorage.setItem(storageKey, JSON.stringify({
+                  pricingMode,
+                  duration,
+                  couponCode,
+                  meetingPoint,
+                  notes,
+                  calendarOpen,
+                }));
+              } catch {
+                /* ignore */
+              }
+            }}
             className="inline-flex px-6 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent-600"
           >
             {t('auth.login.submit')}

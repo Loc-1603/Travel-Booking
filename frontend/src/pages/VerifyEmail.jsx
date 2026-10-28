@@ -11,6 +11,7 @@ export default function VerifyEmail() {
   const email = searchParams.get('email') || '';
   const verified = searchParams.get('verified') === '1';
   const errorCode = searchParams.get('error') || '';
+  const redirect = searchParams.get('redirect') || '/';
   const [resending, setResending] = useState(false);
   const [resendStatus, setResendStatus] = useState('');
   const [error, setError] = useState('');
@@ -47,7 +48,7 @@ export default function VerifyEmail() {
               <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[#1a1a1a] mb-2">{t('auth.verifyEmail.verifiedTitle')}</h1>
               <p className="text-[#5c5852] mb-6 leading-relaxed">{t('auth.verifyEmail.verifiedMessage')}</p>
               <Link
-                to="/login"
+                to={redirect && redirect !== '/' ? `/login?redirect=${encodeURIComponent(redirect)}` : '/login'}
                 className="inline-flex w-full h-12 items-center justify-center rounded-xl bg-[#1a1a1a] text-white font-semibold hover:bg-[#2d2a28] focus:ring-2 focus:ring-[#b8860b]/30 transition-colors"
               >
                 {t('auth.verifyEmail.goToLogin')}
@@ -88,7 +89,7 @@ export default function VerifyEmail() {
 
               <p className="mt-6 text-[#5c5852] text-sm">
                 {t('auth.verifyEmail.noEmail')} {' '}
-                <Link to="/register" className="text-[#b8860b] font-semibold hover:text-[#996f09]">
+                <Link to={redirect && redirect !== '/' ? `/register?redirect=${encodeURIComponent(redirect)}` : '/register'} className="text-[#b8860b] font-semibold hover:text-[#996f09]">
                   {t('auth.register.title')}
                 </Link>
               </p>

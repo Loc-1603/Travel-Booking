@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ChevronRight, MapPin } from 'lucide-react';
@@ -43,6 +43,7 @@ export default function Booking() {
   const isGuest = !user;
   const [loginGate, setLoginGate] = useState(false);
   const bookingRedirect = encodeURIComponent(location.pathname + location.search);
+  const storageKey = `booking:returnState:${location.pathname}${location.search}`;
   const hotelId = searchParams.get('hotel_id') || searchParams.get('hotelId');
   const roomId = searchParams.get('room_id');
   const checkIn = searchParams.get('check_in');
@@ -55,6 +56,25 @@ export default function Booking() {
   const [specialRequests, setSpecialRequests] = useState('');
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
   const [modalInitialTab, setModalInitialTab] = useState('overview');
+
+  // Restore any in-progress booking state saved before an auth redirect.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(storageKey);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (typeof saved.step === 'number') setStep(saved.step);
+        if (typeof saved.quantity === 'number') setQuantity(saved.quantity);
+        if (typeof saved.couponCode === 'string') setCouponCode(saved.couponCode);
+        if (typeof saved.lateCheckout === 'boolean') setLateCheckout(saved.lateCheckout);
+        if (typeof saved.specialRequests === 'string') setSpecialRequests(saved.specialRequests);
+        sessionStorage.removeItem(storageKey);
+      }
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const bedTypeLabel = (value) => {
     if (!value) return null;
@@ -217,12 +237,26 @@ export default function Booking() {
       <div className="flex gap-2">
         <Link
           to={`/login?redirect=${bookingRedirect}`}
+          onClick={() => {
+            try {
+              sessionStorage.setItem(storageKey, JSON.stringify({ step, quantity, couponCode, lateCheckout, specialRequests }));
+            } catch {
+              /* ignore */
+            }
+          }}
           className="flex-1 py-2.5 rounded-xl bg-[#b8860b] text-white font-semibold text-center hover:bg-[#996f09] transition-colors"
         >
           {t('common.login', 'Đăng nhập')}
         </Link>
         <Link
           to={`/register?redirect=${bookingRedirect}`}
+          onClick={() => {
+            try {
+              sessionStorage.setItem(storageKey, JSON.stringify({ step, quantity, couponCode, lateCheckout, specialRequests }));
+            } catch {
+              /* ignore */
+            }
+          }}
           className="flex-1 py-2.5 rounded-xl border border-[#b8860b] text-[#b8860b] font-semibold text-center hover:bg-[#fff7e6] transition-colors"
         >
           {t('common.register', 'Đăng ký')}

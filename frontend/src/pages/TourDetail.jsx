@@ -93,7 +93,10 @@ export default function TourDetail() {
 
   const handleBookNow = () => {
     if (!user) {
-      navigate(`/login?redirect=${encodeURIComponent(`/tours/${uuid}`)}`);
+      const redirectPath = slot
+        ? `/tours/book/${uuid}?slot_id=${slot.id}`
+        : `/tours/${uuid}`;
+      navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`);
       return;
     }
     if (!slot) return;

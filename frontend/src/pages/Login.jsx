@@ -33,6 +33,10 @@ export default function Login() {
     }
   };
 
+  const registerHref = redirect && redirect !== '/'
+    ? `/register?redirect=${encodeURIComponent(redirect)}`
+    : '/register';
+
   return (
     <div className="py-16 sm:py-20 lg:py-24">
       <div className="max-w-md mx-auto">
@@ -75,7 +79,7 @@ export default function Login() {
             {error && <ErrorMessage message={error} />}
             {requiresVerification && (
               <Link
-                to={`/verify-email?email=${encodeURIComponent(email)}`}
+                to={`/verify-email?email=${encodeURIComponent(email)}${redirect && redirect !== '/' ? `&redirect=${encodeURIComponent(redirect)}` : ''}`}
                 className="block text-center text-sm text-[#b8860b] font-semibold hover:text-[#996f09]"
               >
                 {t('auth.verifyEmail.resend')}
@@ -98,7 +102,7 @@ export default function Login() {
           </form>
           <p className="mt-6 text-[#5c5852] text-sm text-center">
             {t('auth.login.noAccount')} {' '}
-            <Link to="/register" className="text-[#b8860b] font-semibold hover:text-[#996f09]">
+            <Link to={registerHref} className="text-[#b8860b] font-semibold hover:text-[#996f09]">
               {t('auth.login.signUp')}
             </Link>
           </p>

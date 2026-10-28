@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { User, Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/useAuth';
 import ErrorMessage from '../components/ErrorMessage';
@@ -8,7 +8,9 @@ import { useTranslation } from 'react-i18next';
 export default function Register() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { register: registerUser } = useAuth();
+  const redirect = searchParams.get('redirect') || '/';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,7 +28,10 @@ export default function Register() {
     setLoading(true);
     try {
       await registerUser(name, email, password, passwordConfirmation);
-      navigate(`/verify-email?email=${encodeURIComponent(email)}`);
+      const target = redirect && redirect !== '/'
+        ? `/verify-email?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(redirect)}`
+        : `/verify-email?email=${encodeURIComponent(email)}`;
+      navigate(target);
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.errors ? JSON.stringify(err.response.data.errors) : err.message || t('auth.errors.registerFailed'));
     } finally {
@@ -123,7 +128,7 @@ export default function Register() {
           </form>
           <p className="mt-6 text-[#5c5852] text-sm text-center">
             {t('auth.register.hasAccount')} {' '}
-            <Link to="/login" className="text-[#b8860b] font-semibold hover:text-[#996f09]">
+            <Link to={redirect && redirect !== '/' ? `/login?redirect=${encodeURIComponent(redirect)}` : '/login'} className="text-[#b8860b] font-semibold hover:text-[#996f09]">
               {t('auth.register.logIn')}
             </Link>
           </p>
