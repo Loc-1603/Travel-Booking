@@ -5,7 +5,7 @@ Nền tảng đặt phòng khách sạn và đặt tour du lịch theo mô hình
 - **Backend:** Laravel 12, PHP 8.2+, MySQL 8, Sanctum, Reverb, VNPay.
 - **Frontend khách hàng:** React 19, Vite 7, Tailwind CSS 4, React Query.
 - **Tiền tệ:** VND cho toàn bộ booking, payment, coupon và payout.
-- **Ngôn ngữ:** giao diện khách hàng song ngữ Anh/Việt; admin/vendor/guide dùng tiếng Việt (admin có thêm tiếng Anh).
+- **Ngôn ngữ:** giao diện khách hàng song ngữ Anh/Việt; admin/vendor/guide dùng tiếng Việt.
 
 ## 1. Tổng quan
 
@@ -300,8 +300,7 @@ npm run build
 - Cấu hình VNPay production và URL IPN công khai.
 - Đặt `VITE_API_URL` trỏ tới API production khi build frontend.
 
-Hướng dẫn hạ tầng chi tiết: [backend/docs/INFRASTRUCTURE.md](backend/docs/INFRASTRUCTURE.md). Kế hoạch deploy VPS: [docs/plans/deploy-production-vps-2026-10-16.md](docs/plans/deploy-production-vps-2026-10-16.md).
-
+Hướng dẫn hạ tầng chi tiết: [backend/docs/INFRASTRUCTURE.md](backend/docs/INFRASTRUCTURE.md).
 ## 11. Tài liệu
 
 - [backend/README.md](backend/README.md) — cài đặt, route, vận hành backend.

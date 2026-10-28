@@ -1,73 +1,73 @@
-# Website Settings Feature
+# Tính năng Cài đặt Website
 
-This document explains how to use and extend the website settings feature in the Hotel Booking Platform.
+Tài liệu này giải thích cách sử dụng và mở rộng tính năng cài đặt website trong Nền tảng Đặt phòng Khách sạn.
 
-## Overview
+## Tổng quan
 
-The website settings feature allows super administrators to customize various aspects of the website including:
+Tính năng cài đặt website cho phép super administrator tùy chỉnh nhiều khía cạnh của website bao gồm:
 
-- **General Settings**: Site name, description, contact information
-- **Brand Assets**: Logo and favicon upload/management
-- **Social Media**: Links to social media profiles
-- **SEO Settings**: Meta tags, keywords, Google Analytics
-- **Maintenance Mode**: Enable/disable maintenance mode with custom message
+- **Cài đặt chung**: Tên site, mô tả, thông tin liên hệ
+- **Tài sản thương hiệu**: Upload/quản lý logo và favicon
+- **Mạng xã hội**: Link đến các hồ sơ mạng xã hội
+- **Cài đặt SEO**: Meta tags, keywords, Google Analytics
+- **Chế độ bảo trì**: Bật/tắt chế độ bảo trì với thông điệp tùy chỉnh
 
-## Access
+## Truy cập
 
-Website settings can only be accessed by users with **SUPER_ADMIN** role:
-1. Login to admin panel
-2. Navigate to "Website Settings" in the sidebar menu
+Cài đặt website chỉ có thể truy cập bởi người dùng có vai trò **SUPER_ADMIN**:
+1. Đăng nhập vào admin panel
+2. Điều hướng đến "Website Settings" trong menu sidebar
 3. URL: `/admin/website-settings`
 
-## Available Settings
+## Các cài đặt có sẵn
 
-### General Settings
-- **Site Name**: The main name of your website (required)
-- **Site Description**: Brief description of your website
-- **Contact Email**: Primary contact email address
-- **Contact Phone**: Contact phone number
-- **Address**: Physical address
+### Cài đặt chung
+- **Tên site**: Tên chính của website (bắt buộc)
+- **Mô tả site**: Mô tả ngắn về website
+- **Email liên hệ**: Địa chỉ email liên hệ chính
+- **Số điện thoại liên hệ**: Số điện thoại liên hệ
+- **Địa chỉ**: Địa chỉ vật lý
 
-### Brand Assets
-- **Site Logo**: Upload a logo image (JPEG, PNG, JPG, GIF, SVG - max 2MB)
-- **Favicon**: Upload a favicon (ICO, PNG, JPG, JPEG - max 1MB)
+### Tài sản thương hiệu
+- **Logo site**: Upload ảnh logo (JPEG, PNG, JPG, GIF, SVG - tối đa 2MB)
+- **Favicon**: Upload favicon (ICO, PNG, JPG, JPEG - tối đa 1MB)
 
-### Social Media Links
-- **Facebook URL**: Link to Facebook page
-- **Twitter URL**: Link to Twitter profile
-- **Instagram URL**: Link to Instagram profile
-- **LinkedIn URL**: Link to LinkedIn page
+### Link mạng xã hội
+- **URL Facebook**: Link đến trang Facebook
+- **URL Twitter**: Link đến hồ sơ Twitter
+- **URL Instagram**: Link đến hồ sơ Instagram
+- **URL LinkedIn**: Link đến trang LinkedIn
 
-### SEO Settings
-- **Meta Title**: Default title for SEO
-- **Meta Description**: Default description for SEO
-- **Meta Keywords**: Keywords for SEO (comma-separated)
-- **Google Analytics**: Google Analytics tracking code
+### Cài đặt SEO
+- **Meta Title**: Title mặc định cho SEO
+- **Meta Description**: Description mặc định cho SEO
+- **Meta Keywords**: Keywords cho SEO (phân tách bằng dấu phẩy)
+- **Google Analytics**: Mã theo dõi Google Analytics
 
-### Maintenance Mode
-- **Enable Maintenance Mode**: Toggle to enable/disable
-- **Maintenance Message**: Custom message shown during maintenance
+### Chế độ bảo trì
+- **Bật chế độ bảo trì**: Toggle bật/tắt
+- **Thông điệp bảo trì**: Thông điệp tùy chỉnh hiển thị trong thời gian bảo trì
 
-## Usage in Code
+## Sử dụng trong code
 
-### Using the Service Class
+### Sử dụng Service Class
 
 ```php
 use App\Services\WebsiteSettingsService;
 
-// Get individual settings
+// Lấy từng cài đặt
 $siteName = WebsiteSettingsService::getSiteName();
 $siteLogo = WebsiteSettingsService::getSiteLogo();
 $isMaintenance = WebsiteSettingsService::isMaintenanceMode();
 
-// Get any setting by key
+// Lấy bất kỳ cài đặt nào theo key
 $email = WebsiteSettingsService::get('site_email', 'default@example.com');
 
-// Get all settings as array
+// Lấy tất cả cài đặt dạng array
 $allSettings = WebsiteSettingsService::getAllSettings();
 ```
 
-### Using the Trait
+### Sử dụng Trait
 
 ```php
 use App\Traits\HasWebsiteSettings;
@@ -84,71 +84,71 @@ class YourClass
 }
 ```
 
-### Using Blade Components
+### Sử dụng Blade Components
 
 ```blade
-<!-- Include meta tags in your layout head -->
+<!-- Include meta tags trong layout head -->
 <x-website.meta />
 
-<!-- Get individual settings in views -->
+<!-- Lấy từng cài đặt trong views -->
 {{ WebsiteSettingsService::getSiteName() }}
 
-<!-- Display logo if exists -->
+<!-- Hiển thị logo nếu tồn tại -->
 @if(WebsiteSettingsService::getSiteLogo())
     <img src="{{ WebsiteSettingsService::getSiteLogo() }}" alt="Logo">
 @endif
 ```
 
-## File Storage
+## Lưu trữ file
 
-Uploaded files (logo, favicon) are stored in:
-- **Storage Path**: `storage/app/public/website/`
-- **Public URL**: `public/storage/website/`
+Các file upload (logo, favicon) được lưu tại:
+- **Đường dẫn storage**: `storage/app/public/website/`
+- **URL public**: `public/storage/website/`
 
-Make sure to run: `php artisan storage:link` to make files publicly accessible.
+Đảm bảo chạy: `php artisan storage:link` để file có thể truy cập công khai.
 
-## Maintenance Mode
+## Chế độ bảo trì
 
-When maintenance mode is enabled:
-- All non-admin routes will show the maintenance page
-- Admin panel remains accessible
-- API requests return JSON with maintenance status
-- AJAX requests receive proper JSON responses
+Khi chế độ bảo trì được bật:
+- Tất cả route không phải admin sẽ hiển thị trang bảo trì
+- Admin panel vẫn truy cập được
+- Các request API trả về JSON với trạng thái bảo trì
+- Các request AJAX nhận response JSON phù hợp
 
-### Customizing Maintenance Page
+### Tùy chỉnh trang bảo trì
 
-The maintenance view is located at: `resources/views/maintenance.blade.php`
+View bảo trì nằm tại: `resources/views/maintenance.blade.php`
 
-You can customize the styling and content as needed.
+Bạn có thể tùy chỉnh styling và nội dung theo nhu cầu.
 
 ## Database Schema
 
-Settings are stored in the `platform_settings` table:
-- `key` (string, primary): Setting identifier
-- `value` (text, nullable): Setting value
-- `timestamps`: Created/updated timestamps
+Cài đặt được lưu trong bảng `platform_settings`:
+- `key` (string, primary): Định danh cài đặt
+- `value` (text, nullable): Giá trị cài đặt
+- `timestamps`: Thời gian tạo/cập nhật
 
-## Adding New Settings
+## Thêm cài đặt mới
 
-### 1. Add to Controller
+### 1. Thêm vào Controller
 
-In `WebsiteSettingsController@index`, add your new setting:
+Trong `WebsiteSettingsController@index`, thêm cài đặt mới:
 
 ```php
 $new_setting => PlatformSetting::get('new_setting', 'default_value'),
 ```
 
-### 2. Add Validation
+### 2. Thêm validation
 
-In `WebsiteSettingsRequest`, add validation rules:
+Trong `WebsiteSettingsRequest`, thêm rule validation:
 
 ```php
 'new_setting' => 'required|string|max:255',
 ```
 
-### 3. Add to View
+### 3. Thêm vào View
 
-In `index.blade.php`, add the form field:
+Trong `index.blade.php`, thêm form field:
 
 ```blade
 <div class="mb-3">
@@ -157,9 +157,9 @@ In `index.blade.php`, add the form field:
 </div>
 ```
 
-### 4. Add Service Method (Optional)
+### 4. Thêm Service Method (Tùy chọn)
 
-In `WebsiteSettingsService`, add a helper method:
+Trong `WebsiteSettingsService`, thêm helper method:
 
 ```php
 public static function getNewSetting(): string
@@ -168,30 +168,30 @@ public static function getNewSetting(): string
 }
 ```
 
-## Security Considerations
+## Cân nhắc bảo mật
 
-- Only SUPER_ADMIN users can access website settings
-- File uploads are validated for type and size
-- Old files are automatically deleted when new ones are uploaded
-- All input is properly validated and sanitized
+- Chỉ người dùng SUPER_ADMIN mới truy cập được cài đặt website
+- File upload được validate về loại và kích thước
+- File cũ tự động bị xóa khi upload file mới
+- Tất cả input được validate và sanitize đúng cách
 
-## Performance
+## Hiệu năng
 
-Settings are cached by Laravel's query cache when accessed via the `PlatformSetting` model. For high-traffic applications, consider implementing additional caching layers in the service class.
+Cài đặt được cache bởi query cache của Laravel khi truy cập qua model `PlatformSetting`. Với ứng dụng traffic cao, cân nhắc implement thêm các lớp cache trong service class.
 
-## Troubleshooting
+## Xử lý sự cố
 
-### Files Not Displaying
-- Run `php artisan storage:link`
-- Check file permissions in `storage/app/public/website/`
-- Verify the `APP_URL` in your `.env` file
+### File không hiển thị
+- Chạy `php artisan storage:link`
+- Kiểm tra quyền file trong `storage/app/public/website/`
+- Xác minh `APP_URL` trong file `.env`
 
-### Maintenance Mode Not Working
-- Ensure the `CheckMaintenanceMode` middleware is registered
-- Check that the middleware is applied to your routes
-- Verify the setting is saved correctly in the database
+### Chế độ bảo trì không hoạt động
+- Đảm bảo middleware `CheckMaintenanceMode` được đăng ký
+- Kiểm tra middleware được áp dụng cho routes của bạn
+- Xác minh cài đặt được lưu đúng trong database
 
-### Settings Not Saving
-- Check that you have SUPER_ADMIN role
-- Verify form validation is passing
-- Check database connection and permissions
+### Cài đặt không lưu
+- Kiểm tra bạn có vai trò SUPER_ADMIN
+- Xác minh validation form pass
+- Kiểm tra kết nối database và quyền
