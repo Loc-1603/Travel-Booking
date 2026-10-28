@@ -300,7 +300,8 @@ npm run build
 - Cấu hình VNPay production và URL IPN công khai.
 - Đặt `VITE_API_URL` trỏ tới API production khi build frontend.
 
-Hướng dẫn hạ tầng chi tiết: [backend/docs/INFRASTRUCTURE.md](backend/docs/INFRASTRUCTURE.md).
+Hướng dẫn hạ tầng chi tiết: [backend/docs/INFRASTRUCTURE.md](backend/docs/INFRASTRUCTURE.md). Kế hoạch deploy VPS: [docs/plans/deploy-production-vps-2026-10-16.md](docs/plans/deploy-production-vps-2026-10-16.md).
+
 ## 11. Tài liệu
 
 - [backend/README.md](backend/README.md) — cài đặt, route, vận hành backend.
