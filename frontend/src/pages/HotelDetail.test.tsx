@@ -1,3 +1,7 @@
+import '@testing-library/jest-dom/vitest';
+
+
+
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, within, cleanup } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
@@ -468,7 +472,7 @@ describe('HotelDetail — room filter bar + availability query (redesign FE-3/FE
     const params = (hotelCall as unknown[])[1] as { params: Record<string, unknown> };
     expect(params.params.check_in).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(params.params.check_out).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    expect(params.params.adults).toBe(2);
+    expect(params.params.adults).toBe(1);
     expect(params.params.rooms).toBe(1);
   });
 
@@ -485,11 +489,12 @@ describe('HotelDetail — room filter bar + availability query (redesign FE-3/FE
     expect(await screen.findByLabelText('Nhận phòng')).toBeInTheDocument();
     expect(screen.getAllByRole('article')).toHaveLength(4);
 
-    fireEvent.click(screen.getByText('2 người lớn · 1 phòng'));
+    fireEvent.click(screen.getByText('1 người lớn · 1 phòng'));
     const increase = screen.getByRole('button', { name: 'Tăng người lớn' });
     fireEvent.click(increase);
     fireEvent.click(increase);
-    fireEvent.click(increase); // 2 → 5 adults
+    fireEvent.click(increase);
+    fireEvent.click(increase); // 1 → 5 adults
     expect(screen.getByText('5 người lớn · 1 phòng')).toBeInTheDocument();
 
     // FX-3: editing the draft does NOT refetch — the list is unchanged until search

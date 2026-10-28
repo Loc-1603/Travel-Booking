@@ -57,7 +57,7 @@ export function HotelRoomFilterBar({
 
   const checkIn = roomSearch?.checkIn ?? '';
   const checkOut = roomSearch?.checkOut ?? '';
-  const adults = roomSearch?.adults ?? 2;
+  const adults = roomSearch?.adults ?? 1;
   const rooms = roomSearch?.rooms ?? 1;
 
   useEffect(() => {

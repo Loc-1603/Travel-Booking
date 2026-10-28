@@ -53,7 +53,7 @@ function resolveInitialRoomSearch(searchParams) {
   if (checkOut <= checkIn) {
     checkOut = toISODateLocal(addDaysLocal(parseISODateLocal(checkIn), 1));
   }
-  return { checkIn, checkOut, adults: 2, rooms: 1 };
+  return { checkIn, checkOut, adults: 1, rooms: 1 };
 }
 
 function WishlistHeart({ hotelId, checkIn, checkOut }) {
