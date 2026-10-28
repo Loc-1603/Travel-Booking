@@ -41,7 +41,12 @@ class EloquentTourAvailabilitySlotRepository implements TourAvailabilitySlotRepo
             $query->whereDate('tour_availability_slots.date', '=', $travelDate);
         }
 
-        return $query->orderBy('tour_availability_slots.start_time')->first();
+        // Chọn slot rẻ nhất trong ngày (giá override nếu có) để khớp
+        // price_from đang hiển thị trên card và preview thanh toán.
+        return $query
+            ->orderByRaw('(COALESCE(tour_availability_slots.price_override, tour_products.base_price_daily) + COALESCE(tour_products.base_fixed, 0) + COALESCE(tour_products.transport_fee, 0)) asc')
+            ->orderBy('tour_availability_slots.id')
+            ->first();
     }
 
     public function listForTourRange(int $tourId, string $from, string $to): Collection

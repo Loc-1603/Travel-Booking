@@ -32,7 +32,8 @@ class TourProviderController extends BaseApiController
 
         $query = $this->tours->withProviderRatingStats(
             $this->tours->providerBaseQuery(),
-            $provinceId
+            $provinceId,
+            $request->input('travel_date')
         );
 
         if ($provinceId !== null) {
@@ -98,7 +99,10 @@ class TourProviderController extends BaseApiController
      */
     public function show(Request $request, string $uuid): JsonResponse
     {
-        $request->validate(['province_slug' => 'nullable|string|max:150']);
+        $request->validate([
+            'province_slug' => 'nullable|string|max:150',
+            'travel_date' => 'nullable|date',
+        ]);
 
         $provinceId = null;
         if ($request->filled('province_slug')) {
@@ -109,7 +113,7 @@ class TourProviderController extends BaseApiController
             $provinceId = $province->id;
         }
 
-        $provider = $this->tours->providerDetail($uuid, $provinceId);
+        $provider = $this->tours->providerDetail($uuid, $provinceId, $request->input('travel_date'));
         if (! $provider) {
             return $this->error('Guide not found.', 404, 'NOT_FOUND');
         }

@@ -104,8 +104,8 @@ test('guide list ranks by score and exposes rating fields', function (): void {
         ->and((int) $data[0]['review_count'])->toBe(2)
         ->and((float) $data[0]['score'])->toBe(9.0)
         ->and((int) $data[0]['tours_count'])->toBe(1)
-        // Giá 1 ngày do guide đặt: price_from = MIN(base_price_daily).
-        ->and((float) $data[0]['price_from'])->toBe(1200000.0)
+        // Card = subtotal + transport = base_fixed + base_price_daily + transport_fee.
+        ->and((float) $data[0]['price_from'])->toBe(1500000.0)
         ->and($data[0]['primary_tour']['uuid'])->toBe($this->tourA->uuid)
         ->and($data[1]['business_name'])->toBe('Local Expert B');
 });

@@ -66,7 +66,7 @@ class TourQueryService
      * score = AVG(rating 1..5) * COUNT(visible reviews)
      * via tour_bookings.provider_id — no schema change needed.
      */
-    public function withProviderRatingStats($query, ?int $provinceId = null)
+    public function withProviderRatingStats($query, ?int $provinceId = null, ?string $travelDate = null)
     {
         $provinceFilter = $provinceId !== null
             ? ' AND tb.province_id = '.(int) $provinceId
@@ -84,13 +84,36 @@ class TourQueryService
             ? "provider_id = tour_providers.id AND status = 'published' AND province_id = ".(int) $provinceId
             : "provider_id = tour_providers.id AND status = 'published'";
 
-        return $query->select('tour_providers.*')
+        $query = $query->select('tour_providers.*')
             ->selectRaw("{$avgSql} as average_rating")
             ->selectRaw("{$countSql} as review_count")
             ->selectRaw("({$avgSql}) * ({$countSql}) as score")
-            ->selectRaw("(SELECT COUNT(*) FROM tour_products WHERE {$toursWhere}) as tours_count")
-            // Giá 1 ngày do guide tự thiết lập: dùng giá ngày để sort/hiển thị.
-            ->selectRaw("(SELECT MIN(base_price_daily) FROM tour_products WHERE {$toursWhere}) as price_from");
+            ->selectRaw("(SELECT COUNT(*) FROM tour_products WHERE {$toursWhere}) as tours_count");
+
+        // Giá hiển thị người dùng = subtotal + phí di chuyển (chưa thuế).
+        // subtotal của luồng guide 1 ngày = base_fixed + giá ngày, nên price_from
+        // phải cộng đủ cả 3 thành phần để khớp mục thanh toán.
+        $priceExpr = 'COALESCE(base_fixed, 0) + base_price_daily + COALESCE(transport_fee, 0)';
+
+        if ($travelDate !== null && $travelDate !== '') {
+            // Có ngày đi: chỉ lấy slot còn trống đúng ngày để giá card khớp preview.
+            $day = Carbon::parse($travelDate)->toDateString();
+            $nextDay = Carbon::parse($day)->addDay()->toDateString();
+            $provinceSql = $provinceId !== null ? ' AND t.province_id = '.(int) $provinceId : '';
+
+            return $query->selectRaw(
+                '(SELECT MIN(COALESCE(s.price_override, t.base_price_daily) + COALESCE(t.base_fixed, 0) + COALESCE(t.transport_fee, 0))'
+                .' FROM tour_availability_slots s'
+                .' INNER JOIN tour_products t ON t.id = s.tour_id'
+                .' WHERE t.provider_id = tour_providers.id'
+                ." AND t.status = 'published'"
+                ." AND s.status = 'available'"
+                ." AND s.date >= ? AND s.date < ?{$provinceSql}) as price_from",
+                [$day, $nextDay]
+            );
+        }
+
+        return $query->selectRaw("(SELECT MIN({$priceExpr}) FROM tour_products WHERE {$toursWhere}) as price_from");
     }
 
     /**
@@ -240,7 +263,7 @@ class TourQueryService
                     ->whereDate('tour_bookings.start_at', '=', $day)
                     ->whereIn('tour_bookings.status', ['confirmed', 'ongoing', 'pending_payment']);
             })
-            ->orderBy('tour_availability_slots.start_time')
+            ->orderBy('tour_availability_slots.id')
             ->select('tour_availability_slots.*')
             ->get();
     }
@@ -259,9 +282,9 @@ class TourQueryService
     /**
      * Single approved vendor with rating stats + tours/slots for GuideDetail.
      */
-    public function providerDetail(string $uuid, ?int $provinceId = null): ?TourProvider
+    public function providerDetail(string $uuid, ?int $provinceId = null, ?string $travelDate = null): ?TourProvider
     {
-        $query = $this->withProviderRatingStats($this->providerBaseQuery(), $provinceId)
+        $query = $this->withProviderRatingStats($this->providerBaseQuery(), $provinceId, $travelDate)
             ->with(['vendor', 'tours' => function ($q) use ($provinceId): void {
                 $q->where('status', 'published')
                     ->when($provinceId !== null, fn ($qq) => $qq->where('province_id', $provinceId))
@@ -279,7 +302,7 @@ class TourQueryService
                 $q->where('date', '>=', Carbon::today()->toDateString())
                     ->where('status', 'available')
                     ->orderBy('date')
-                    ->orderBy('start_time')
+                    ->orderBy('id')
                     ->limit(60);
             }]);
 

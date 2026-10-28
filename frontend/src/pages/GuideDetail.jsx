@@ -81,6 +81,11 @@ export default function GuideDetail() {
   }, [travelDate]);
   const todayISO = useMemo(() => new Date().toISOString().split('T')[0], []);
 
+  // Khi điều hướng tới trang chi tiết guide, luôn cuộn về đầu trang.
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [uuid]);
+
   const handleDateUpdate = () => {
     if (!draftDate || draftDate === travelDate) return;
     setSearchParams((prev) => {
@@ -97,9 +102,12 @@ export default function GuideDetail() {
   const [submitError, setSubmitError] = useState(null);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['tour-provider', uuid, provinceSlug],
+    queryKey: ['tour-provider', uuid, provinceSlug, travelDate],
     queryFn: async () => {
-      const params = provinceSlug ? { province_slug: provinceSlug } : {};
+      const params = {
+        ...(provinceSlug && { province_slug: provinceSlug }),
+        ...(travelDate && { travel_date: travelDate }),
+      };
       const res = await api.get(`/tour-providers/${uuid}`, { params });
       if (!res.data?.success) throw new Error(res.data?.message || 'Failed to load guide');
       return res.data;

@@ -37,7 +37,7 @@ class TourProviderResource extends JsonResource
         $primaryTour = null;
         if ($this->relationLoaded('tours') && $this->tours->isNotEmpty()) {
             $primary = $this->tours
-                ->sortBy(fn ($t) => (float) $t->base_price_daily)
+                ->sortBy(fn ($t) => (float) $t->base_fixed + (float) $t->base_price_daily + (float) ($t->transport_fee ?? 0))
                 ->first();
             $primaryTour = [
                 'id' => $primary->id,

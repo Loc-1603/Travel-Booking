@@ -459,6 +459,14 @@ test('guide 1-day flow: availability, preview and booking by provider', function
         ->and((float) $preview->json('data.total'))->toBe(1836000.0)
         ->and($preview->json('data.pricing_mode'))->toBe('day');
 
+    // Card trước khi vào chi tiết phải bằng "tạm tính + phí di chuyển".
+    $list = $this->getJson("/api/v1/tour-providers?province_slug=ha-giang-test&travel_date={$date}")->assertOk();
+    $priceFrom = (float) $list->json('data.data.0.price_from');
+    expect($priceFrom)->toBe(1700000.0)
+        ->and($priceFrom)->toBe(
+            (float) $preview->json('data.subtotal') + (float) $preview->json('data.add_on_amount')
+        );
+
     // Đặt theo guide (không cần slot_id).
     $store = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings/guide', [
         'provider_uuid' => $providerUuid, 'travel_date' => $date,
@@ -480,6 +488,32 @@ test('guide 1-day flow: availability, preview and booking by provider', function
     $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings/guide-preview', [
         'provider_uuid' => $otherProvider->uuid, 'slot_id' => $this->slot->id, 'travel_date' => $date,
     ])->assertStatus(422);
+});
+
+test('guide preview picks the cheapest available tour for the day', function (): void {
+    $date = Carbon::tomorrow()->toDateString();
+    $cheaper = TourProduct::create([
+        'provider_id' => $this->tour->provider_id,
+        'province_id' => $this->tour->province_id,
+        'title' => 'Cheaper day tour',
+        'base_fixed' => 50000,
+        'base_price_hourly' => 50000,
+        'base_price_daily' => 450000,
+        'transport_fee' => 100000,
+        'status' => 'published',
+    ]);
+    TourAvailabilitySlot::create([
+        'tour_id' => $cheaper->id, 'date' => $date,
+        'start_time' => '13:00:00', 'end_time' => '17:00:00', 'status' => 'available',
+    ]);
+
+    $preview = $this->actingAs($this->customer)->postJson('/api/v1/tour-bookings/guide-preview', [
+        'provider_uuid' => $this->tour->provider->uuid, 'travel_date' => $date,
+    ])->assertOk();
+
+    // Tour rẻ hơn được chọn: subtotal = 50.000 + 450.000; transport = 100.000.
+    expect((float) $preview->json('data.subtotal'))->toBe(500000.0)
+        ->and((float) $preview->json('data.add_on_amount'))->toBe(100000.0);
 });
 
 test('slot must belong to the booked tour', function (): void {
