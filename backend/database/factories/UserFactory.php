@@ -12,7 +12,7 @@ use App\Enums\Role;
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
+     * Thing used bye current password be the factory.
      */
     protected static ?string $password;
 

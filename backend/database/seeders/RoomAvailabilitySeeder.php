@@ -17,7 +17,7 @@ class RoomAvailabilitySeeder extends Seeder
         }
 
         $startDate = Carbon::today();
-        $endDate = Carbon::today()->addDays(180);
+        $endDate = Carbon::today()->addDays(60);
 
         foreach ($rooms as $room) {
             for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {

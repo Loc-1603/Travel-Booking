@@ -162,61 +162,61 @@ class TourHaGiangDemoSeeder extends Seeder
                 .'<hr>'
                 .'<p><em>👉 Nhắn tin cho mình trước 1 ngày để kịp chuẩn bị xe và lịch trình nhé!</em></p>',
             'languages' => ['vi', 'en'], 'ratings' => [5, 5, 5],
-            'fixed' => 400000, 'hourly' => 180000, 'daily' => 1400000, 'transport' => 250000,
+            'fixed' => 0, 'hourly' => 180000, 'daily' => 400000, 'transport' => 200000,
         ],
         [
             'name' => 'Lò Thị Mai', 'email' => 'guide-hg-02@test.local',
             'bio' => 'Guide nữ người Tày, chuyên tour nhẹ nhàng, chụp ảnh đẹp. Nhận chở tới: Phố cổ Đồng Văn, Dinh Vua Mèo, Cao nguyên đá.',
             'languages' => ['vi', 'en'], 'ratings' => [5, 5, 4],
-            'fixed' => 350000, 'hourly' => 150000, 'daily' => 1200000, 'transport' => 200000,
+            'fixed' => 0, 'hourly' => 150000, 'daily' => 350000, 'transport' => 150000,
         ],
         [
             'name' => 'Sùng Mí Dỉ', 'email' => 'guide-hg-03@test.local',
             'bio' => 'Xế cứng cung đường đèo, am hiểu văn hóa chợ phiên. Nhận chở tới: Chợ Mèo Vạc, Đèo Mã Pí Lèng, Làng H’Mông Pả Vi.',
             'languages' => ['vi'], 'ratings' => [5, 4],
-            'fixed' => 300000, 'hourly' => 150000, 'daily' => 1100000, 'transport' => 200000,
+            'fixed' => 0, 'hourly' => 150000, 'daily' => 300000, 'transport' => 150000,
         ],
         [
             'name' => 'Nguyễn Văn Thắng', 'email' => 'guide-hg-04@test.local',
             'bio' => 'Cựu phượt thủ, nay làm guide full-time, xe mới, đồ bảo hộ đầy đủ. Nhận chở tới: toàn tuyến loop 3N2Đ + Sông Nho Quế.',
             'languages' => ['vi', 'en', 'fr'], 'ratings' => [5, 5, 4, 4],
-            'fixed' => 500000, 'hourly' => 200000, 'daily' => 1500000, 'transport' => 300000,
+            'fixed' => 0, 'hourly' => 200000, 'daily' => 400000, 'transport' => 200000,
         ],
         [
             'name' => 'Trần Thu Hà', 'email' => 'guide-hg-05@test.local',
             'bio' => 'Guide nữ, tour chậm rãi ngắm cảnh, cà phê phố cổ. Nhận chở tới: Phố cổ Đồng Văn, Cột cờ Lũng Cú, Nhà của Pao.',
             'languages' => ['vi', 'en'], 'ratings' => [4, 4],
-            'fixed' => 250000, 'hourly' => 120000, 'daily' => 900000, 'transport' => 150000,
+            'fixed' => 0, 'hourly' => 120000, 'daily' => 300000, 'transport' => 100000,
         ],
         [
             'name' => 'Hoàng Văn Sơn', 'email' => 'guide-hg-06@test.local',
             'bio' => 'Người Dao đỏ, chuyên trekking + tắm lá thuốc. Nhận chở tới: Ruộng bậc thang Hoàng Su Phì, Chợ Quản Bạ, Núi đôi Cô Tiên.',
             'languages' => ['vi'], 'ratings' => [5, 4, 5],
-            'fixed' => 300000, 'hourly' => 140000, 'daily' => 1000000, 'transport' => 180000,
+            'fixed' => 0, 'hourly' => 140000, 'daily' => 350000, 'transport' => 150000,
         ],
         [
             'name' => 'Vừ Thị Súa', 'email' => 'guide-hg-07@test.local',
             'bio' => 'Guide trẻ nói tiếng Anh tốt, chuyên khách quốc tế đi 1 mình. Nhận chở tới: Sông Nho Quế, Đèo Mã Pí Lèng, Mèo Vạc.',
             'languages' => ['vi', 'en'], 'ratings' => [5, 5],
-            'fixed' => 350000, 'hourly' => 160000, 'daily' => 1250000, 'transport' => 220000,
+            'fixed' => 0, 'hourly' => 160000, 'daily' => 400000, 'transport' => 200000,
         ],
         [
             'name' => 'Đặng Quốc Bảo', 'email' => 'guide-hg-08@test.local',
             'bio' => 'Lái xe ô tô 4 chỗ cho khách không đi được xe máy. Nhận chở tới: toàn tỉnh theo yêu cầu, đón tại TP. Hà Giang.',
             'languages' => ['vi'], 'ratings' => [4, 5, 3],
-            'fixed' => 450000, 'hourly' => 180000, 'daily' => 1300000, 'transport' => 300000,
+            'fixed' => 0, 'hourly' => 180000, 'daily' => 400000, 'transport' => 200000,
         ],
         [
             'name' => 'Lý A Chính', 'email' => 'guide-hg-09@test.local',
             'bio' => 'Thợ ảnh tự do + guide, bao ảnh đẹp mang về. Nhận chở tới: Dốc Thẩm Mã, Nhà của Pao, Sủng Là, Lũng Cú.',
             'languages' => ['vi', 'en'], 'ratings' => [5, 4, 4, 5],
-            'fixed' => 400000, 'hourly' => 170000, 'daily' => 1350000, 'transport' => 250000,
+            'fixed' => 0, 'hourly' => 170000, 'daily' => 400000, 'transport' => 200000,
         ],
         [
             'name' => 'Phạm Minh Đức', 'email' => 'guide-hg-10@test.local',
             'bio' => 'Guide mới, giá mềm, nhiệt tình. Nhận chở tới: TP. Hà Giang – Quản Bạ – Yên Minh trong ngày.',
             'languages' => ['vi'], 'ratings' => [3, 4],
-            'fixed' => 200000, 'hourly' => 100000, 'daily' => 800000, 'transport' => 150000,
+            'fixed' => 0, 'hourly' => 100000, 'daily' => 300000, 'transport' => 100000,
         ],
     ];
 
@@ -289,17 +289,23 @@ class TourHaGiangDemoSeeder extends Seeder
                 ]
             );
 
+            // Giá demo luôn đồng bộ theo seeder (re-run db:seed cập nhật giá).
+            $tour->forceFill([
+                'base_fixed' => $g['fixed'],
+                'base_price_hourly' => $g['hourly'],
+                'base_price_daily' => $g['daily'],
+                'transport_fee' => $g['transport'],
+            ])->save();
+
             TourImage::firstOrCreate(
                 ['tour_id' => $tour->id, 'url' => $province->image ?? 'locations/tours/default.jpg'],
                 ['tour_id' => $tour->id, 'url' => $province->image ?? 'locations/tours/default.jpg', 'is_banner' => true, 'sort_order' => 0]
             );
 
-            // 14 ngày slot trống (sáng + chiều) để test lọc multi-day.
-            for ($d = 1; $d <= 14; $d++) {
+            // 30 ngày slot trống theo ngày (08:00-18:00).
+            for ($d = 1; $d <= 30; $d++) {
                 $date = Carbon::tomorrow()->addDays($d - 1)->toDateString();
-                foreach ([['08:00:00', '12:00:00'], ['13:30:00', '17:30:00']] as [$start, $end]) {
-                    $this->firstOrCreateSlot($tour, $date, $start, $end, 'available');
-                }
+                $this->firstOrCreateSlot($tour, $date, '08:00:00', '18:00:00', 'available');
             }
 
             $this->seedReviews($provider, $tour, $province->id, $customers, $g['ratings'], $i);

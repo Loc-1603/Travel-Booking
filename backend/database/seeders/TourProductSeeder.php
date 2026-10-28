@@ -40,17 +40,17 @@ class TourProductSeeder extends Seeder
             [
                 'province' => 'Hà Giang',
                 'title' => 'Hà Giang 1vs1: Mã Pí Lèng – Nho Quế trong ngày',
-                'base_fixed' => 300000,
+                'base_fixed' => 0,
                 'hourly' => 150000,
-                'daily' => 1200000,
-                'transport' => 200000,
+                'daily' => 450000,
+                'transport' => 150000,
             ],
             [
                 'province' => 'Sa Pa',
                 'title' => 'Sa Pa trekking 1vs1: Cát Cát – Mường Hoa nửa ngày',
-                'base_fixed' => 200000,
+                'base_fixed' => 0,
                 'hourly' => 120000,
-                'daily' => 900000,
+                'daily' => 300000,
                 'transport' => 150000,
             ],
         ];
@@ -80,17 +80,25 @@ class TourProductSeeder extends Seeder
                 ]
             );
 
+            // Giá demo luôn đồng bộ theo seeder (re-run db:seed cập nhật giá).
+            $tour->forceFill([
+                'base_fixed' => $demo['base_fixed'],
+                'base_price_hourly' => $demo['hourly'],
+                'base_price_daily' => $demo['daily'],
+                'transport_fee' => $demo['transport'],
+            ])->save();
+
             TourImage::firstOrCreate(
                 ['tour_id' => $tour->id, 'url' => $province->image ?? 'locations/tours/default.jpg'],
                 ['tour_id' => $tour->id, 'url' => $province->image ?? 'locations/tours/default.jpg', 'is_banner' => true, 'sort_order' => 0]
             );
 
-            // 7 ngày slot mẫu 8:00-12:00 để test availability
-            for ($i = 1; $i <= 7; $i++) {
+            // 30 ngày slot mẫu theo ngày (08:00-18:00) để test availability
+            for ($i = 1; $i <= 30; $i++) {
                 $date = Carbon::tomorrow()->addDays($i - 1)->toDateString();
                 TourAvailabilitySlot::firstOrCreate(
                     ['tour_id' => $tour->id, 'date' => $date, 'start_time' => '08:00:00'],
-                    ['tour_id' => $tour->id, 'date' => $date, 'start_time' => '08:00:00', 'end_time' => '12:00:00', 'status' => 'available']
+                    ['tour_id' => $tour->id, 'date' => $date, 'start_time' => '08:00:00', 'end_time' => '18:00:00', 'status' => 'available']
                 );
             }
         }
